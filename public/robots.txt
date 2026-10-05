@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /internal/
+Disallow: /contribute
+
+Sitemap: https://vthaidex.vercel.app/sitemap.xml

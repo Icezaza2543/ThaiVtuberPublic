@@ -58,3 +58,13 @@ test('snapshot rejects forbidden fields nested inside aggregate rows',()=>{
   const badLifecycle=structuredClone(validSnapshot);badLifecycle.summary.lifecycle[0].evidence='secret';
   assert.throws(()=>validateSnapshot(badLifecycle),/lifecycle.*forbidden|allowlist/i);
 });
+
+test('snapshot accepts aggregate agency and platform-span summaries but rejects extra keys in them',()=>{
+  const ok=structuredClone(validSnapshot);
+  Object.assign(ok.summary,{agencies:[{name:'Agency A',count:1}],agency_total:1,independent_count:0,platform_span:[{platforms:1,count:1}]});
+  const v=validateSnapshot(ok);assert.deepEqual(v.summary.agencies,[{name:'Agency A',count:1}]);assert.equal(v.summary.independent_count,0);
+  const bad=structuredClone(ok);bad.summary.agencies[0].persona_id='secret';
+  assert.throws(()=>validateSnapshot(bad),/forbidden|allowlist/i);
+  const tooMany=structuredClone(ok);tooMany.summary.independent_count=5;
+  assert.throws(()=>validateSnapshot(tooMany),/exceeds/);
+});

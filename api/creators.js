@@ -17,7 +17,7 @@ export async function handleCreators(request,{storage=defaultStorage,cursorSecre
   let snapshot;
   try{snapshot=await storage.readCurrentSnapshot();}catch{return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());}
   if(!snapshot) return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());
-  const expected={snapshot:snapshot.snapshot_id,q:query.q,platform:query.platform,status:query.status};
+  const expected={snapshot:snapshot.snapshot_id,q:query.q,platform:query.platform,status:query.status,scope:query.scope};
   let pos=0;
   if(query.cursor){
     try{pos=decodeCursor(query.cursor,expected,{secret:cursorSecret,now}).pos;}catch{return jsonResponse(400,{error:'invalid_cursor'},noIndexHeaders());}
@@ -27,6 +27,7 @@ export async function handleCreators(request,{storage=defaultStorage,cursorSecre
     .filter(c=>!needle||sortKey(c.name).includes(needle)||sortKey(c.agency).includes(needle))
     .filter(c=>!query.platform||(c.platforms||[]).some(p=>p.name===query.platform))
     .filter(c=>!query.status||c.status===query.status)
+    .filter(c=>!query.scope||(query.scope==='independent'?!c.agency:Boolean(c.agency)))
     .sort((a,b)=>sortKey(a.name).localeCompare(sortKey(b.name),'th'));
   if(!Number.isInteger(pos)||pos<0||pos>filtered.length) return jsonResponse(400,{error:'invalid_cursor'},noIndexHeaders());
   const items=filtered.slice(pos,pos+query.limit);

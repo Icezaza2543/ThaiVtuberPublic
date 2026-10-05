@@ -1,21 +1,15 @@
-<!doctype html><html lang="th"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#fbf8ff">
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f2f4f9">
 <title>รายชื่อ VTuber ไทย — VThaiDex</title><meta name="description" content="ค้นหารายชื่อ VTuber ไทยตามชื่อ แพลตฟอร์ม สังกัด และสถานะจากสารบบสาธารณะ VThaiDex">
 <link rel="canonical" href="https://vthaidex.vercel.app/directory">
 <meta property="og:title" content="รายชื่อ VTuber ไทย — VThaiDex"><meta property="og:description" content="ค้นหารายชื่อ VTuber ไทยตามชื่อ แพลตฟอร์ม สังกัด และสถานะจากสารบบสาธารณะ VThaiDex"><meta property="og:type" content="website"><meta property="og:url" content="https://vthaidex.vercel.app/directory">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Noto+Sans+Thai:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"></head><body><a class="skip" href="#main">ข้ามไปยังเนื้อหา</a>
-<header class="site-header"><div class="nav-wrap">
-<a class="brand" href="/" aria-label="VThaiDex หน้าแรก"><img src="/assets/logo.svg" alt="" width="36" height="36"><span><strong>VThaiDex</strong><small>สารบบ VTuber ไทย</small></span></a>
-<button class="menu-button icon-button" id="menuButton" aria-expanded="false" aria-controls="navLinks"><span class="material-symbols-outlined">menu</span><span class="sr-only">เมนู</span></button>
-<nav id="navLinks" class="nav-links" aria-label="เมนูหลัก"><a href="/">ภาพรวม</a><a href="/directory" class="active">รายชื่อ VTuber</a><a href="/about">เกี่ยวกับข้อมูล</a></nav>
-<div class="header-actions"><a class="open-data" href="/about"><span class="material-symbols-outlined">policy</span><span>วิธีการและนโยบาย</span></a><a class="icon-button contribute-link" href="/contribute" title="แจ้งข้อมูล / เพิ่มรายชื่อ"><span class="material-symbols-outlined">person_add</span><span class="sr-only">แจ้งข้อมูล / เพิ่มรายชื่อ</span></a></div>
-</div></header>
-<main id="main"><section class="page page-active"><div class="shell directory-stack">
-<div class="directory-intro"><div><span class="section-pill"><span class="material-symbols-outlined">badge</span>สารบบครีเอเตอร์เสมือนจริง</span><h1>รายชื่อ VTuber</h1><p>ค้นหาตามชื่อ แพลตฟอร์ม สังกัด หรือสถานะ</p></div><div class="directory-summary card"><span class="material-symbols-outlined">groups</span><div><small>รายการที่แสดง</small><strong><span id="visibleCount">0</span> รายการ</strong></div></div></div>
-<section class="filter-panel card" aria-label="ตัวกรองรายชื่อ"><div class="filter-top"><label class="search-box"><span class="material-symbols-outlined">search</span><input id="searchInput" type="search" placeholder="ค้นหาชื่อ VTuber หรือสังกัด…" autocomplete="off" aria-label="ค้นหา VTuber"></label></div><div class="filter-row"><span class="filter-label">แพลตฟอร์ม:</span><div class="pill-group" id="platformPills"></div></div><div class="filter-row"><span class="filter-label">สถานะ:</span><div class="pill-group" id="statusPills"></div></div></section>
-<div class="creator-grid" id="creatorGrid" aria-live="polite"><div class="card empty-state" style="grid-column:1/-1">กำลังโหลดข้อมูล</div></div>
-<section class="community-callout"><div><span class="callout-icon material-symbols-outlined">person_add</span><div><h2>ไม่พบรายชื่อหรือต้องการอัปเดตข้อมูล?</h2><p>ส่งเฉพาะข้อมูลสาธารณะผ่าน Google Form ของ VThaiDex</p></div></div><a class="button primary" href="/contribute">แจ้งข้อมูล <span class="material-symbols-outlined">edit_document</span></a></section>
-<div class="directory-footer"><span id="resultCount">0 รายการ</span><button id="loadMore" class="button secondary" hidden>โหลดเพิ่มเติม <span class="material-symbols-outlined">expand_more</span></button></div>
-</div></section></main><footer class="footer"><div class="shell footer-inner"><div class="footer-top"><div><div class="footer-brand"><strong>VThaiDex</strong><span>Community Reference</span></div><p>พอร์ทัลข้อมูลสาธารณะเพื่อช่วยให้คนทั่วไปเข้าใจระบบนิเวศ VTuber ไทย โดยแยกข้อมูลสาธารณะออกจากข้อมูลวิจัยและข้อมูลหลังบ้าน</p></div><div class="footer-links"><a href="/about">เกี่ยวกับข้อมูล</a><a href="/terms">Terms</a><a href="/terms-of-use">Terms of Use</a><a href="/privacy">Privacy</a><a href="/data-license">Data License</a></div></div><div class="footer-bottom"><span>Source code: AGPL-3.0 · Website text / docs: CC BY 4.0 · Database &amp; API collection: All Rights Reserved</span><a href="https://ezdn.app/icezaza" target="_blank" rel="noopener noreferrer">EasyDonate — สนับสนุนผู้พัฒนา ↗</a></div></div></footer><script type="module" src="/assets/js/common.js"></script><script type="module" src="/assets/js/directory.js"></script></body></html>
+<link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+</head>
+<body>
+<div id="root" data-page="directory"></div>
+<noscript>VThaiDex ต้องเปิด JavaScript เพื่อแสดงรายชื่อและสถิติ</noscript>
+<script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
