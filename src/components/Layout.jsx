@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
-import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info, Sun, Moon } from 'lucide-react';
+import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info, Sun, Moon, Coffee } from 'lucide-react';
 import { DONATE_URL, SOURCE_URL } from '../lib/api.js';
 import Backdrop from './Backdrop.jsx';
 
@@ -101,13 +101,24 @@ function Header() {
 function Footer() {
   return (
     <footer className="mt-16 bg-deep/80 backdrop-blur">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 text-sm sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
-        <div>
-          <p className="font-display text-base">VThaiDex</p>
-          <p className="mt-2 max-w-xs text-muted">สารบบ VTuber ไทย ทำขึ้นเพื่อให้วีตัวเล็กถูกมองเห็นมากขึ้น ไม่เกี่ยวข้องกับครีเอเตอร์หรือแพลตฟอร์มใด</p>
-          <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block font-medium text-sky hover:underline">
-            เลี้ยงกาแฟคนทำเว็บ
+      <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
+        <div className="card flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-4">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand/12 text-brand"><Coffee size={22} aria-hidden="true" /></span>
+            <div>
+              <p className="font-display text-lg">สนับสนุนคนทำ VThaiDex</p>
+              <p className="mt-0.5 max-w-[52ch] text-sm text-muted">เว็บนี้ทำโดยคนคนเดียว ไม่มีโฆษณา ถ้าชอบที่นี่ เลี้ยงกาแฟหนึ่งแก้วช่วยค่าเซิร์ฟเวอร์และเวลาทำข้อมูลได้ เงินนี้ไม่ได้ไปถึงวีในรายชื่อ</p>
+            </div>
+          </div>
+          <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary shrink-0">
+            <Coffee size={16} aria-hidden="true" /> เลี้ยงกาแฟผ่าน EasyDonate
           </a>
+        </div>
+      </div>
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 text-sm sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div>
+          <p className="font-display text-base">VThai<span className="text-brand">Dex</span></p>
+          <p className="mt-2 max-w-xs text-muted">สารบบ VTuber ไทย ทำขึ้นเพื่อให้วีตัวเล็กถูกมองเห็นมากขึ้น ไม่เกี่ยวข้องกับครีเอเตอร์หรือแพลตฟอร์มใด</p>
         </div>
         <nav aria-label="นโยบาย">
           <p className="text-faint">นโยบาย</p>
