@@ -1,0 +1,2 @@
+const menu=document.querySelector('#menuButton');const nav=document.querySelector('#navLinks');if(menu&&nav){menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));});}
+const path=location.pathname.replace(/\/$/,'')||'/';document.querySelectorAll('.nav-links a').forEach(a=>{const target=new URL(a.href,location.origin).pathname.replace(/\/$/,'')||'/';if(target===path)a.classList.add('active');});
