@@ -195,6 +195,7 @@ terms-of-use.html
 privacy.html
 data-license.html
 contribute.html
+LICENSE.md
 robots.txt
 sitemap.xml
 styles.css
@@ -266,7 +267,7 @@ Tests must assert:
 1. a valid snapshot with only allowed public fields passes;
 2. creator objects containing `persona_id`, `account_id`, `evidence`, `followers`, `network`, or `finance` fail;
 3. invalid URL schemes fail or are normalized out according to the public schema;
-4. page limit greater than 24 is rejected/normalized by the request parser;
+4. an explicit page limit greater than 24 is rejected with HTTP 400; omitted limit defaults to 24;
 5. lifecycle value outside the public vocabulary fails.
 
 Run:
@@ -528,7 +529,8 @@ Apply `X-Robots-Tag: noindex, nofollow`.
 `GET /api/creators`:
 
 - parse `q`, `platform`, `status`, `cursor`, `limit`;
-- maximum limit 24;
+- omitted limit defaults to 24;
+- explicit limit greater than 24 returns HTTP 400;
 - filter in memory from current private snapshot;
 - deterministic stable ordering by normalized creator name;
 - return `items` + `next_cursor`;
@@ -768,6 +770,8 @@ Terms of Use
 Privacy
 Data License
 ```
+
+Create `LICENSE.md` as the repository-level licensing notice. It must state the scope clearly and link to the official CC BY 4.0 license rather than implying that third-party material or the compiled dataset is covered.
 
 Data License states:
 
@@ -1481,7 +1485,7 @@ On `/contribute`:
 
 ## Data extraction verification
 
-- request `limit=999`; verify max 24/rejection behavior;
+- request `limit=999`; verify HTTP 400 and no oversized response;
 - tamper cursor; verify error;
 - reuse cursor with different filter; verify error;
 - call removed public JSON paths; verify 404;
