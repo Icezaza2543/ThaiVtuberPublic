@@ -53,3 +53,11 @@ test('intake token endpoint issues token only when explicitly enabled',async()=>
   const response=await handleIntakeToken(new Request(origin+'/api/intake-token'),{secret,now,nonce:'nonce-enabled',enabled:true});
   assert.equal(response.status,200);assert.ok((await body(response)).token);
 });
+
+
+test('intake POST is disabled even when a previously issued token is still valid',async()=>{
+  const storage=createMemoryStorage();
+  const response=await handleIntake(request({token:await tokenAt(),honeypot:'',client_elapsed_ms:5000,envelope}),{storage,tokenSecret:secret,now,keyIds:new Set(['vtd-test-01']),randomId:()=> 'id',enabled:false});
+  assert.equal(response.status,503);assert.deepEqual(await body(response),{error:'intake_disabled'});
+  assert.equal((await storage.listIntake('pending')).length,0);
+});
