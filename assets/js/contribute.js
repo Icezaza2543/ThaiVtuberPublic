@@ -1,7 +1,16 @@
 import {encryptSubmission} from './intake-crypto.js';
-const clean=s=>String(s??'').trim();function validHttpUrl(value){if(!clean(value))return false;try{const u=new URL(value);return u.protocol==='https:'||u.protocol==='http:';}catch{return false;}}
+const clean=s=>String(s??'').trim();
+function parsedHttpUrl(value){const raw=clean(value);if(!raw||raw.length>2048)return null;try{const u=new URL(raw);return u.protocol==='https:'||u.protocol==='http:'?u:null;}catch{return null;}}
+function hostMatches(host,domains){const h=String(host||'').toLowerCase();return domains.some(domain=>h===domain||h.endsWith('.'+domain));}
 export function validateIdentity(value){return clean(value.name)?{ok:true}:{ok:false,error:'กรุณากรอกชื่อ VTuber'};}
-export function validatePlatforms(value){const vals=[value.youtube,value.x,value.other].map(clean).filter(Boolean);if(!vals.length)return{ok:false,error:'กรุณาใส่ลิงก์สาธารณะอย่างน้อย 1 ช่องทาง'};if(vals.some(v=>!validHttpUrl(v)))return{ok:false,error:'กรุณาตรวจสอบ URL ให้ขึ้นต้นด้วย https:// หรือ http://'};return{ok:true};}
+export function validatePlatforms(value){
+  const youtube=clean(value.youtube),x=clean(value.x),other=clean(value.other),vals=[youtube,x,other].filter(Boolean);
+  if(!vals.length)return{ok:false,error:'กรุณาใส่ลิงก์สาธารณะอย่างน้อย 1 ช่องทาง'};
+  if(vals.some(v=>!parsedHttpUrl(v)))return{ok:false,error:'กรุณาตรวจสอบ URL ให้ขึ้นต้นด้วย https:// หรือ http://'};
+  if(youtube&&!hostMatches(parsedHttpUrl(youtube).hostname,['youtube.com']))return{ok:false,error:'ช่อง YouTube ต้องใช้ลิงก์จาก youtube.com'};
+  if(x&&!hostMatches(parsedHttpUrl(x).hostname,['x.com','twitter.com']))return{ok:false,error:'ช่อง X / Twitter ต้องใช้ลิงก์จาก x.com หรือ twitter.com'};
+  return{ok:true};
+}
 export function buildSubmission(v){return{schema_version:1,creator:{name:clean(v.name),affiliation:clean(v.agency)||null,debut:clean(v.debut)||null,status:clean(v.status)||'unknown'},platforms:{youtube:clean(v.youtube)||null,x:clean(v.x)||null,other:clean(v.other)||null},evidence:clean(v.evidence)||null};}
 function values(form){return Object.fromEntries(new FormData(form).entries());}function setError(message=''){const el=document.querySelector('#formError');if(el){el.textContent=message;el.hidden=!message;}}function showStep(step){document.querySelectorAll('[data-step-panel]').forEach(el=>el.hidden=Number(el.dataset.stepPanel)!==step);document.querySelectorAll('[data-step-indicator]').forEach(el=>{const n=Number(el.dataset.stepIndicator);el.classList.toggle('active',n===step);el.classList.toggle('done',n<step);});}
 function renderReview(v){const out=document.querySelector('#reviewCard');if(!out)return;const e=s=>String(s||'—').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));const row=(a,b)=>`<div class="review-row"><span>${a}</span><strong>${e(b)}</strong></div>`;out.innerHTML=[row('ชื่อ',v.name),row('สังกัด',v.agency),row('เดบิวต์',v.debut),row('สถานะ',v.status),row('YouTube',v.youtube),row('X / Twitter',v.x),row('ช่องทางอื่น',v.other)].join('');}
