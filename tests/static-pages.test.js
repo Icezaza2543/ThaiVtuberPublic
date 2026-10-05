@@ -37,3 +37,15 @@ test('repository license separates CC BY site content, source code, public facts
   assert.match(license,/underlying public facts.*where applicable law/i);
   const page=text('data-license.html');assert.match(page,/source code/i);assert.match(page,/ข้อเท็จจริงสาธารณะ/);
 });
+
+
+import { existsSync } from 'node:fs';
+
+test('legacy bulk-export and hash-app artifacts are removed',()=>{
+  for(const path of ['app.js','data/bootstrap-summary.json','scripts/publish.ps1']){
+    assert.equal(existsSync(new URL(`../${path}`,import.meta.url)),false,`${path} must not ship after cutover`);
+  }
+  const readme=text('README.md');
+  assert.equal(readme.includes('public-creators.json'),false);
+  assert.equal(readme.includes('scripts/export_public.py'),false);
+});
