@@ -43,3 +43,18 @@ test('snapshot rejects lifecycle values outside public vocabulary', () => {
   bad.creators[0].status = 'secret-status';
   assert.throws(() => validateSnapshot(bad), /status|lifecycle/i);
 });
+
+
+test('snapshot rejects forbidden fields nested inside public summary and meta',()=>{
+  const badSummary=structuredClone(validSnapshot);badSummary.summary.internal_secret='do-not-publish';
+  assert.throws(()=>validateSnapshot(badSummary),/summary.*forbidden|allowlist/i);
+  const badMeta=structuredClone(validSnapshot);badMeta.meta.reviewer='private';
+  assert.throws(()=>validateSnapshot(badMeta),/meta.*forbidden|allowlist/i);
+});
+
+test('snapshot rejects forbidden fields nested inside aggregate rows',()=>{
+  const badPlatform=structuredClone(validSnapshot);badPlatform.summary.platforms[0].account_id='secret';
+  assert.throws(()=>validateSnapshot(badPlatform),/platform.*forbidden|allowlist/i);
+  const badLifecycle=structuredClone(validSnapshot);badLifecycle.summary.lifecycle[0].evidence='secret';
+  assert.throws(()=>validateSnapshot(badLifecycle),/lifecycle.*forbidden|allowlist/i);
+});
