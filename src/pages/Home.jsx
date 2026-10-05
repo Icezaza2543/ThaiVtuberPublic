@@ -2,7 +2,7 @@ import { Component, lazy, Suspense, useCallback, useEffect, useState } from 'rea
 import { Search, Shuffle, X, BarChart3, ArrowRight, Sparkles } from 'lucide-react';
 import Layout from '../components/Layout.jsx';
 import { DbMark, SectionHeading } from '../components/brand.jsx';
-import { CreatorCard, Legend, PENLIGHT, YearBars } from '../components/ui.jsx';
+import { BRAND, CreatorCard, Legend, NEUTRAL, YearBars } from '../components/ui.jsx';
 import { fetchOverview, fetchSpotlight, fmt, pct, platformLabel } from '../lib/api.js';
 
 const Universe = lazy(() => import('../components/Universe.jsx'));
@@ -83,7 +83,7 @@ function UniversePanel({ data, picked, onPick, onClear, picking }) {
             <button type="button" onClick={onClear} className="absolute right-2 top-2 z-10 rounded-full p-1.5 text-faint hover:bg-raised hover:text-ink">
               <X size={16} aria-hidden="true" /><span className="sr-only">ปิด</span>
             </button>
-            <CreatorCard creator={picked} accent={PENLIGHT[1]} />
+            <CreatorCard creator={picked} accent={BRAND} />
           </div>
           <button type="button" onClick={onPick} disabled={picking} className="btn btn-secondary mt-2 w-full">
             <Shuffle size={15} aria-hidden="true" /> {picking ? 'กำลังสุ่ม…' : 'สุ่มอีกคน'}
@@ -120,7 +120,7 @@ function Hero({ data }) {
     <section className="mx-auto grid max-w-6xl items-center gap-8 px-4 pb-6 pt-8 sm:px-6 sm:pt-10 lg:grid-cols-[5fr_7fr]">
       <div>
         <Quip />
-        <h1 className="mt-4 text-3xl leading-tight">ค้นพบ <span className="glow-title">VTuber ไทย</span>ที่คุณยังไม่รู้จัก</h1>
+        <h1 className="mt-4 text-3xl leading-tight">ค้นพบ <span className="text-brand">VTuber ไทย</span>ที่คุณยังไม่รู้จัก</h1>
         <p className="mt-4 max-w-[46ch] text-muted">
           {data && indiePct != null
             ? `รวม ${fmt(data.total_vtubers)} คนจากทุกแพลตฟอร์ม ${indiePct}% เป็นวีอิสระที่ไม่มีค่ายคอยดัน ลองคลิกดาวสักดวงแล้วไปทักทายเขาดู`
@@ -169,7 +169,7 @@ function Spotlight() {
       <div className="mt-4 grid gap-4 sm:grid-cols-3" aria-live="polite">
         {error && <p className="text-sm text-muted sm:col-span-3">สุ่มไม่สำเร็จ ลองกด “สุ่มชุดใหม่” อีกครั้ง</p>}
         {!error && !items && [0, 1, 2].map((i) => <div key={i} className="card h-40 animate-pulse" />)}
-        {!error && items?.map((c, i) => <CreatorCard key={`${c.name}-${i}`} creator={c} accent={PENLIGHT[i + 1]} />)}
+        {!error && items?.map((c, i) => <CreatorCard key={`${c.name}-${i}`} creator={c} accent={BRAND} />)}
       </div>
     </section>
   );
@@ -206,15 +206,15 @@ function Pulse({ data }) {
         <div className="card p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-base">เดบิวต์ต่อปี</h3>
-            {hasSplit && <Legend items={[{ label: 'วีอิสระ', color: PENLIGHT[1] }, { label: 'มีสังกัด', color: PENLIGHT[3] }]} />}
+            {hasSplit && <Legend items={[{ label: 'วีอิสระ', color: BRAND }, { label: 'มีสังกัด', color: NEUTRAL }]} />}
           </div>
           <div className="mt-5">
             <YearBars
               label="จำนวนเดบิวต์ต่อปี"
               years={years}
               series={hasSplit
-                ? [{ key: 'indie', color: PENLIGHT[1], values: indieYears }, { key: 'agency', color: PENLIGHT[3], values: agencyYears }]
-                : [{ key: 'all', color: PENLIGHT[1], values: allYears }]}
+                ? [{ key: 'indie', color: BRAND, values: indieYears }, { key: 'agency', color: NEUTRAL, values: agencyYears }]
+                : [{ key: 'all', color: BRAND, values: allYears }]}
               height={180}
             />
           </div>

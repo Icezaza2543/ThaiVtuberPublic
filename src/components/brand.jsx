@@ -12,9 +12,8 @@ export function DbMark({ size = 14, mono = false, className = '' }) {
       {!mono && (
         <defs>
           <linearGradient id={id} x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="#ff5fa2" />
-            <stop offset="0.5" stopColor="#ffe45c" />
-            <stop offset="1" stopColor="#43e0ff" />
+            <stop offset="0" stopColor="var(--color-brand)" />
+            <stop offset="1" stopColor="var(--color-lilac)" />
           </linearGradient>
         </defs>
       )}
