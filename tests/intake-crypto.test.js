@@ -7,3 +7,12 @@ test('encryptSubmission produces authenticated hybrid envelope with no plaintext
 test('identity validation requires public creator name',()=>{assert.deepEqual(validateIdentity({name:'   '}),{ok:false,error:'กรุณากรอกชื่อ VTuber'});assert.equal(validateIdentity({name:'Alpha'}).ok,true);});
 test('platform validation requires one valid public URL',()=>{assert.equal(validatePlatforms({youtube:'',x:'',other:''}).ok,false);assert.equal(validatePlatforms({youtube:'javascript:alert(1)',x:'',other:''}).ok,false);assert.equal(validatePlatforms({youtube:'https://youtube.com/@alpha',x:'',other:''}).ok,true);});
 test('buildSubmission contains creator public facts only',()=>{const value=buildSubmission({name:'Alpha',agency:'Indie',debut:'2024',status:'active',youtube:'https://youtube.com/@a',x:'',other:'',evidence:'https://example.com/post'});assert.equal(value.creator.name,'Alpha');assert.equal(value.platforms.youtube,'https://youtube.com/@a');assert.equal('email' in value,false);assert.equal('submitter' in value,false);});
+
+
+test('platform validation checks the expected host for YouTube and X',()=>{
+  assert.equal(validatePlatforms({youtube:'https://x.com/alpha',x:'',other:''}).ok,false);
+  assert.equal(validatePlatforms({youtube:'https://www.youtube.com/@alpha',x:'',other:''}).ok,true);
+  assert.equal(validatePlatforms({youtube:'',x:'https://youtube.com/@alpha',other:''}).ok,false);
+  assert.equal(validatePlatforms({youtube:'',x:'https://twitter.com/alpha',other:''}).ok,true);
+  assert.equal(validatePlatforms({youtube:'',x:'https://x.com/alpha',other:''}).ok,true);
+});
