@@ -42,3 +42,14 @@ test('maintenance requires cron secret and purges according to retention windows
   const denied=await handleMaintenance(new Request(origin+'/api/maintenance'),{storage,cronSecret:'cron-secret',now:new Date('2026-10-05T00:00:00Z')});assert.equal(denied.status,401);
   const allowed=await handleMaintenance(new Request(origin+'/api/maintenance',{headers:{authorization:'Bearer cron-secret'}}),{storage,cronSecret:'cron-secret',now:new Date('2026-10-05T00:00:00Z')});assert.equal(allowed.status,200);assert.deepEqual(await body(allowed),{purged:{pending:1,reviewed:0,rejected:0}});
 });
+
+
+test('intake token endpoint is disabled by default until explicitly enabled',async()=>{
+  const response=await handleIntakeToken(new Request(origin+'/api/intake-token'),{secret,now,nonce:'nonce-disabled',enabled:false});
+  assert.equal(response.status,503);assert.deepEqual(await body(response),{error:'intake_disabled'});
+});
+
+test('intake token endpoint issues token only when explicitly enabled',async()=>{
+  const response=await handleIntakeToken(new Request(origin+'/api/intake-token'),{secret,now,nonce:'nonce-enabled',enabled:true});
+  assert.equal(response.status,200);assert.ok((await body(response)).token);
+});
