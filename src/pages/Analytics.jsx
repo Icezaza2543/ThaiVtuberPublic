@@ -3,6 +3,7 @@ import { ArrowRight, RotateCw } from 'lucide-react';
 import Layout, { PageTitle } from '../components/Layout.jsx';
 import { HelpTip, Legend, PENLIGHT, platformColor, ShareBars, YearBars } from '../components/ui.jsx';
 import { fetchOverview, fmt, formatDate, pct, platformLabel, STATUS_LABELS } from '../lib/api.js';
+import { ChangeBars, Donut, Heatmap, Lollipop, MultiLine, StackedShare, Treemap, Waffle } from '../components/charts.jsx';
 
 const byYear = (rows, key = 'count') => Object.fromEntries((rows || []).map((r) => [r.year, r[key]]));
 
@@ -100,6 +101,14 @@ function WholeIndustry({ d }) {
         <Card title="จำนวนสะสม" help="จำนวนวีที่ทราบปีเดบิวต์ รวมสะสมตั้งแต่ปีแรก">
           <GrowthLine rows={d.debut_trend} />
         </Card>
+        <Card title="เปลี่ยนแปลงจากปีก่อน" help="จำนวนเดบิวต์ปีนี้ลบปีก่อน แท่งสีชมพูคือปีที่เดบิวต์น้อยลง ปีล่าสุดยังไม่จบปี">
+          <ChangeBars label="จำนวนเดบิวต์ที่เพิ่มหรือลดจากปีก่อน" points={years.map((y) => ({ year: y, value: all[y] }))} />
+        </Card>
+        {Number.isFinite(d.independent_count) && (
+          <Card title="100 คนในวงการ" help="ถ้าย่อวงการเหลือ 100 คน หนึ่งช่องคือประมาณ 1%">
+            <Waffle label="สัดส่วนวีอิสระกับวีมีสังกัด" parts={[{ label: 'วีอิสระ', value: d.independent_count, color: PENLIGHT[1] }, { label: 'มีสังกัด', value: d.total_vtubers - d.independent_count, color: PENLIGHT[3] }]} />
+          </Card>
+        )}
         <Card
           className="lg:col-span-2"
           title="อยู่บนแพลตฟอร์มไหน"
@@ -115,6 +124,43 @@ function WholeIndustry({ d }) {
               />
             ))}
           </div>
+        </Card>
+      </div>
+    </Section>
+  );
+}
+
+function PlatformInsights({ d }) {
+  const rows = d.platform_breakdown || [];
+  if (!rows.length) return null;
+  const top = rows.slice(0, 6);
+  const years = [...new Set(top.flatMap((r) => (r.debut_years || []).map((y) => y.year)))].sort();
+  const colorOf = (r, i) => platformColor(r.platform, i);
+  const cumulative = top.slice(0, 5).map((r, i) => {
+    let run = 0;
+    const m = byYear(r.debut_years);
+    return { label: platformLabel(r.platform), color: colorOf(r, i), points: years.map((y) => ({ x: y, y: (run += m[y] || 0) })) };
+  });
+  return (
+    <Section title="ภาพรวมแพลตฟอร์ม">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card title="ขนาดของแต่ละแพลตฟอร์ม" help="พื้นที่ของแต่ละช่องตามจำนวนวีไทยที่อยู่บนแพลตฟอร์มนั้น">
+          <Treemap label="จำนวนวีไทยต่อแพลตฟอร์ม" items={rows.slice(0, 10).map((r, i) => ({ label: platformLabel(r.platform), value: r.count, color: colorOf(r, i) }))} />
+        </Card>
+        <Card title="แพลตฟอร์มไหนวีอิสระเยอะ" help="สัดส่วนวีอิสระในแต่ละแพลตฟอร์ม เรียงจากมากไปน้อย">
+          <Lollipop
+            label="สัดส่วนวีอิสระต่อแพลตฟอร์ม"
+            rows={rows.slice(0, 10).map((r, i) => ({ label: platformLabel(r.platform), value: pct(r.independent, r.count) ?? 0, color: colorOf(r, i) })).sort((a, b) => b.value - a.value)}
+          />
+        </Card>
+        <Card className="lg:col-span-2" title="เดบิวต์แต่ละปี บนแต่ละแพลตฟอร์ม" help="ตัวเลขในช่องคือจำนวนวีที่เดบิวต์ปีนั้นและมีช่องบนแพลตฟอร์มนั้น สีเข้มคือปีที่มากที่สุดของแพลตฟอร์มนั้น">
+          <Heatmap label="ตารางความร้อน แพลตฟอร์มกับปีเดบิวต์" cols={years} rows={top.map((r, i) => ({ label: platformLabel(r.platform), color: colorOf(r, i), values: byYear(r.debut_years) }))} />
+        </Card>
+        <Card title="โตสะสมบนแต่ละแพลตฟอร์ม" aside={<Legend items={cumulative.map((c) => ({ label: c.label, color: c.color }))} />}>
+          <MultiLine label="จำนวนสะสมของวีที่ทราบปีเดบิวต์ แยกตามแพลตฟอร์ม" series={cumulative} />
+        </Card>
+        <Card title="สัดส่วนแพลตฟอร์มของรุ่นเดบิวต์" help="ในวีที่เดบิวต์แต่ละปี มีช่องทางบนแพลตฟอร์มไหนบ้าง คิดเป็นสัดส่วนเต็ม 100%" aside={<Legend items={top.slice(0, 5).map((r, i) => ({ label: platformLabel(r.platform), color: colorOf(r, i) }))} />}>
+          <StackedShare label="สัดส่วนแพลตฟอร์มในแต่ละปีเดบิวต์" xs={years.filter((y) => top.some((r) => byYear(r.debut_years)[y] > 2))} layers={top.slice(0, 5).map((r, i) => ({ label: platformLabel(r.platform), color: colorOf(r, i), values: byYear(r.debut_years) }))} />
         </Card>
       </div>
     </Section>
@@ -144,9 +190,7 @@ function ByPlatform({ d }) {
           <p className="mt-3 font-display text-3xl tabular-nums">{fmt(r.count)}</p>
           <p className="text-muted">วีไทยบน {platformLabel(r.platform)} คิดเป็น {pct(r.count, d.total_vtubers)}% ของทั้งหมด</p>
           <div className="mt-6">
-            <div className="flex justify-between text-sm"><span>วีอิสระ</span><span className="tabular-nums">{pct(r.independent, r.count)}%</span></div>
-            <div className="mt-1.5 h-2 rounded-full bg-deep" aria-hidden="true"><div className="h-full rounded-full" style={{ width: `${pct(r.independent, r.count)}%`, background: color }} /></div>
-            <p className="mt-1.5 text-sm text-faint">{fmt(r.independent)} คนไม่มีสังกัด</p>
+            <Donut size={132} label={`วีอิสระกับวีมีสังกัดบน ${platformLabel(r.platform)}`} center={`${pct(r.independent, r.count)}%`} sub="วีอิสระ" segments={[{ label: 'วีอิสระ', value: r.independent, color }, { label: 'มีสังกัด', value: r.count - r.independent, color: 'var(--color-faint)' }]} />
           </div>
           <a href={`/directory?platform=${encodeURIComponent(r.platform)}&scope=independent`} className="btn btn-secondary mt-6">
             ดูวีอิสระบน {platformLabel(r.platform)} <ArrowRight size={15} aria-hidden="true" />
@@ -189,18 +233,7 @@ function IndieVsAgency({ d }) {
         <div className="flex flex-col gap-4">
         {span.length > 0 && (
           <Card title="มีกี่ช่องทาง" help="นับช่องทางทางการที่ตรวจแล้วของแต่ละคน">
-            <div className="flex h-3 overflow-hidden rounded-full" aria-hidden="true">
-              {span.map((r, i) => <span key={r.platforms} style={{ width: `${(r.count / spanTotal) * 100}%`, background: PENLIGHT[i % PENLIGHT.length] }} />)}
-            </div>
-            <ul className="mt-4 space-y-2 text-sm">
-              {span.map((r, i) => (
-                <li key={r.platforms} className="flex items-center gap-2">
-                  <span className="size-2.5 rounded-sm" style={{ background: PENLIGHT[i % PENLIGHT.length] }} aria-hidden="true" />
-                  {r.platforms >= 5 ? '5 ช่องทางขึ้นไป' : `${r.platforms} ช่องทาง`}
-                  <span className="ml-auto tabular-nums text-muted">{pct(r.count, spanTotal)}%</span>
-                </li>
-              ))}
-            </ul>
+            <Donut size={132} label="จำนวนช่องทางต่อคน" center={`${pct(span.filter((r) => r.platforms >= 2).reduce((x, r) => x + r.count, 0), spanTotal)}%`} sub="มีหลายช่องทาง" segments={span.map((r, i) => ({ label: r.platforms >= 5 ? '5 ช่องทางขึ้นไป' : `${r.platforms} ช่องทาง`, value: r.count, color: PENLIGHT[i % PENLIGHT.length] }))} />
           </Card>
         )}
         <Card title="สถานะ" help="จากสถานะที่ตรวจแล้ว ไม่ได้เดาจากโพสต์ล่าสุด คนที่จบกิจกรรมยังอยู่ในสารบบ เพราะเป็นส่วนหนึ่งของประวัติวงการ">
@@ -241,6 +274,7 @@ export default function Analytics() {
         <>
           <KeyNumbers d={d} />
           <WholeIndustry d={d} />
+          <PlatformInsights d={d} />
           <ByPlatform d={d} />
           <IndieVsAgency d={d} />
         </>

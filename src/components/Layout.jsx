@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info } from 'lucide-react';
 import { DONATE_URL, SOURCE_URL } from '../lib/api.js';
+
+// Dev-only font tryout panel; excluded from the production bundle.
+const FontPicker = import.meta.env.DEV ? lazy(() => import('./FontPicker.jsx')) : null;
 
 const NAV = [
   { href: '/', label: 'หน้าแรก', icon: Orbit },
@@ -119,6 +122,7 @@ export default function Layout({ children }) {
       <Header />
       <main id="main">{children}</main>
       <Footer />
+      {FontPicker && <Suspense fallback={null}><FontPicker /></Suspense>}
     </>
   );
 }
