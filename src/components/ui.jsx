@@ -58,7 +58,7 @@ export function CreatorCard({ creator, accent = PENLIGHT[0] }) {
 }
 
 /** Vertical bars for discrete years. series: [{key, color, values: {year: n}}] stacked bottom-up. */
-export function YearBars({ years, series, height = 200, label }) {
+export function YearBars({ years, series, height = 150, label }) {
   const totals = years.map((y) => series.reduce((a, s) => a + (s.values[y] || 0), 0));
   const max = Math.max(...totals, 1);
   return (
@@ -92,7 +92,7 @@ export function ShareBars({ rows, max }) {
   return (
     <ul className="space-y-3">
       {rows.map((r, i) => (
-        <li key={r.key} className="grid grid-cols-[5.5rem_1fr_3.5rem] items-center gap-3 text-sm">
+        <li key={r.key} className="grid grid-cols-[1.75rem_1fr_3.5rem] items-center gap-3 text-sm" title={r.name}>
           <span className="truncate">{r.label}</span>
           <span className="relative h-2 rounded-full bg-deep" aria-hidden="true">
             <span className="bar-grow absolute inset-y-0 left-0 rounded-full opacity-35" style={{ width: `${(r.value / top) * 100}%`, background: r.color, animationDelay: `${i * 40}ms` }} />
@@ -111,7 +111,7 @@ export function Legend({ items }) {
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
       {items.map((it) => (
-        <li key={it.label} className="flex items-center gap-1.5">
+        <li key={it.key ?? it.label} className="flex items-center gap-1.5" title={it.name}>
           <span className="size-2.5 rounded-sm" style={{ background: it.color, opacity: it.faded ? 0.35 : 1 }} aria-hidden="true" />
           {it.label}
         </li>
