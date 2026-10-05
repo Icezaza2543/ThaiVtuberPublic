@@ -61,7 +61,7 @@ function Hero({ data }) {
           จักรวาล VTuber ไทย
         </h1>
         <p className="mt-4 max-w-xl text-lg text-ink/85 sm:text-xl">
-          {data ? `${fmt(data.total_vtubers)} รายชื่อ ใน ${fmt(data.agency_total)} สังกัด และครีเอเตอร์อิสระอีก ${fmt(data.independent_count)} คน` : 'กำลังรวบรวมดวงดาว'}
+          {!data ? 'กำลังรวบรวมดวงดาว' : Number.isFinite(data.agency_total) ? `${fmt(data.total_vtubers)} รายชื่อ ใน ${fmt(data.agency_total)} สังกัด และครีเอเตอร์อิสระอีก ${fmt(data.independent_count)} คน` : `${fmt(data.total_vtubers)} รายชื่อจากข้อมูลสาธารณะที่ตรวจแล้ว`}
           {updated && <span className="block text-base text-muted">อัปเดตเมื่อ {updated}</span>}
         </p>
 
@@ -104,13 +104,13 @@ function KeyFigures({ data }) {
   const multi = span.filter((r) => r.platforms >= 2).reduce((a, r) => a + r.count, 0);
   const figures = [
     [fmt(data.total_vtubers), 'รายชื่อในสารบบ'],
-    [fmt(data.agency_total), 'สังกัด'],
-    [`${pct(data.independent_count, data.total_vtubers) ?? '—'}%`, 'เป็นครีเอเตอร์อิสระ'],
-    [`${pct(multi, data.total_vtubers) ?? '—'}%`, 'มีมากกว่าหนึ่งช่องทาง'],
+    Number.isFinite(data.agency_total) && [fmt(data.agency_total), 'สังกัด'],
+    Number.isFinite(data.independent_count) && [`${pct(data.independent_count, data.total_vtubers)}%`, 'เป็นครีเอเตอร์อิสระ'],
+    span.length > 0 && [`${pct(multi, data.total_vtubers)}%`, 'มีมากกว่าหนึ่งช่องทาง'],
     [fmt((data.platforms || []).length), 'แพลตฟอร์มที่พบ'],
-  ];
+  ].filter(Boolean);
   return (
-    <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">
+    <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3 lg:grid-flow-col lg:auto-cols-fr">
       {figures.map(([value, label], i) => (
         <div key={label} className="bg-card px-5 py-5">
           <dt className="text-sm text-muted">{label}</dt>
@@ -225,8 +225,12 @@ function Dashboard({ data, error, retry }) {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Panel title="อยู่บนแพลตฟอร์มไหน" note="หนึ่งคนอยู่ได้หลายแพลตฟอร์ม ผลรวมจึงเกินจำนวนรายชื่อ"><PlatformBars data={data} /></Panel>
         <Panel title="เดบิวต์ปีไหน" note={`นับจาก ${fmt(data.known_debut_year_count)} รายชื่อที่ทราบปีเดบิวต์ (${pct(data.known_debut_year_count, data.total_vtubers)}%)`}><DebutYears data={data} /></Panel>
-        <Panel title="สังกัดในจักรวาล" note="สังกัดที่มีสมาชิกมากที่สุด 12 แห่ง คือดาวเคราะห์ดวงใหญ่ในภาพด้านบน" className="lg:col-span-2"><AgencyShare data={data} /></Panel>
-        <Panel title="แต่ละคนมีกี่ช่องทาง" note="นับช่องทางทางการที่ตรวจแล้วของแต่ละรายชื่อ"><PlatformSpan data={data} /></Panel>
+        {Array.isArray(data.agencies) && Number.isFinite(data.independent_count) && (
+          <Panel title="สังกัดในจักรวาล" note="สังกัดที่มีสมาชิกมากที่สุด 12 แห่ง คือดาวเคราะห์ดวงใหญ่ในภาพด้านบน" className="lg:col-span-2"><AgencyShare data={data} /></Panel>
+        )}
+        {Array.isArray(data.platform_span) && (
+          <Panel title="แต่ละคนมีกี่ช่องทาง" note="นับช่องทางทางการที่ตรวจแล้วของแต่ละรายชื่อ"><PlatformSpan data={data} /></Panel>
+        )}
         <Panel title="สถานะ" note="จากสถานะที่ตรวจแล้วในทะเบียน ไม่ได้เดาจากโพสต์ล่าสุด">
           <ul className="space-y-2">
             {(data.lifecycle || []).filter((r) => r.count > 0).map((r) => (
