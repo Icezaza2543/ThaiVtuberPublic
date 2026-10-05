@@ -10,7 +10,7 @@ const byYear = (rows, key = 'count') => Object.fromEntries((rows || []).map((r) 
 function Section({ title, help, children }) {
   return (
     <section className="mx-auto mt-14 max-w-6xl px-4 sm:px-6">
-      <h2 className="flex items-center gap-2 text-xl">{title}{help && <HelpTip>{help}</HelpTip>}</h2>
+      <h2 className="flex items-center gap-2 text-xl"><span className="size-2.5 rounded-full bg-gradient-to-br from-brand to-lemon shadow-[0_0_12px_#ff5fa2]" aria-hidden="true" />{title}{help && <HelpTip>{help}</HelpTip>}</h2>
       <div className="mt-5">{children}</div>
     </section>
   );
@@ -43,9 +43,9 @@ function KeyNumbers({ d }) {
   return (
     <ul className="mx-auto mt-8 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:px-6 md:grid-cols-3 lg:grid-cols-5">
       {cards.map((c) => (
-        <li key={c.label} className="card p-4 sm:p-5">
+        <li key={c.label} className="card p-4 sm:p-5" style={{ background: `linear-gradient(150deg, ${c.color}33, transparent 65%), var(--color-card)`, borderColor: `${c.color}55` }}>
           <span className="block h-1 w-8 rounded-full" style={{ background: c.color }} aria-hidden="true" />
-          <p className="mt-3 font-display text-2xl tabular-nums">{c.value}</p>
+          <p className="mt-3 font-display text-2xl tabular-nums" style={{ color: c.color }}>{c.value}</p>
           <p className="text-sm">{c.label}</p>
           {c.sub && <p className="text-xs text-faint">{c.sub}</p>}
         </li>

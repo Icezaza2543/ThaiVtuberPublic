@@ -1,29 +1,28 @@
 @import 'tailwindcss';
-@import '@fontsource/mitr/thai-400.css';
-@import '@fontsource/mitr/latin-400.css';
-@import '@fontsource/mitr/thai-500.css';
-@import '@fontsource/mitr/latin-500.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/thai-400.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/latin-400.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/thai-500.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/latin-500.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/thai-600.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/latin-600.css';
+@import '@fontsource/sriracha/thai-400.css';
+@import '@fontsource/sriracha/latin-400.css';
+@import '@fontsource/sarabun/thai-400.css';
+@import '@fontsource/sarabun/latin-400.css';
+@import '@fontsource/sarabun/thai-500.css';
+@import '@fontsource/sarabun/latin-500.css';
+@import '@fontsource/sarabun/thai-600.css';
+@import '@fontsource/sarabun/latin-600.css';
 
 /*
- * VThaiDex tokens. Neutral night base; the brand pink is reserved for the one primary action per area.
+ * VThaiDex tokens. Concert-stage night: saturated violet base lit by pink/cyan/lilac stage glows.
+ * The pink→peach gradient is reserved for the one primary action per area.
  * Penlight colours (pink/sky/lemon/lilac/mint/peach) are data colours only.
  * Type scale: 1.25 ratio from a 15px body (12 / 15 / 18.75 / 23.4 / 29.3 / 36.6).
  */
 @theme {
-  --color-paper: #110f24;
-  --color-card: #1a1733;
-  --color-raised: #231f42;
-  --color-deep: #0b0a19;
-  --color-ink: #ece9f7;
-  --color-muted: #9d97b8;
-  --color-faint: #6f6990;
-  --color-line: #2a2645;
+  --color-paper: #150f3a;
+  --color-card: #211a55;
+  --color-raised: #2e2470;
+  --color-deep: #0e0a2a;
+  --color-ink: #fbf9ff;
+  --color-muted: #c9c0f2;
+  --color-faint: #9a90d0;
+  --color-line: #3b3088;
   --color-brand: #ff5fa2;
   --color-brand-hover: #ff7fb5;
   --color-sky: #43e0ff;
@@ -32,8 +31,8 @@
   --color-mint: #7dffb3;
   --color-peach: #ff9f5c;
 
-  --font-display: 'Mitr', 'IBM Plex Sans Thai Looped', system-ui, sans-serif;
-  --font-sans: 'IBM Plex Sans Thai Looped', system-ui, sans-serif;
+  --font-display: 'Sriracha', 'Sarabun', system-ui, sans-serif;
+  --font-sans: 'Sarabun', system-ui, sans-serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.8125rem;
@@ -56,11 +55,18 @@
     min-height: 100dvh;
     font-size: var(--text-base);
     line-height: 1.7;
+    background:
+      radial-gradient(900px 520px at 8% -6%, rgb(255 95 162 / 0.28), transparent 60%),
+      radial-gradient(800px 520px at 100% 8%, rgb(67 224 255 / 0.20), transparent 60%),
+      radial-gradient(900px 700px at 50% 110%, rgb(180 140 255 / 0.22), transparent 60%),
+      var(--color-paper);
+    background-attachment: fixed;
   }
   h1, h2, h3 {
     font-family: var(--font-display);
-    font-weight: 500;
-    line-height: 1.3;
+    font-weight: 400; /* Sriracha ships one weight */
+    line-height: 1.35;
+    letter-spacing: 0.01em;
   }
   :focus-visible {
     outline: 2px solid var(--color-lemon);
@@ -76,9 +82,16 @@
 
 @layer components {
   .card {
-    background: var(--color-card);
+    background: linear-gradient(160deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0) 45%), var(--color-card);
     border: 1px solid var(--color-line);
     border-radius: 1rem;
+    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.6);
+  }
+  .glow-title {
+    background: linear-gradient(90deg, #ff5fa2, #ff9f5c 30%, #ffe45c 50%, #43e0ff 75%, #b48cff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .btn {
     display: inline-flex;
@@ -92,10 +105,11 @@
     line-height: 1.4;
   }
   .btn-primary {
-    background: var(--color-brand);
-    color: var(--color-deep);
+    background: linear-gradient(135deg, var(--color-brand), var(--color-peach));
+    color: #1a0b2e;
+    box-shadow: 0 8px 24px -8px rgb(255 95 162 / 0.7);
   }
-  .btn-primary:hover { background: var(--color-brand-hover); }
+  .btn-primary:hover { filter: brightness(1.08); box-shadow: 0 10px 30px -8px rgb(255 95 162 / 0.9); }
   .btn-secondary {
     background: var(--color-raised);
     color: var(--color-ink);
@@ -116,9 +130,10 @@
   }
   .chip:hover { color: var(--color-ink); }
   .chip[aria-pressed='true'], .chip[aria-selected='true'] {
-    background: var(--color-ink);
-    color: var(--color-deep);
-    border-color: var(--color-ink);
+    background: linear-gradient(135deg, var(--color-sky), var(--color-lilac));
+    color: #120a33;
+    border-color: transparent;
+    font-weight: 600;
   }
   .bar-grow {
     transform-origin: left;
