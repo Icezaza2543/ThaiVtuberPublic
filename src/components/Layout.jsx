@@ -28,11 +28,11 @@ function Header() {
   const [open, setOpen] = useState(false);
   const path = currentPath();
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
         <a href="/" className="mr-auto flex items-center gap-2" aria-label="VThaiDex หน้าแรก">
           <img src="/assets/logo.svg" alt="" width="28" height="28" />
-          <span className="font-display text-lg font-medium">VThaiDex</span>
+          <span className="glow-title font-display text-xl">VThaiDex</span>
         </a>
         <nav aria-label="เมนูหลัก" className="hidden items-center gap-1 md:flex">
           {NAV.map(({ href, label, icon: Icon }) => (
@@ -130,7 +130,7 @@ export default function Layout({ children }) {
 export function PageTitle({ title, children }) {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6 sm:pt-14">
-      <h1 className="text-2xl sm:text-3xl">{title}</h1>
+      <h1 className="glow-title w-fit text-2xl sm:text-3xl">{title}</h1>
       {children && <div className="mt-2 max-w-[60ch] text-muted">{children}</div>}
     </div>
   );

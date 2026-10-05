@@ -101,7 +101,7 @@ function Hero({ data }) {
   return (
     <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-10 pt-10 sm:px-6 sm:pt-14 lg:grid-cols-[5fr_7fr]">
       <div>
-        <h1 className="text-3xl leading-tight">ค้นพบ VTuber ไทยที่คุณยังไม่รู้จัก</h1>
+        <h1 className="text-3xl leading-tight">ค้นพบ <span className="glow-title">VTuber ไทย</span>ที่คุณยังไม่รู้จัก</h1>
         <p className="mt-4 max-w-[46ch] text-muted">
           {data && indiePct != null
             ? `รวม ${fmt(data.total_vtubers)} คนจากทุกแพลตฟอร์ม ${indiePct}% เป็นวีอิสระที่ไม่มีค่ายคอยดัน ลองคลิกดาวสักดวงแล้วไปทักทายเขาดู`

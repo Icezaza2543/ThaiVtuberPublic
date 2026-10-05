@@ -19,7 +19,7 @@ const FONTS = [
   ['Chonburi', 'Display', '400'], ['Srisakdi', 'Display', '400;700'],
 ];
 const NAMES = FONTS.map((f) => f[0]);
-const DEFAULTS = { display: 'Mitr', body: 'IBM Plex Sans Thai Looped' };
+const DEFAULTS = { display: 'Sriracha', body: 'Sarabun' };
 const KEY = 'vthaidex-font-tryout';
 
 function load(name) {
