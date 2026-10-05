@@ -68,3 +68,15 @@ test('snapshot accepts aggregate agency and platform-span summaries but rejects 
   const tooMany=structuredClone(ok);tooMany.summary.independent_count=5;
   assert.throws(()=>validateSnapshot(tooMany),/exceeds/);
 });
+
+test('snapshot accepts count-only insights and rejects names inside them',()=>{
+  const ok=structuredClone(validSnapshot);
+  ok.summary.insights={basis:{records:1,with_youtube_followers:1,activity_scanned:1,data_as_of:'2026-10-04'},tiers:[{tier:'independent',count:1}],big_agency_count:0,
+    activity:[{tier:'independent',scanned:1,active:1}],size_bands:[{band:'<1K',independent:1,small_mid:0,big:0}],debuts_by_tier:[{year:2025,independent:1,small_mid:0,big:0}],
+    live_combos:[{platforms:['youtube'],count:1,independent:1}],no_live_platform:0};
+  assert.equal(validateSnapshot(ok).summary.insights.tiers[0].count,1);
+  const bad=structuredClone(ok);bad.summary.insights.tiers[0].agency='Big Co';
+  assert.throws(()=>validateSnapshot(bad),/forbidden|allowlist/i);
+  const badCombo=structuredClone(ok);badCombo.summary.insights.live_combos[0].platforms=['onlyfans'];
+  assert.throws(()=>validateSnapshot(badCombo),/invalid live combo/);
+});
