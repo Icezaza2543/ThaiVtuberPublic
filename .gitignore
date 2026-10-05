@@ -1,4 +1,2 @@
 .vercel/
-data/public-summary.json
-data/public-creators.json
 .DS_Store
