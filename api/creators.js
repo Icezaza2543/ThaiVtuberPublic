@@ -9,7 +9,8 @@ export async function handleCreators(request,{storage=defaultStorage,cursorSecre
   if(request.method!=='GET') return jsonResponse(405,{error:'method_not_allowed'},{...noIndexHeaders(),Allow:'GET'});
   let query;
   try{query=parseCreatorQuery(new URL(request.url));}catch{return jsonResponse(400,{error:'invalid_query'},noIndexHeaders());}
-  let snapshot;\n  try{snapshot=await storage.readCurrentSnapshot();}catch{return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());}
+  let snapshot;
+  try{snapshot=await storage.readCurrentSnapshot();}catch{return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());}
   if(!snapshot) return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());
   const expected={snapshot:snapshot.snapshot_id,q:query.q,platform:query.platform,status:query.status};
   let pos=0;
