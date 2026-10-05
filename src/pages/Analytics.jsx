@@ -3,6 +3,7 @@ import { ArrowRight, RotateCw } from 'lucide-react';
 import Layout, { PageTitle } from '../components/Layout.jsx';
 import { SectionHeading } from '../components/brand.jsx';
 import PlatformIcon from '../components/PlatformIcon.jsx';
+import Insights from './insights.jsx';
 import { BRAND, HelpTip, Legend, NEUTRAL, platformColor, RAMP, ShareBars, YearBars } from '../components/ui.jsx';
 import { fetchOverview, fmt, formatDate, pct, platformLabel, STATUS_LABELS } from '../lib/api.js';
 import { ChangeBars, Donut, Heatmap, Lollipop, MultiLine, StackedShare, Treemap, Waffle } from '../components/charts.jsx';
@@ -93,7 +94,7 @@ function WholeIndustry({ d }) {
   const breakdown = d.platform_breakdown || (d.platforms || []).map((p) => ({ platform: p.platform, count: p.count }));
   return (
     <Section title="ทั้งวงการ">
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-3">
         <Card
           title="เดบิวต์ต่อปี"
           help={`นับเฉพาะ ${fmt(d.known_debut_year_count)} คนที่ทราบปีเดบิวต์ (${pct(d.known_debut_year_count, d.total_vtubers)}%) ปีล่าสุดยังไม่จบปี`}
@@ -107,13 +108,8 @@ function WholeIndustry({ d }) {
         <Card title="เปลี่ยนแปลงจากปีก่อน" help="จำนวนเดบิวต์ปีนี้ลบปีก่อน แท่งสีชมพูคือปีที่เดบิวต์น้อยลง ปีล่าสุดยังไม่จบปี">
           <ChangeBars label="จำนวนเดบิวต์ที่เพิ่มหรือลดจากปีก่อน" points={years.map((y) => ({ year: y, value: all[y] }))} />
         </Card>
-        {Number.isFinite(d.independent_count) && (
-          <Card title="100 คนในวงการ" help="ถ้าย่อวงการเหลือ 100 คน หนึ่งช่องคือประมาณ 1%">
-            <Waffle label="สัดส่วนวีอิสระกับวีมีสังกัด" parts={[{ label: 'วีอิสระ', value: d.independent_count, color: BRAND }, { label: 'มีสังกัด', value: d.total_vtubers - d.independent_count, color: NEUTRAL }]} />
-          </Card>
-        )}
         <Card
-          className="md:col-span-2 xl:col-span-4"
+          className="md:col-span-3"
           title="อยู่บนแพลตฟอร์มไหน"
           help="หนึ่งคนอยู่ได้หลายแพลตฟอร์ม ผลรวมจึงเกินจำนวนวีทั้งหมด"
           aside={d.platform_breakdown && <Legend items={[{ label: 'สีเข้ม = วีอิสระ', color: 'var(--color-ink)' }, { label: 'สีจาง = มีสังกัด', color: 'var(--color-ink)', faded: true }]} />}
@@ -276,8 +272,8 @@ export default function Analytics() {
       {d && (
         <>
           <KeyNumbers d={d} />
+          {d.insights && <Section title="สิ่งที่ข้อมูลบอก"><Insights ins={d.insights} /></Section>}
           <WholeIndustry d={d} />
-          <PlatformInsights d={d} />
           <ByPlatform d={d} />
           <IndieVsAgency d={d} />
         </>
