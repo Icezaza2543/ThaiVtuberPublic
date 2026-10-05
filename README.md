@@ -1,4 +1,4 @@
-# ThaiVtuberPublic
+# VThaiDex
 
 A lightweight public-facing overview of the Thai VTuber ecosystem.
 
@@ -17,7 +17,7 @@ It does **not** expose internal IDs, evidence records, reviewer metadata, audien
 ## Data flow
 
 ```text
-ThaiVtuber_DATA -> ThaiVtuberSNA -> ThaiVtuberMaster -> public exporter -> ThaiVtuberPublic
+ThaiVtuber_DATA -> ThaiVtuberSNA -> ThaiVtuberMaster -> public exporter -> VThaiDex
 ```
 
 Generate Master data first, then from `ThaiVtuberMaster` run:
@@ -45,7 +45,7 @@ Open `http://127.0.0.1:5501`.
 
 ## Support link
 
-The public site includes an optional support call-to-action for the website developer:
+VThaiDex includes an optional support call-to-action for the website developer:
 
 - EasyDonate: https://ezdn.app/icezaza
 
