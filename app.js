@@ -1,0 +1,34 @@
+const state={summary:null,creators:[],filtered:[],visible:24};
+const statusLabels={active:'กำลังทำกิจกรรม',hiatus:'พักกิจกรรม',inactive:'ไม่ทำกิจกรรม',graduated:'Graduated',unknown:'ไม่ทราบ'};
+const fmt=n=>Number.isFinite(n)?new Intl.NumberFormat('th-TH').format(n):'—';
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+async function json(path){const r=await fetch(path,{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));return r.json()}
+async function load(){
+  try{state.summary=await json('./data/public-summary.json')}catch{state.summary=await json('./data/bootstrap-summary.json')}
+  try{const d=await json('./data/public-creators.json');state.creators=Array.isArray(d.creators)?d.creators:[]}catch{state.creators=[]}
+  renderOverview();setupDirectory();
+}
+function renderOverview(){
+  const s=state.summary||{};const platforms=Array.isArray(s.platforms)?s.platforms:[];const lifecycle=Array.isArray(s.lifecycle)?s.lifecycle:[];
+  const pMap=Object.fromEntries(platforms.map(x=>[x.platform,x.count]));
+  const active=(lifecycle.find(x=>x.status==='active')||{}).count;
+  const cards=[
+    ['VTuber ที่ยืนยันแล้ว',s.total_vtubers,'นับตามตัวตนหรือระเบียนที่ผ่านการจัดกลุ่ม'],
+    ['YouTube',pMap.youtube,'มีอย่างน้อยหนึ่งช่อง YouTube'],
+    ['X / Twitter',pMap.x,'มีอย่างน้อยหนึ่งบัญชี X'],
+    ['กำลังทำกิจกรรม',active,'อิงจากสถานะที่มีอยู่ในฐานข้อมูล']
+  ];
+  document.querySelector('#summaryCards').innerHTML=cards.map(([a,b,c])=>`<article class="card stat-card"><span class="stat-label">${a}</span><strong class="stat-number">${fmt(b)}</strong><span class="stat-note">${c}</span></article>`).join('');
+  const generated=s.meta?.generated_at;document.querySelector('#updatedAt').textContent='อัปเดตล่าสุด: '+(generated?new Date(generated).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}):'—');
+  renderBars(platforms);renderLifecycle(lifecycle);renderTrend(s.debut_trend||[],s.known_debut_year_count);
+}
+function renderBars(rows){const root=document.querySelector('#platformChart');if(!rows.length)return;root.classList.remove('empty-state');const max=Math.max(...rows.map(x=>x.count||0),1);root.innerHTML=rows.slice(0,6).map(x=>`<div class="bar-row"><span>${esc(platformName(x.platform))}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.max(2,(x.count||0)/max*100)}%"></div></div><span class="bar-count">${fmt(x.count)}</span></div>`).join('')}
+function renderLifecycle(rows){const root=document.querySelector('#lifecycleChart');if(!rows.length)return;root.classList.remove('empty-state');root.innerHTML=rows.filter(x=>(x.count||0)>0).map(x=>`<div class="status-item"><span class="status-dot"></span><span class="status-name">${esc(statusLabels[x.status]||x.status)}</span><strong class="status-count">${fmt(x.count)}</strong></div>`).join('')||'ยังไม่มีข้อมูล'}
+function renderTrend(rows,known){const root=document.querySelector('#trendChart');document.querySelector('#trendCoverage').textContent=Number.isFinite(known)?`มีข้อมูลปีเดบิวต์ ${fmt(known)} รายการ`:'แสดงเฉพาะคนที่มีข้อมูลปีเดบิวต์';if(rows.length<2)return;root.classList.remove('empty-state');const W=920,H=250,p=38,vals=rows.map(x=>x.cumulative_known_debuts||0),max=Math.max(...vals,1),minY=Math.min(...vals,0);const pts=rows.map((r,i)=>{const x=p+i*(W-p*2)/Math.max(rows.length-1,1);const y=H-p-(r.cumulative_known_debuts-minY)/(max-minY||1)*(H-p*2);return{x,y,r}});const poly=pts.map(x=>`${x.x},${x.y}`).join(' ');const grids=[0,.25,.5,.75,1].map(k=>{const y=p+k*(H-p*2);return`<line class="trend-grid" x1="${p}" y1="${y}" x2="${W-p}" y2="${y}"/>`}).join('');const dots=pts.map(({x,y,r})=>`<circle class="trend-dot" cx="${x}" cy="${y}" r="5"><title>${r.year}: ${fmt(r.cumulative_known_debuts)}</title></circle><text class="trend-label" x="${x}" y="${H-8}" text-anchor="middle">${r.year}</text>`).join('');root.innerHTML=`<svg class="trend-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="กราฟจำนวนสะสมของรายการที่มีข้อมูลปีเดบิวต์">${grids}<polyline class="trend-line" points="${poly}"/>${dots}</svg>`}
+function platformName(p){return({youtube:'YouTube',x:'X / Twitter',twitch:'Twitch',tiktok:'TikTok',facebook:'Facebook',bluesky:'Bluesky'}[p]||p)}
+function setupDirectory(){const platforms=[...new Set(state.creators.flatMap(c=>(c.platforms||[]).map(p=>p.name)))].sort();document.querySelector('#platformFilter').insertAdjacentHTML('beforeend',platforms.map(p=>`<option value="${esc(p)}">${esc(platformName(p))}</option>`).join(''));['searchInput','platformFilter','statusFilter'].forEach(id=>document.querySelector('#'+id).addEventListener('input',()=>{state.visible=24;filterDirectory()}));document.querySelector('#loadMore').addEventListener('click',()=>{state.visible+=24;renderDirectory()});filterDirectory()}
+function filterDirectory(){const q=document.querySelector('#searchInput').value.trim().toLocaleLowerCase('th');const platform=document.querySelector('#platformFilter').value;const status=document.querySelector('#statusFilter').value;state.filtered=state.creators.filter(c=>(!q||`${c.name} ${c.agency||''}`.toLocaleLowerCase('th').includes(q))&&(!platform||(c.platforms||[]).some(p=>p.name===platform))&&(!status||c.status===status));renderDirectory()}
+function renderDirectory(){const rows=state.filtered.slice(0,state.visible);document.querySelector('#resultCount').textContent=`${fmt(state.filtered.length)} รายการ`;const grid=document.querySelector('#creatorGrid');grid.innerHTML=rows.length?rows.map(c=>`<article class="card creator-card"><h3>${esc(c.name)}</h3><p class="creator-agency">${esc(c.agency||'Independent')}</p><div class="creator-bottom"><div class="chips">${(c.platforms||[]).map(p=>p.url?`<span class="chip"><a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(platformName(p.name))} ↗</a></span>`:`<span class="chip">${esc(platformName(p.name))}</span>`).join('')}</div><span class="status-chip ${esc(c.status)}">${esc(statusLabels[c.status]||c.status)}</span></div></article>`).join(''):'<div class="card empty-state" style="grid-column:1/-1">ไม่พบรายการที่ตรงกับตัวกรอง</div>';document.querySelector('#loadMore').hidden=state.visible>=state.filtered.length}
+function route(){const id=(location.hash||'#overview').slice(1);const target=['overview','directory','about'].includes(id)?id:'overview';document.querySelectorAll('.page').forEach(x=>x.classList.toggle('page-active',x.id===target));document.querySelector('#navLinks').classList.remove('open');document.querySelector('#menuButton').setAttribute('aria-expanded','false');scrollTo({top:0,behavior:'instant'})}
+window.addEventListener('hashchange',route);document.querySelector('#menuButton').addEventListener('click',e=>{const nav=document.querySelector('#navLinks');const open=nav.classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',String(open))});route();load();
