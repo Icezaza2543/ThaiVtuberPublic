@@ -71,7 +71,7 @@ export function Waffle({ parts, label }) {
 }
 
 /** Year-over-year change as bars above/below a zero line. points [{year, value}] */
-export function ChangeBars({ points, label, color = '#7dffb3', negative = '#ff5fa2', height = 140 }) {
+export function ChangeBars({ points, label, color = 'var(--color-brand)', negative = 'var(--color-neutral)', height = 140 }) {
   const deltas = points.slice(1).map((p, i) => ({ year: p.year, d: p.value - points[i].value }));
   const max = Math.max(...deltas.map((x) => Math.abs(x.d)), 1);
   return (
@@ -113,7 +113,7 @@ export function Treemap({ items, label, height = 200 }) {
           return (
             <div key={ri} className="flex min-h-0 gap-1" style={{ flexGrow: sum }}>
               {row.map((it) => (
-                <div key={it.key ?? it.label} className="flex min-w-0 flex-col justify-between overflow-hidden rounded-md p-2" style={{ flexGrow: it.value, background: it.color, color: '#0b0a19' }} title={`${it.name ?? it.label}: ${fmt(it.value)}`}>
+                <div key={it.key ?? it.label} className="flex min-w-0 flex-col justify-between overflow-hidden rounded-md p-2" style={{ flexGrow: it.value, background: it.color, color: 'var(--color-paper)' }} title={`${it.name ?? it.label}: ${fmt(it.value)}`}>
                   <span className="truncate text-sm font-semibold leading-tight">{it.icon ?? it.label}</span>
                   <span className="truncate text-xs tabular-nums opacity-80">{fmt(it.value)}</span>
                 </div>
@@ -168,7 +168,7 @@ export function Heatmap({ rows, cols, label }) {
                 {cols.map((c) => {
                   const v = r.values[c] || 0;
                   return (
-                    <td key={c} className="h-7 rounded text-center tabular-nums" style={{ background: v ? r.color : 'var(--color-deep)', opacity: v ? 0.25 + 0.75 * (v / peak) : 1, color: v / peak > 0.55 ? '#0b0a19' : 'var(--color-ink)' }} title={`${r.name ?? ''} ${c}: ${fmt(v)}`}>
+                    <td key={c} className="h-7 rounded text-center tabular-nums" style={{ background: v ? r.color : 'var(--color-deep)', opacity: v ? 0.25 + 0.75 * (v / peak) : 1, color: v / peak > 0.55 ? 'var(--color-paper)' : 'var(--color-ink)' }} title={`${r.name ?? ''} ${c}: ${fmt(v)}`}>
                       {v ? fmt(v) : ''}
                     </td>
                   );

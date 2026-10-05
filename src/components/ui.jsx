@@ -2,10 +2,16 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { CircleHelp, ExternalLink } from 'lucide-react';
 import { creatorSummary, fmt } from '../lib/api.js';
 
-// Data colours (idol penlights). A platform keeps its colour across every chart via platformColor().
-export const PENLIGHT = ['#ff5fa2', '#43e0ff', '#ffe45c', '#b48cff', '#7dffb3', '#ff9f5c'];
-const ORDER = ['youtube', 'x', 'twitch', 'bluesky', 'tiktok', 'easydonate'];
-export const platformColor = (name, i = 0) => PENLIGHT[ORDER.indexOf(name) >= 0 ? ORDER.indexOf(name) : i % PENLIGHT.length];
+// Colour discipline: BRAND marks what matters (independent creators, the main series), NEUTRAL is everything
+// else, RAMP is one hue from strong to light for ordered categories, and platforms use their own brand colour.
+export const BRAND = 'var(--color-brand)';
+export const NEUTRAL = 'var(--color-neutral)';
+export const RAMP = [100, 78, 58, 40, 26].map((p) => `color-mix(in srgb, var(--color-brand) ${p}%, var(--color-card))`);
+const PLATFORM_COLORS = {
+  youtube: '#ff0033', twitch: '#9146ff', bluesky: '#1185fe', facebook: '#0866ff', instagram: '#e1306c',
+  tiktok: '#00c2ba', kofi: '#ff6433', buymeacoffee: '#e6b800', streamlabs: '#31c3a2', x: 'var(--color-ink)',
+};
+export const platformColor = (name) => PLATFORM_COLORS[name] || NEUTRAL;
 
 /** Help icon that opens on click/tap (hover does not exist on touch screens). */
 export function HelpTip({ children, label = 'คำอธิบาย' }) {
@@ -36,7 +42,7 @@ export function HelpTip({ children, label = 'คำอธิบาย' }) {
 }
 
 /** One creator: name, agency/debut as quiet secondary text, and real channel buttons (the clickable part). */
-export function CreatorCard({ creator, accent = PENLIGHT[0] }) {
+export function CreatorCard({ creator, accent = BRAND }) {
   const c = creatorSummary(creator);
   return (
     <article className="card flex h-full flex-col p-5">
