@@ -40,7 +40,9 @@ test('creators API rejects oversized limit',async()=>{
 test('modified cursor and filter mismatch fail',async()=>{
   const storage=createMemoryStorage();await storage.writeSnapshot(snapshot());
   const first=await body(await handleCreators(new Request('https://vthaidex.test/api/creators?q=creator'),{storage,cursorSecret,now}));
-  const changed=first.next_cursor.slice(0,-1)+(first.next_cursor.endsWith('A')?'B':'A');
+  const parts=first.next_cursor.split('.');
+  const bytes=Buffer.from(parts[2],'base64url');bytes[0]^=1;parts[2]=bytes.toString('base64url');
+  const changed=parts.join('.');
   assert.equal((await handleCreators(new Request(`https://vthaidex.test/api/creators?q=creator&cursor=${changed}`),{storage,cursorSecret,now})).status,400);
   assert.equal((await handleCreators(new Request(`https://vthaidex.test/api/creators?q=other&cursor=${encodeURIComponent(first.next_cursor)}`),{storage,cursorSecret,now})).status,400);
 });
