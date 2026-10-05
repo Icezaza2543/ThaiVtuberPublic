@@ -83,3 +83,12 @@ test('stats and creators fail closed when private storage is unavailable',async(
   const creators=await handleCreators(new Request('https://vthaidex.test/api/creators'),{storage:broken,cursorSecret,now});
   assert.equal(creators.status,503);assert.deepEqual(await body(creators),{error:'data_unavailable'});
 });
+
+
+test('creators API fails closed when cursor secret is missing or invalid',async()=>{
+  const storage=createMemoryStorage();await storage.writeSnapshot(snapshot());
+  for(const badSecret of ['',Buffer.alloc(16,1).toString('base64url')]){
+    const response=await handleCreators(new Request('https://vthaidex.test/api/creators?limit=24'),{storage,cursorSecret:badSecret,now});
+    assert.equal(response.status,503);assert.deepEqual(await body(response),{error:'data_unavailable'});
+  }
+});
