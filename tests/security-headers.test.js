@@ -38,3 +38,8 @@ test('internal endpoints inherit API noindex/no-store and maintenance cron remai
   assert.equal(api['cache-control'],'no-store');
   assert.deepEqual(config.crons,[{path:'/api/maintenance',schedule:'0 3 * * *'}]);
 });
+
+
+test('legacy public data route header is gone',()=>{
+  assert.equal(config.headers.some(row=>row.source==='/data/(.*)'),false);
+});
