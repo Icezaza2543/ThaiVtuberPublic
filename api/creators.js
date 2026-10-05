@@ -4,11 +4,16 @@ import { jsonResponse, noIndexHeaders } from '../lib/http.js';
 import { parseCreatorQuery } from '../lib/public-schema.js';
 
 function sortKey(value){return String(value??'').normalize('NFKC').toLocaleLowerCase('th');}
+function validCursorSecret(secret){
+  if(typeof secret!=='string'||!secret)return false;
+  try{return Buffer.from(secret,'base64url').length===32;}catch{return false;}
+}
 
 export async function handleCreators(request,{storage=defaultStorage,cursorSecret=process.env.VTHAIDEX_CURSOR_SECRET,now=Date.now()}={}){
   if(request.method!=='GET') return jsonResponse(405,{error:'method_not_allowed'},{...noIndexHeaders(),Allow:'GET'});
   let query;
   try{query=parseCreatorQuery(new URL(request.url));}catch{return jsonResponse(400,{error:'invalid_query'},noIndexHeaders());}
+  if(!validCursorSecret(cursorSecret)) return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());
   let snapshot;
   try{snapshot=await storage.readCurrentSnapshot();}catch{return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());}
   if(!snapshot) return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());
