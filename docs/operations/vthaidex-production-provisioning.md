@@ -51,7 +51,7 @@ Before production cutover:
 
 ## 5. Contribution form
 
-`/contribute` links to the owner's Google Form (`#contributeFormLink` in `contribute.html`). The form
+`/contribute` links to the owner's Google Form (`#contributeFormLink` in `contribute.html`; until the form exists it is a disabled "coming soon" label — replace it with `<a ... href="https://forms.gle/..." target="_blank" rel="noopener noreferrer">`). The form
 collects public creator facts only, does not collect email addresses, and is reviewed by the owner, who
 applies accepted rows through the ThaiVtuberSNA review scripts.
 
