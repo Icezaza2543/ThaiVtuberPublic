@@ -17,15 +17,15 @@ export default function Backdrop() {
         <defs>
           <linearGradient id="wave-a" x1="0" x2="1">
             <stop offset="0" stopColor="#ff5fa2" stopOpacity="0" />
-            <stop offset="0.35" stopColor="#ff5fa2" stopOpacity="0.55" />
-            <stop offset="0.7" stopColor="#b48cff" stopOpacity="0.45" />
-            <stop offset="1" stopColor="#43e0ff" stopOpacity="0" />
+            <stop offset="0.35" stopColor="var(--color-brand)" stopOpacity="0.5" />
+            <stop offset="0.7" stopColor="var(--color-lilac)" stopOpacity="0.4" />
+            <stop offset="1" stopColor="var(--color-lilac)" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="wave-b" x1="0" x2="1">
-            <stop offset="0" stopColor="#43e0ff" stopOpacity="0" />
-            <stop offset="0.4" stopColor="#43e0ff" stopOpacity="0.4" />
-            <stop offset="0.75" stopColor="#ffe45c" stopOpacity="0.35" />
-            <stop offset="1" stopColor="#ff9f5c" stopOpacity="0" />
+            <stop offset="0" stopColor="var(--color-lilac)" stopOpacity="0" />
+            <stop offset="0.4" stopColor="var(--color-lilac)" stopOpacity="0.35" />
+            <stop offset="0.75" stopColor="var(--color-brand)" stopOpacity="0.3" />
+            <stop offset="1" stopColor="var(--color-brand)" stopOpacity="0" />
           </linearGradient>
         </defs>
         <g className="waves" fill="none" strokeWidth="1.4">
@@ -38,7 +38,7 @@ export default function Backdrop() {
         </g>
         {TWINKLES.map(([x, y, r], i) => (
           <g key={i} className="twinkle" style={{ animationDelay: `${(i % 6) * 0.7}s` }} transform={`translate(${x * 14.4} ${y * 9})`}>
-            <path d={`M0 ${-r * 4} L${r * 0.8} 0 L0 ${r * 4} L${-r * 0.8} 0 Z M${-r * 4} 0 L0 ${r * 0.8} L${r * 4} 0 L0 ${-r * 0.8} Z`} fill="#fbf9ff" opacity="0.8" />
+            <path d={`M0 ${-r * 4} L${r * 0.8} 0 L0 ${r * 4} L${-r * 0.8} 0 Z M${-r * 4} 0 L0 ${r * 0.8} L${r * 4} 0 L0 ${-r * 0.8} Z`} fill="var(--color-ink)" opacity="0.7" />
           </g>
         ))}
       </svg>

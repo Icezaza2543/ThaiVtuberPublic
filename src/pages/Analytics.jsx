@@ -3,7 +3,7 @@ import { ArrowRight, RotateCw } from 'lucide-react';
 import Layout, { PageTitle } from '../components/Layout.jsx';
 import { SectionHeading } from '../components/brand.jsx';
 import PlatformIcon from '../components/PlatformIcon.jsx';
-import { HelpTip, Legend, PENLIGHT, platformColor, ShareBars, YearBars } from '../components/ui.jsx';
+import { BRAND, HelpTip, Legend, NEUTRAL, platformColor, RAMP, ShareBars, YearBars } from '../components/ui.jsx';
 import { fetchOverview, fmt, formatDate, pct, platformLabel, STATUS_LABELS } from '../lib/api.js';
 import { ChangeBars, Donut, Heatmap, Lollipop, MultiLine, StackedShare, Treemap, Waffle } from '../components/charts.jsx';
 
@@ -37,18 +37,18 @@ function KeyNumbers({ d }) {
   const years = (d.debut_trend || []).filter((r) => r.year < new Date().getFullYear() && r.known_debuts > 0);
   const last = years.at(-1);
   const cards = [
-    { value: fmt(d.total_vtubers), label: 'VTuber ไทยทั้งหมด', color: PENLIGHT[0] },
-    Number.isFinite(d.independent_count) && { value: fmt(d.independent_count), label: 'วีอิสระ', sub: `${pct(d.independent_count, d.total_vtubers)}% ของทั้งหมด`, color: PENLIGHT[1] },
-    Number.isFinite(d.agency_total) && { value: fmt(d.agency_total), label: 'สังกัด', sub: `มีสมาชิก ${fmt(d.total_vtubers - d.independent_count)} คน`, color: PENLIGHT[3] },
-    last && { value: fmt(last.known_debuts), label: `เดบิวต์ปี ${last.year}`, sub: 'เท่าที่ทราบปีเดบิวต์', color: PENLIGHT[2] },
-    span.length > 0 && { value: `${pct(multi, d.total_vtubers)}%`, label: 'มีมากกว่าหนึ่งช่องทาง', color: PENLIGHT[4] },
+    { value: fmt(d.total_vtubers), label: 'VTuber ไทยทั้งหมด', color: NEUTRAL },
+    Number.isFinite(d.independent_count) && { value: fmt(d.independent_count), label: 'วีอิสระ', sub: `${pct(d.independent_count, d.total_vtubers)}% ของทั้งหมด`, color: BRAND },
+    Number.isFinite(d.agency_total) && { value: fmt(d.agency_total), label: 'สังกัด', sub: `มีสมาชิก ${fmt(d.total_vtubers - d.independent_count)} คน`, color: NEUTRAL },
+    last && { value: fmt(last.known_debuts), label: `เดบิวต์ปี ${last.year}`, sub: 'เท่าที่ทราบปีเดบิวต์', color: NEUTRAL },
+    span.length > 0 && { value: `${pct(multi, d.total_vtubers)}%`, label: 'มีมากกว่าหนึ่งช่องทาง', color: NEUTRAL },
   ].filter(Boolean);
   return (
     <ul className="mx-auto mt-6 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:px-6 md:grid-cols-3 lg:grid-cols-5">
       {cards.map((c) => (
-        <li key={c.label} className="card p-4 sm:p-5" style={{ background: `linear-gradient(150deg, ${c.color}33, transparent 65%), var(--color-card)`, borderColor: `${c.color}55` }}>
+        <li key={c.label} className="card p-4 sm:p-5">
           <span className="block h-1 w-8 rounded-full" style={{ background: c.color }} aria-hidden="true" />
-          <p className="mt-3 font-display text-2xl tabular-nums" style={{ color: c.color }}>{c.value}</p>
+          <p className="mt-3 font-display text-2xl tabular-nums" style={{ color: c.color === BRAND ? BRAND : undefined }}>{c.value}</p>
           <p className="text-sm">{c.label}</p>
           {c.sub && <p className="text-xs text-faint">{c.sub}</p>}
         </li>
@@ -69,13 +69,13 @@ function GrowthLine({ rows }) {
       <svg viewBox={`0 0 ${W} ${H}`} className="h-36 w-full" role="img" aria-label={`จำนวนสะสมเพิ่มจาก ${fmt(pts[0].cumulative_known_debuts)} เป็น ${fmt(max)} คน`}>
         <defs>
           <linearGradient id="growth" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor={PENLIGHT[0]} stopOpacity="0.35" />
-            <stop offset="1" stopColor={PENLIGHT[0]} stopOpacity="0" />
+            <stop offset="0" stopColor={BRAND} stopOpacity="0.35" />
+            <stop offset="1" stopColor={BRAND} stopOpacity="0" />
           </linearGradient>
         </defs>
         <polygon points={`${xy[0][0]},${H - pad} ${line} ${xy.at(-1)[0]},${H - pad}`} fill="url(#growth)" />
-        <polyline points={line} fill="none" stroke={PENLIGHT[0]} strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-        {xy.map(([x, y], i) => <circle key={pts[i].year} cx={x} cy={y} r="3.5" fill={PENLIGHT[0]}><title>{`${pts[i].year}: ${fmt(pts[i].cumulative_known_debuts)}`}</title></circle>)}
+        <polyline points={line} fill="none" stroke={BRAND} strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+        {xy.map(([x, y], i) => <circle key={pts[i].year} cx={x} cy={y} r="3.5" fill={BRAND}><title>{`${pts[i].year}: ${fmt(pts[i].cumulative_known_debuts)}`}</title></circle>)}
       </svg>
       <div className="mt-1 flex justify-between text-[11px] tabular-nums text-faint" aria-hidden="true">
         <span>{pts[0].year}</span><span>{pts.at(-1).year}</span>
@@ -97,9 +97,9 @@ function WholeIndustry({ d }) {
         <Card
           title="เดบิวต์ต่อปี"
           help={`นับเฉพาะ ${fmt(d.known_debut_year_count)} คนที่ทราบปีเดบิวต์ (${pct(d.known_debut_year_count, d.total_vtubers)}%) ปีล่าสุดยังไม่จบปี`}
-          aside={split && <Legend items={[{ label: 'วีอิสระ', color: PENLIGHT[1] }, { label: 'มีสังกัด', color: PENLIGHT[3] }]} />}
+          aside={split && <Legend items={[{ label: 'วีอิสระ', color: BRAND }, { label: 'มีสังกัด', color: NEUTRAL }]} />}
         >
-          <YearBars label="เดบิวต์ต่อปี" years={years} series={split ? [{ key: 'i', color: PENLIGHT[1], values: indie }, { key: 'a', color: PENLIGHT[3], values: agency }] : [{ key: 'all', color: PENLIGHT[1], values: all }]} />
+          <YearBars label="เดบิวต์ต่อปี" years={years} series={split ? [{ key: 'i', color: BRAND, values: indie }, { key: 'a', color: NEUTRAL, values: agency }] : [{ key: 'all', color: BRAND, values: all }]} />
         </Card>
         <Card title="จำนวนสะสม" help="จำนวนวีที่ทราบปีเดบิวต์ รวมสะสมตั้งแต่ปีแรก">
           <GrowthLine rows={d.debut_trend} />
@@ -109,21 +109,21 @@ function WholeIndustry({ d }) {
         </Card>
         {Number.isFinite(d.independent_count) && (
           <Card title="100 คนในวงการ" help="ถ้าย่อวงการเหลือ 100 คน หนึ่งช่องคือประมาณ 1%">
-            <Waffle label="สัดส่วนวีอิสระกับวีมีสังกัด" parts={[{ label: 'วีอิสระ', value: d.independent_count, color: PENLIGHT[1] }, { label: 'มีสังกัด', value: d.total_vtubers - d.independent_count, color: PENLIGHT[3] }]} />
+            <Waffle label="สัดส่วนวีอิสระกับวีมีสังกัด" parts={[{ label: 'วีอิสระ', value: d.independent_count, color: BRAND }, { label: 'มีสังกัด', value: d.total_vtubers - d.independent_count, color: NEUTRAL }]} />
           </Card>
         )}
         <Card
           className="md:col-span-2 xl:col-span-4"
           title="อยู่บนแพลตฟอร์มไหน"
           help="หนึ่งคนอยู่ได้หลายแพลตฟอร์ม ผลรวมจึงเกินจำนวนวีทั้งหมด"
-          aside={d.platform_breakdown && <Legend items={[{ label: 'สีเข้ม = วีอิสระ', color: '#ece9f7' }, { label: 'สีจาง = มีสังกัด', color: '#ece9f7', faded: true }]} />}
+          aside={d.platform_breakdown && <Legend items={[{ label: 'สีเข้ม = วีอิสระ', color: 'var(--color-ink)' }, { label: 'สีจาง = มีสังกัด', color: 'var(--color-ink)', faded: true }]} />}
         >
           <div className="grid gap-x-10 gap-y-3 md:grid-cols-2">
             {[breakdown.slice(0, 6), breakdown.slice(6, 12)].map((rows, col) => (
               <ShareBars
                 key={col}
                 max={breakdown[0]?.count}
-                rows={rows.map((r, i) => ({ key: r.platform, name: platformLabel(r.platform), label: icon(r.platform), value: r.count, part: r.independent, color: platformColor(r.platform, i + col * 6) }))}
+                rows={rows.map((r, i) => ({ key: r.platform, name: platformLabel(r.platform), label: icon(r.platform), value: r.count, part: r.independent, color: platformColor(r.platform) }))}
               />
             ))}
           </div>
@@ -138,7 +138,7 @@ function PlatformInsights({ d }) {
   if (!rows.length) return null;
   const top = rows.slice(0, 6);
   const years = [...new Set(top.flatMap((r) => (r.debut_years || []).map((y) => y.year)))].sort();
-  const colorOf = (r, i) => platformColor(r.platform, i);
+  const colorOf = (r, i) => platformColor(r.platform);
   const cumulative = top.slice(0, 5).map((r, i) => {
     let run = 0;
     const m = byYear(r.debut_years);
@@ -176,7 +176,7 @@ function ByPlatform({ d }) {
   if (!rows.length) return null;
   const r = rows.find((x) => x.platform === sel) || rows[0];
   const i = rows.indexOf(r);
-  const color = platformColor(r.platform, i);
+  const color = platformColor(r.platform);
   const years = (r.debut_years || []).filter((y) => y.count > 0);
   return (
     <Section title="แยกตามแพลตฟอร์ม">
@@ -193,7 +193,7 @@ function ByPlatform({ d }) {
           <p className="mt-2 font-display text-3xl tabular-nums">{fmt(r.count)}</p>
           <p className="text-muted">วีไทยบน {platformLabel(r.platform)} คิดเป็น {pct(r.count, d.total_vtubers)}% ของทั้งหมด</p>
           <div className="mt-6">
-            <Donut size={132} label={`วีอิสระกับวีมีสังกัดบน ${platformLabel(r.platform)}`} center={`${pct(r.independent, r.count)}%`} sub="วีอิสระ" segments={[{ label: 'วีอิสระ', value: r.independent, color }, { label: 'มีสังกัด', value: r.count - r.independent, color: 'var(--color-faint)' }]} />
+            <Donut size={132} label={`วีอิสระกับวีมีสังกัดบน ${platformLabel(r.platform)}`} center={`${pct(r.independent, r.count)}%`} sub="วีอิสระ" segments={[{ label: 'วีอิสระ', value: r.independent, color }, { label: 'มีสังกัด', value: r.count - r.independent, color: NEUTRAL }]} />
           </div>
           <a href={`/directory?platform=${encodeURIComponent(r.platform)}&scope=independent`} className="btn btn-secondary mt-6">
             ดูวีอิสระบน {platformLabel(r.platform)} <ArrowRight size={15} aria-hidden="true" />
@@ -222,8 +222,8 @@ function IndieVsAgency({ d }) {
         {sizes.length > 0 && (
           <Card title="วีอยู่ที่ไหนกันบ้าง" className="lg:col-span-2">
             <ul className="space-y-4">
-              {[{ label: 'ไม่มีสังกัด', note: 'วีอิสระ', members: d.independent_count, color: PENLIGHT[1] },
-                ...sizes.map((s, i) => ({ label: `ค่าย ${s.size} คน`, note: `${fmt(s.agencies)} ค่าย`, members: s.members, color: PENLIGHT[[3, 2, 5, 0][i] ?? 3] }))].map((row) => (
+              {[{ label: 'ไม่มีสังกัด', note: 'วีอิสระ', members: d.independent_count, color: BRAND },
+                ...sizes.map((s, i) => ({ label: `ค่าย ${s.size} คน`, note: `${fmt(s.agencies)} ค่าย`, members: s.members, color: NEUTRAL }))].map((row) => (
                 <li key={row.label} className="grid grid-cols-[7rem_1fr_4rem] items-center gap-3 text-sm">
                   <span>{row.label}<span className="block text-xs text-faint">{row.note}</span></span>
                   <span className="h-2.5 rounded-full bg-deep" aria-hidden="true"><span className="bar-grow block h-full rounded-full" style={{ width: `${(row.members / maxMembers) * 100}%`, background: row.color }} /></span>
@@ -236,7 +236,7 @@ function IndieVsAgency({ d }) {
         <div className="flex flex-col gap-4">
         {span.length > 0 && (
           <Card title="มีกี่ช่องทาง" help="นับช่องทางทางการที่ตรวจแล้วของแต่ละคน">
-            <Donut size={132} label="จำนวนช่องทางต่อคน" center={`${pct(span.filter((r) => r.platforms >= 2).reduce((x, r) => x + r.count, 0), spanTotal)}%`} sub="มีหลายช่องทาง" segments={span.map((r, i) => ({ label: r.platforms >= 5 ? '5 ช่องทางขึ้นไป' : `${r.platforms} ช่องทาง`, value: r.count, color: PENLIGHT[i % PENLIGHT.length] }))} />
+            <Donut size={132} label="จำนวนช่องทางต่อคน" center={`${pct(span.filter((r) => r.platforms >= 2).reduce((x, r) => x + r.count, 0), spanTotal)}%`} sub="มีหลายช่องทาง" segments={span.map((r, i) => ({ label: r.platforms >= 5 ? '5 ช่องทางขึ้นไป' : `${r.platforms} ช่องทาง`, value: r.count, color: RAMP[Math.min(i, RAMP.length - 1)] }))} />
           </Card>
         )}
         <Card title="สถานะ" help="จากสถานะที่ตรวจแล้ว ไม่ได้เดาจากโพสต์ล่าสุด คนที่จบกิจกรรมยังอยู่ในสารบบ เพราะเป็นส่วนหนึ่งของประวัติวงการ">

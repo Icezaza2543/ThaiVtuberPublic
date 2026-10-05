@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
-import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info } from 'lucide-react';
+import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info, Sun, Moon } from 'lucide-react';
 import { DONATE_URL, SOURCE_URL } from '../lib/api.js';
 import Backdrop from './Backdrop.jsx';
 
@@ -25,6 +25,21 @@ function currentPath() {
   return location.pathname.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/$/, '$1') || '/';
 }
 
+function ThemeToggle() {
+  const [theme, setTheme] = useState(() => (typeof document !== 'undefined' && document.documentElement.dataset.theme) || 'dark');
+  const next = theme === 'dark' ? 'light' : 'dark';
+  const toggle = () => {
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('vthaidex-theme', next); } catch { /* private mode */ }
+    setTheme(next);
+  };
+  return (
+    <button type="button" onClick={toggle} className="rounded-lg p-2 text-muted hover:bg-raised hover:text-ink" aria-label={next === 'light' ? 'เปลี่ยนเป็นธีมสว่าง' : 'เปลี่ยนเป็นธีมมืด'} title={next === 'light' ? 'ธีมสว่าง' : 'ธีมมืด'}>
+      {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+    </button>
+  );
+}
+
 function Header() {
   const [open, setOpen] = useState(false);
   const path = currentPath();
@@ -33,7 +48,7 @@ function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
         <a href="/" className="mr-auto flex items-center gap-2" aria-label="VThaiDex หน้าแรก">
           <img src="/assets/logo.svg" alt="" width="28" height="28" />
-          <span className="glow-title font-display text-xl">VThaiDex</span>
+          <span className="font-display text-xl">VThai<span className="text-brand">Dex</span></span>
         </a>
         <nav aria-label="เมนูหลัก" className="hidden items-center gap-1 md:flex">
           {NAV.map(({ href, label, icon: Icon }) => (
@@ -52,6 +67,7 @@ function Header() {
           <PenLine size={15} aria-hidden="true" />
           แจ้งข้อมูล
         </a>
+        <ThemeToggle />
         <button
           type="button"
           className="rounded-lg p-2 md:hidden"
@@ -132,7 +148,7 @@ export default function Layout({ children }) {
 export function PageTitle({ title, children }) {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6 sm:pt-14">
-      <h1 className="glow-title w-fit text-2xl sm:text-3xl">{title}</h1>
+      <h1 className="w-fit text-2xl sm:text-3xl">{title}</h1>
       {children && <div className="mt-2 max-w-[60ch] text-muted">{children}</div>}
     </div>
   );
