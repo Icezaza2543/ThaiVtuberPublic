@@ -87,14 +87,24 @@ See `LICENSE`, `LICENSE.md` and `/data-license`.
 
 ## Development
 
-Requires Node.js 22+ for the API/unit test suite.
+React 19 + Tailwind CSS v4, built by Vite as a multi-page site (one HTML entry per route, so each page keeps
+its own SEO head). Pages live in `src/pages/`, shared layout in `src/components/`, API helpers in
+`src/lib/api.js`. The home page's 3D universe (`src/components/Universe.jsx`, three.js via
+react-three-fiber) is lazy-loaded and is drawn only from aggregate stats: agencies are planets sized by
+member count, independent creators are points in a spiral disc coloured by platform mix.
+
+Requires Node.js 22+.
 
 ```bash
 npm install
-npm test
+npm run dev      # http://localhost:5173, /api proxied to production
+npm test         # API, schema and data-helper tests
+npm run build    # dist/
 ```
 
-The site remains mostly static HTML/CSS/JavaScript with Vercel Functions under `api/`.
+`VTHAIDEX_STATS_FILE=<summary.json> npm run dev` serves `/api/stats` from a local file, e.g. a summary that
+has not been published yet. Fonts are self-hosted through `@fontsource`; the site makes no third-party
+requests. Vercel builds with `npm run build` and serves `dist/` plus the functions in `api/`.
 
 ## Production provisioning
 
