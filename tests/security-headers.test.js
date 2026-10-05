@@ -33,10 +33,10 @@ test('all API routes are noindex and no-store',()=>{
   assert.equal(h['cache-control'],'no-store');
 });
 
-test('internal endpoints inherit API noindex/no-store and maintenance cron remains daily',()=>{
+test('internal endpoints inherit API noindex/no-store and no intake maintenance cron remains',()=>{
   const api=map(bySource('/api/(.*)'));
   assert.equal(api['cache-control'],'no-store');
-  assert.deepEqual(config.crons,[{path:'/api/maintenance',schedule:'0 3 * * *'}]);
+  assert.equal(config.crons,undefined);
 });
 
 

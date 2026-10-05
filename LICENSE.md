@@ -6,7 +6,9 @@ Unless another notice applies, explanatory text, project documentation, and VTha
 
 Attribution should identify VThaiDex, link to the source where practical, link to CC BY 4.0, and indicate whether changes were made.
 
-The **source code is not covered by CC BY** unless an individual file or a separate software license explicitly says otherwise. Source code remains All Rights Reserved by default.
+## Source code — AGPL-3.0-only
+
+The VThaiDex source code is licensed under the **GNU Affero General Public License v3.0 only** (full text in `LICENSE`). You may use, modify and redistribute it; if you run a modified version for users over a network, you must offer them its source code under the same license. The source code is not covered by CC BY, and the AGPL does not cover the compiled database below.
 
 ## Database / Dataset / API collection — All Rights Reserved
 

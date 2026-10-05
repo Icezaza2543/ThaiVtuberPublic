@@ -38,29 +38,12 @@ VThaiDex production does **not** receive credentials that can read ThaiVtuber_DA
 
 The public frontend does not ship a full creator JSON/CSV dataset. Directory access is paginated and bounded to 24 creator records per request.
 
-## Private contribution flow
+## Contribution flow
 
-```text
-browser form
-   |
-   | AES-256-GCM content encryption
-   | RSA-OAEP-SHA256 key wrapping
-   v
-ciphertext-only intake
-   |
-   v
-private storage
-   |
-   | authenticated operator fetch
-   v
-ThaiVtuberMaster local review
-   |
-   | private key stays local
-   v
-canonical human-review workflow
-```
-
-Contribution is **disabled by default**. `VTHAIDEX_INTAKE_ENABLED=true` is set only after the public key, offline key backups, private storage, local decrypt/review flow, and preview submission have all been verified.
+Contributions go through an owner-managed **Google Form** linked from `/contribute`. The site itself has no
+submission endpoint and stores no contributor data. The owner reviews answers against public evidence and
+applies accepted changes in ThaiVtuber_DATA through the normal review scripts; the next snapshot publish
+updates VThaiDex.
 
 ## Public routes
 
@@ -82,39 +65,25 @@ Public content routes use clean URLs for SEO. `/contribute`, `/api/*`, and inter
 ```text
 GET  /api/stats
 GET  /api/creators?q=&platform=&status=&cursor=&limit=
-POST /api/intake
-GET  /api/intake-token
 
 POST /api/internal/publish
-GET|PATCH /api/internal/intake
-GET /api/maintenance
 ```
 
-Internal endpoints require separate secrets. Public API responses never expose canonical IDs or review metadata.
+The publish endpoint requires its own secret. Public API responses never expose canonical IDs or review metadata.
 
 ## Security boundaries
 
-Vercel may hold:
-
-- sanitized private snapshots;
-- encrypted intake ciphertext;
-- publish/cursor/operator/form-token/cron secrets.
-
-Vercel must **not** hold:
-
-- ThaiVtuber_DATA Google credentials;
-- the RSA intake private key;
-- the intake private-key passphrase.
-
-A VThaiDex application/storage breach alone should therefore not be enough to read stored intake plaintext or pivot into the canonical database.
+Vercel holds sanitized private snapshots and the publish/cursor secrets. It must **not** hold
+ThaiVtuber_DATA Google credentials, so a VThaiDex breach cannot pivot into the canonical database.
 
 ## Licensing
 
+- source code: **AGPL-3.0-only** (`LICENSE`) — anyone may use, modify and share it; a modified version offered to users over a network must publish its source under AGPL-3.0
 - VThaiDex-authored UI, explanatory text, and documentation: **CC BY 4.0**
 - compiled database / dataset / API collection: **All Rights Reserved**
 - third-party names, marks, logos, media, and creator-owned material remain with their owners.
 
-See `LICENSE.md` and `/data-license`.
+See `LICENSE`, `LICENSE.md` and `/data-license`.
 
 ## Development
 
@@ -129,13 +98,11 @@ The site remains mostly static HTML/CSS/JavaScript with Vercel Functions under `
 
 ## Production provisioning
 
-Admin-only provisioning and key-recovery steps are documented in:
+Admin-only provisioning steps are documented in:
 
 ```text
 docs/operations/vthaidex-production-provisioning.md
 ```
-
-Do not enable private intake until every recovery and ciphertext-only verification gate in that runbook passes.
 
 ## Support
 
@@ -147,4 +114,4 @@ Support is for VThaiDex development/project costs and is not connected to VTuber
 
 ## Status
 
-This branch is a staged migration. Production cutover is intentionally blocked until private storage, environment secrets, the local intake key recovery drill, first canonical snapshot publish, encrypted intake preview test, and final security review have all passed.
+This branch is a staged migration. Production cutover waits for the first canonical snapshot publish and the API checks in the provisioning runbook.
