@@ -61,3 +61,14 @@ test('intake POST is disabled even when a previously issued token is still valid
   assert.equal(response.status,503);assert.deepEqual(await body(response),{error:'intake_disabled'});
   assert.equal((await storage.listIntake('pending')).length,0);
 });
+
+
+test('stored intake timestamps are day-bucketed to reduce correlation precision',async()=>{
+  const storage=createMemoryStorage();
+  const exact=Date.UTC(2026,9,5,13,47,29,321);
+  const token=issueIntakeToken({secret,now:exact-5000,nonce:'bucket-test'}).token;
+  const response=await handleIntake(request({token,honeypot:'',client_elapsed_ms:5000,envelope}),{storage,tokenSecret:secret,now:exact,keyIds:new Set(['vtd-test-01']),randomId:()=> 'bucket-id',enabled:true});
+  assert.equal(response.status,202);
+  const [record]=await storage.listIntake('pending');
+  assert.equal(record.received_at,'2026-10-05T00:00:00.000Z');
+});
