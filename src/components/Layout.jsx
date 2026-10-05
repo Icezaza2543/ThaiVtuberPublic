@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react';
 import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info } from 'lucide-react';
 import { DONATE_URL, SOURCE_URL } from '../lib/api.js';
+import Backdrop from './Backdrop.jsx';
 
 // Dev-only font tryout panel; excluded from the production bundle.
 const FontPicker = import.meta.env.DEV ? lazy(() => import('./FontPicker.jsx')) : null;
@@ -83,7 +84,7 @@ function Header() {
 
 function Footer() {
   return (
-    <footer className="mt-16 bg-deep">
+    <footer className="mt-16 bg-deep/80 backdrop-blur">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 text-sm sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <p className="font-display text-base">VThaiDex</p>
@@ -119,6 +120,7 @@ export default function Layout({ children }) {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-deep">
         ข้ามไปยังเนื้อหา
       </a>
+      <Backdrop />
       <Header />
       <main id="main">{children}</main>
       <Footer />
