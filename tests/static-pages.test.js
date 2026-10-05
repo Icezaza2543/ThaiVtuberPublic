@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const publicPages=['index.html','directory.html','about.html','terms.html','terms-of-use.html','privacy.html','data-license.html'];
+const publicPages=['index.html','analytics.html','directory.html','about.html','terms.html','terms-of-use.html','privacy.html','data-license.html'];
 const legalLinks=['/terms','/terms-of-use','/privacy','/data-license'];
 const text=file=>readFileSync(new URL(`../${file}`,import.meta.url),'utf8');
 

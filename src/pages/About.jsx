@@ -33,17 +33,17 @@ export default function About() {
       <PageTitle title="เกี่ยวกับข้อมูล">
         VThaiDex แสดงข้อมูลสาธารณะที่ผ่านการตรวจจากทะเบียน VTuber ไทย หน้านี้อธิบายวิธีนับและข้อจำกัดของข้อมูล
       </PageTitle>
-      <dl className="mx-auto mt-12 max-w-6xl divide-y divide-line border-y-2 border-edge px-4 sm:px-6">
+      <dl className="mx-auto mt-12 max-w-6xl divide-y divide-line/70 px-4 sm:px-6">
         {QA.map(({ q, a }) => (
-          <div key={q} className="grid gap-2 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] md:gap-12">
-            <dt className="font-display text-xl font-semibold leading-snug">{q}</dt>
-            <dd className="max-w-[68ch] text-[17px] leading-[1.8] text-muted">{a}</dd>
+          <div key={q} className="grid gap-2 py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] md:gap-12">
+            <dt className="text-base">{q}</dt>
+            <dd className="max-w-[68ch] leading-[1.8] text-muted">{a}</dd>
           </div>
         ))}
       </dl>
       <p className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
-        อ่านต่อ: <a className="font-semibold text-sky underline underline-offset-4" href="/data-license">สัญญาอนุญาต</a> และ{' '}
-        <a className="font-semibold text-sky underline underline-offset-4" href="/terms-of-use">เงื่อนไขการใช้งาน</a>
+        อ่านต่อ: <a className="font-medium text-sky hover:underline" href="/data-license">สัญญาอนุญาต</a> และ{' '}
+        <a className="font-medium text-sky hover:underline" href="/terms-of-use">เงื่อนไขการใช้งาน</a>
       </p>
     </Layout>
   );

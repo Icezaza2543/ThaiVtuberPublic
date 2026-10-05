@@ -102,8 +102,8 @@ npm test         # API, schema and data-helper tests
 npm run build    # dist/
 ```
 
-`VTHAIDEX_STATS_FILE=<summary.json> npm run dev` serves `/api/stats` from a local file, e.g. a summary that
-has not been published yet. Fonts are self-hosted through `@fontsource`; the site makes no third-party
+`VTHAIDEX_SNAPSHOT_FILE=<snapshot.json> npm run dev` serves every `/api` route from a local snapshot through the
+real handlers, e.g. before a new snapshot or endpoint is deployed. Fonts are self-hosted through `@fontsource`; the site makes no third-party
 requests. Vercel builds with `npm run build` and serves `dist/` plus the functions in `api/`.
 
 ## Production provisioning

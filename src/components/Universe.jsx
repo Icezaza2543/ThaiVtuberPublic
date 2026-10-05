@@ -5,22 +5,39 @@ import * as THREE from 'three';
 
 // Idol penlight colours; also used by the dashboard so a colour means the same platform everywhere.
 export const PENLIGHT = ['#ff5fa2', '#43e0ff', '#ffe45c', '#b48cff', '#7dffb3', '#ff9f5c'];
-const MAX_PLANETS = 36;
+const MAX_PLANETS = 24;
 const MAX_MOONS = 48;
+
+let dotTexture;
+/** Soft round sprite so stars are dots, not squares. */
+function roundDot() {
+  if (dotTexture || typeof document === 'undefined') return dotTexture;
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.45, 'rgba(255,255,255,0.9)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 64);
+  dotTexture = new THREE.CanvasTexture(c);
+  return dotTexture;
+}
 
 function seeded(seed) {
   let s = seed >>> 0;
   return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 }
 
-function Core() {
+function Core({ onClick }) {
   const halo = useRef();
   useFrame(({ clock }) => {
     if (halo.current) halo.current.scale.setScalar(1 + Math.sin(clock.elapsedTime * 1.4) * 0.04);
   });
   return (
     <group>
-      <mesh>
+      <mesh onClick={(e) => { e.stopPropagation(); onClick?.(); }} onPointerOver={() => { document.body.style.cursor = 'pointer'; }} onPointerOut={() => { document.body.style.cursor = ''; }}>
         <sphereGeometry args={[2.1, 48, 48]} />
         <meshBasicMaterial color="#fff2f8" toneMapped={false} fog={false} />
       </mesh>
@@ -38,7 +55,7 @@ function Planet({ agency, index, motion, onSelect, hovered, setHovered }) {
   const spin = useRef();
   const rand = useMemo(() => seeded(index * 97 + agency.count), [index, agency.count]);
   const cfg = useMemo(() => {
-    const radius = 6.5 + index * 1.15;
+    const radius = 6.5 + index * 0.95;
     return {
       radius,
       size: 0.28 + Math.sqrt(agency.count) * 0.13,
@@ -96,7 +113,7 @@ function Planet({ agency, index, motion, onSelect, hovered, setHovered }) {
 }
 
 /** Independent creators as a spiral disc. Each point is one creator; colour follows the platform mix. */
-function IndependentGalaxy({ count, inner, platforms, total, motion }) {
+function IndependentGalaxy({ count, inner, platforms, total, motion, onPick }) {
   const ref = useRef();
   const { positions, colors } = useMemo(() => {
     const rand = seeded(count + 7);
@@ -108,9 +125,9 @@ function IndependentGalaxy({ count, inner, platforms, total, motion }) {
     for (let i = 0; i < count; i++) {
       const arm = i % 3;
       const t = Math.pow(rand(), 0.75);
-      const r = inner + t * 30;
+      const r = inner + t * 40;
       const a = arm * ((Math.PI * 2) / 3) + t * 5.2 + (rand() - 0.5) * 0.7;
-      pos.set([Math.cos(a) * r, (rand() - 0.5) * (1.6 - t), Math.sin(a) * r], i * 3);
+      pos.set([Math.cos(a) * r, (rand() - 0.5) * 2.4, Math.sin(a) * r], i * 3);
       let pick = rand() * sum;
       let k = 0;
       while (k < weights.length - 1 && pick > weights[k]) { pick -= weights[k]; k++; }
@@ -125,17 +142,22 @@ function IndependentGalaxy({ count, inner, platforms, total, motion }) {
   });
 
   return (
-    <points ref={ref}>
+    <points
+      ref={ref}
+      onClick={(e) => { e.stopPropagation(); onPick?.(e.index); }}
+      onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+      onPointerOut={() => { document.body.style.cursor = ''; }}
+    >
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         <bufferAttribute attach="attributes-color" args={[colors, 3]} />
       </bufferGeometry>
-      <pointsMaterial vertexColors size={0.26} sizeAttenuation transparent opacity={1} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+      <pointsMaterial map={roundDot()} alphaTest={0.05} vertexColors size={0.75} sizeAttenuation transparent opacity={1} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
     </points>
   );
 }
 
-export default function Universe({ stats, onSelectAgency, onHoverAgency }) {
+export default function Universe({ stats, onSelectAgency, onHoverAgency, onPickIndie, onSun, showAgencies = true, showIndies = true }) {
   const [hovered, setHoveredName] = useState(null);
   const setHovered = (name) => {
     setHoveredName(name);
@@ -143,23 +165,22 @@ export default function Universe({ stats, onSelectAgency, onHoverAgency }) {
   };
   const motion = useMemo(() => typeof window === 'undefined' || !window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
   const agencies = (stats.agencies || []).slice(0, MAX_PLANETS);
-  const inner = 6.5 + agencies.length * 1.15 + 3;
-  // Keep the sun in the upper part of the frame so the headline below stays readable; pull back on narrow screens.
-  const narrow = typeof window !== 'undefined' && window.innerWidth < 768;
+  // Independents share the whole plane with the agencies: they are the majority, so they fill the sky.
+  const inner = 4;
   return (
-    <Canvas camera={{ position: narrow ? [0, 48, 118] : [0, 26, 62], fov: 50 }} dpr={[1, 2]} gl={{ antialias: true }}>
+    <Canvas camera={{ position: [0, 30, 62], fov: 50 }} dpr={[1, 2]} gl={{ antialias: true }} raycaster={{ params: { Points: { threshold: 0.5 } } }}>
       <color attach="background" args={['#0c0922']} />
       <fog attach="fog" args={['#0c0922', 70, 140]} />
       <ambientLight intensity={0.35} />
       <Stars radius={160} depth={60} count={4000} factor={4} saturation={0.6} fade speed={motion ? 0.6 : 0} />
-      <Core />
-      {agencies.map((a, i) => (
+      <Core onClick={onSun} />
+      {showAgencies && agencies.map((a, i) => (
         <Planet key={a.name} agency={a} index={i} motion={motion} hovered={hovered} setHovered={setHovered} onSelect={onSelectAgency} />
       ))}
-      {stats.independent_count > 0 && (
-        <IndependentGalaxy count={stats.independent_count} inner={inner} platforms={stats.platforms || []} total={stats.total_vtubers} motion={motion} />
+      {showIndies && stats.independent_count > 0 && (
+        <IndependentGalaxy count={stats.independent_count} inner={inner} platforms={stats.platforms || []} total={stats.total_vtubers} motion={motion} onPick={onPickIndie} />
       )}
-      <OrbitControls target={[0, narrow ? -26 : -12, 0]} enablePan={false} enableDamping minDistance={14} maxDistance={120} autoRotate={motion && !hovered} autoRotateSpeed={0.35} maxPolarAngle={Math.PI * 0.85} />
+      <OrbitControls enablePan={false} enableDamping minDistance={14} maxDistance={120} autoRotate={motion && !hovered} autoRotateSpeed={0.35} maxPolarAngle={Math.PI * 0.85} />
     </Canvas>
   );
 }

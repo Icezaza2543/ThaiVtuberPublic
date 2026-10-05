@@ -37,12 +37,13 @@ export async function fetchOverview(fetchImpl = fetch) {
   return json(await fetchImpl('/api/stats', { headers: { Accept: 'application/json' } }));
 }
 
-export function buildCreatorUrl({ q = '', platform = '', status = '', cursor = '', limit = PAGE_SIZE } = {}) {
+export function buildCreatorUrl({ q = '', platform = '', status = '', scope = '', cursor = '', limit = PAGE_SIZE } = {}) {
   if (!Number.isInteger(limit) || limit < 1 || limit > PAGE_SIZE) throw new TypeError(`limit must be between 1 and ${PAGE_SIZE}`);
   const p = new URLSearchParams();
   if (q) p.set('q', q);
   if (platform) p.set('platform', platform);
   if (status) p.set('status', status);
+  if (scope) p.set('scope', scope);
   if (cursor) p.set('cursor', cursor);
   p.set('limit', String(limit));
   return `/api/creators?${p.toString()}`;
@@ -63,4 +64,13 @@ export function creatorSummary(c) {
     debutYear: c.debut_year || null,
     links: (c.platforms || []).filter((p) => p.url).map((p) => ({ name: p.name, label: platformLabel(p.name), url: p.url })),
   };
+}
+
+/** A few random independent creators (max 6). */
+export async function fetchSpotlight({ n = 3, platform = '' } = {}, fetchImpl = fetch) {
+  const p = new URLSearchParams({ n: String(n) });
+  if (platform) p.set('platform', platform);
+  const payload = await json(await fetchImpl(`/api/spotlight?${p}`, { headers: { Accept: 'application/json' } }));
+  if (!Array.isArray(payload.items)) throw new Error('invalid spotlight response');
+  return payload.items;
 }

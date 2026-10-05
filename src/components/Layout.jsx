@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Menu, X, PenLine } from 'lucide-react';
+import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info } from 'lucide-react';
 import { DONATE_URL, SOURCE_URL } from '../lib/api.js';
 
 const NAV = [
-  { href: '/', label: 'ภาพรวม' },
-  { href: '/directory', label: 'รายชื่อ VTuber' },
-  { href: '/about', label: 'เกี่ยวกับข้อมูล' },
+  { href: '/', label: 'หน้าแรก', icon: Orbit },
+  { href: '/analytics', label: 'ข้อมูลวงการ', icon: BarChart3 },
+  { href: '/directory', label: 'รายชื่อ', icon: ListFilter },
+  { href: '/about', label: 'เกี่ยวกับ', icon: Info },
 ];
 
 export const LEGAL_LINKS = [
@@ -24,52 +25,51 @@ function Header() {
   const [open, setOpen] = useState(false);
   const path = currentPath();
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-edge bg-paper/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
-        <a href="/" className="mr-auto flex items-center gap-2.5" aria-label="VThaiDex หน้าแรก">
-          <img src="/assets/logo.svg" alt="" width="34" height="34" />
-          <span className="font-display text-xl font-bold tracking-tight">VThaiDex</span>
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
+        <a href="/" className="mr-auto flex items-center gap-2" aria-label="VThaiDex หน้าแรก">
+          <img src="/assets/logo.svg" alt="" width="28" height="28" />
+          <span className="font-display text-lg font-medium">VThaiDex</span>
         </a>
         <nav aria-label="เมนูหลัก" className="hidden items-center gap-1 md:flex">
-          {NAV.map((item) => (
+          {NAV.map(({ href, label, icon: Icon }) => (
             <a
-              key={item.href}
-              href={item.href}
-              aria-current={path === item.href ? 'page' : undefined}
-              className="rounded-md px-3 py-2 text-[15px] font-medium text-muted hover:text-ink aria-[current=page]:text-ink aria-[current=page]:underline aria-[current=page]:decoration-onair aria-[current=page]:decoration-[3px] aria-[current=page]:underline-offset-[10px]"
+              key={href}
+              href={href}
+              aria-current={path === href ? 'page' : undefined}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-muted hover:text-ink aria-[current=page]:bg-raised aria-[current=page]:text-ink"
             >
-              {item.label}
+              <Icon size={15} aria-hidden="true" />
+              {label}
             </a>
           ))}
         </nav>
-        <a
-          href="/contribute"
-          className="hidden items-center gap-2 rounded-md border-2 border-edge bg-card px-3.5 py-1.5 text-[15px] font-semibold shadow-plate-sm hover:translate-x-px hover:translate-y-px hover:shadow-none md:inline-flex"
-        >
-          <PenLine size={16} aria-hidden="true" />
+        <a href="/contribute" className="btn btn-secondary hidden !px-3 !py-1.5 text-sm md:inline-flex">
+          <PenLine size={15} aria-hidden="true" />
           แจ้งข้อมูล
         </a>
         <button
           type="button"
-          className="rounded-md p-2 md:hidden"
+          className="rounded-lg p-2 md:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           onClick={() => setOpen((v) => !v)}
         >
-          {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+          {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
           <span className="sr-only">เมนู</span>
         </button>
       </div>
       {open && (
-        <nav id="mobile-nav" aria-label="เมนูหลัก" className="border-t border-line px-4 pb-4 md:hidden">
-          {[...NAV, { href: '/contribute', label: 'แจ้งข้อมูล' }].map((item) => (
+        <nav id="mobile-nav" aria-label="เมนูหลัก" className="space-y-1 px-4 pb-4 md:hidden">
+          {[...NAV, { href: '/contribute', label: 'แจ้งข้อมูล', icon: PenLine }].map(({ href, label, icon: Icon }) => (
             <a
-              key={item.href}
-              href={item.href}
-              aria-current={path === item.href ? 'page' : undefined}
-              className="block border-b border-line py-3 text-base font-medium aria-[current=page]:text-onair"
+              key={href}
+              href={href}
+              aria-current={path === href ? 'page' : undefined}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink aria-[current=page]:bg-raised"
             >
-              {item.label}
+              <Icon size={17} className="text-muted" aria-hidden="true" />
+              {label}
             </a>
           ))}
         </nav>
@@ -80,31 +80,29 @@ function Header() {
 
 function Footer() {
   return (
-    <footer className="mt-24 border-t-2 border-edge bg-card">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
+    <footer className="mt-24 bg-deep">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 text-sm sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <p className="font-display text-lg font-bold">VThaiDex</p>
-          <p className="mt-2 max-w-sm text-sm text-muted">
-            สารบบ VTuber ไทยจากข้อมูลสาธารณะที่ผ่านการตรวจสอบ ไม่เกี่ยวข้องกับครีเอเตอร์หรือแพลตฟอร์มใดในรายชื่อ
-          </p>
-          <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-sm font-semibold text-sky underline underline-offset-4">
-            สนับสนุนผู้พัฒนาผ่าน EasyDonate
+          <p className="font-display text-base">VThaiDex</p>
+          <p className="mt-2 max-w-xs text-muted">สารบบ VTuber ไทย ทำขึ้นเพื่อให้วีตัวเล็กถูกมองเห็นมากขึ้น ไม่เกี่ยวข้องกับครีเอเตอร์หรือแพลตฟอร์มใด</p>
+          <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block font-medium text-sky hover:underline">
+            เลี้ยงกาแฟคนทำเว็บ
           </a>
         </div>
         <nav aria-label="นโยบาย">
-          <p className="text-sm font-semibold">นโยบาย</p>
-          <ul className="mt-3 space-y-2 text-sm text-muted">
+          <p className="text-faint">นโยบาย</p>
+          <ul className="mt-3 space-y-2 text-muted">
             {LEGAL_LINKS.map((l) => (
-              <li key={l.href}><a className="hover:text-ink hover:underline" href={l.href}>{l.label}</a></li>
+              <li key={l.href}><a className="hover:text-ink" href={l.href}>{l.label}</a></li>
             ))}
           </ul>
         </nav>
-        <div className="text-sm text-muted">
-          <p className="font-semibold text-ink">สิทธิ์การใช้งาน</p>
+        <div className="text-muted">
+          <p className="text-faint">สิทธิ์การใช้งาน</p>
           <ul className="mt-3 space-y-2">
-            <li>ซอร์สโค้ด: <a className="underline underline-offset-4 hover:text-ink" href={SOURCE_URL} target="_blank" rel="noopener noreferrer">AGPL-3.0 บน GitHub</a></li>
-            <li>ข้อความและเอกสาร: CC BY 4.0</li>
-            <li>ฐานข้อมูลที่รวบรวม: สงวนสิทธิ์</li>
+            <li>โค้ด: <a className="hover:text-ink hover:underline" href={SOURCE_URL} target="_blank" rel="noopener noreferrer">AGPL-3.0 บน GitHub</a></li>
+            <li>ข้อความ: CC BY 4.0</li>
+            <li>ฐานข้อมูล: สงวนสิทธิ์</li>
           </ul>
         </div>
       </div>
@@ -115,7 +113,7 @@ function Footer() {
 export default function Layout({ children }) {
   return (
     <>
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-lemon focus:px-4 focus:py-2 focus:text-paper">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-deep">
         ข้ามไปยังเนื้อหา
       </a>
       <Header />
@@ -127,9 +125,9 @@ export default function Layout({ children }) {
 
 export function PageTitle({ title, children }) {
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
-      <h1 className="font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">{title}</h1>
-      {children && <div className="mt-4 max-w-2xl text-lg text-muted">{children}</div>}
+    <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6 sm:pt-14">
+      <h1 className="text-2xl sm:text-3xl">{title}</h1>
+      {children && <div className="mt-2 max-w-[60ch] text-muted">{children}</div>}
     </div>
   );
 }
