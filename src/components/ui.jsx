@@ -69,7 +69,7 @@ export function YearBars({ years, series, height = 200, label }) {
             <span className="mb-1 text-center text-[11px] tabular-nums text-faint opacity-0 group-hover:opacity-100">{fmt(totals[i])}</span>
             <div className="flex w-full flex-col-reverse overflow-hidden rounded-t" style={{ height: `${(totals[i] / max) * 100}%` }}>
               {series.map((s) => (
-                <span key={s.key} style={{ background: s.color, flexGrow: s.values[y] || 0 }} />
+                <span key={s.key} className="block w-full shrink-0" style={{ background: s.color, height: `${totals[i] ? ((s.values[y] || 0) / totals[i]) * 100 : 0}%` }} />
               ))}
             </div>
           </div>
