@@ -83,7 +83,7 @@ function Header() {
 
 function Footer() {
   return (
-    <footer className="mt-24 bg-deep">
+    <footer className="mt-16 bg-deep">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 text-sm sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <p className="font-display text-base">VThaiDex</p>

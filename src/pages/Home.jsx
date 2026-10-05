@@ -1,11 +1,20 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { Search, Shuffle, X, BarChart3, ArrowRight, Sparkles } from 'lucide-react';
 import Layout from '../components/Layout.jsx';
+import { DbMark, SectionHeading } from '../components/brand.jsx';
 import { CreatorCard, Legend, PENLIGHT, YearBars } from '../components/ui.jsx';
 import { fetchOverview, fetchSpotlight, fmt, pct, platformLabel } from '../lib/api.js';
 
 const Universe = lazy(() => import('../components/Universe.jsx'));
 const SPOTLIGHT_PLATFORMS = ['', 'youtube', 'twitch', 'tiktok'];
+// One line of personality per visit, in our own data-registry voice.
+const QUIPS = [
+  'กำลัง query วีไทยทั้งประเทศ… เจอแล้ว 3 พันกว่าคน',
+  'SELECT * FROM วีอิสระ WHERE ยังไม่มีคนรู้จัก',
+  'ฐานข้อมูลนี้ไม่มียอดซับ มีแต่ความน่ารัก',
+  'ทุก row คือคนจริงที่อยู่หลังโมเดล',
+  'index วีไทยแบบไม่จัดอันดับ ใครก็เป็นดาวได้',
+];
 
 class WebGLBoundary extends Component {
   state = { failed: false };
@@ -89,6 +98,15 @@ function UniversePanel({ data, picked, onPick, onClear, picking }) {
   );
 }
 
+function Quip() {
+  const [line] = useState(() => QUIPS[Math.floor(Math.random() * QUIPS.length)]);
+  return (
+    <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-line bg-card/70 px-3 py-1 text-sm text-muted">
+      <DbMark size={11} /> <span className="truncate">{line}</span>
+    </p>
+  );
+}
+
 function Hero({ data }) {
   const [picked, setPicked] = useState(null);
   const [picking, setPicking] = useState(false);
@@ -99,9 +117,10 @@ function Hero({ data }) {
   }, []);
   const indiePct = data ? pct(data.independent_count, data.total_vtubers) : null;
   return (
-    <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-10 pt-10 sm:px-6 sm:pt-14 lg:grid-cols-[5fr_7fr]">
+    <section className="mx-auto grid max-w-6xl items-center gap-8 px-4 pb-6 pt-8 sm:px-6 sm:pt-10 lg:grid-cols-[5fr_7fr]">
       <div>
-        <h1 className="text-3xl leading-tight">ค้นพบ <span className="glow-title">VTuber ไทย</span>ที่คุณยังไม่รู้จัก</h1>
+        <Quip />
+        <h1 className="mt-4 text-3xl leading-tight">ค้นพบ <span className="glow-title">VTuber ไทย</span>ที่คุณยังไม่รู้จัก</h1>
         <p className="mt-4 max-w-[46ch] text-muted">
           {data && indiePct != null
             ? `รวม ${fmt(data.total_vtubers)} คนจากทุกแพลตฟอร์ม ${indiePct}% เป็นวีอิสระที่ไม่มีค่ายคอยดัน ลองคลิกดาวสักดวงแล้วไปทักทายเขาดู`
@@ -134,22 +153,20 @@ function Spotlight() {
   }, [platform]);
   useEffect(load, [load]);
   return (
-    <section aria-labelledby="spotlight" className="mx-auto mt-16 max-w-6xl px-4 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 id="spotlight" className="text-xl">วีอิสระที่น่าทำความรู้จัก</h2>
-          <p className="mt-1 text-sm text-muted">สุ่มใหม่ทุกครั้ง ไม่มีใครได้ที่หนึ่ง</p>
-        </div>
+    <section aria-labelledby="spotlight" className="mx-auto mt-8 max-w-6xl px-4 sm:px-6">
+      <SectionHeading id="spotlight">วีอิสระที่น่าทำความรู้จัก</SectionHeading>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted">สุ่มใหม่ทุกครั้ง ไม่มีใครได้ที่หนึ่ง</p>
         <button type="button" onClick={load} className="btn btn-secondary"><Shuffle size={15} aria-hidden="true" /> สุ่มชุดใหม่</button>
       </div>
-      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="แพลตฟอร์ม">
+      <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="แพลตฟอร์ม">
         {SPOTLIGHT_PLATFORMS.map((p) => (
           <button key={p || 'all'} type="button" className="chip" aria-pressed={platform === p} onClick={() => setPlatform(p)}>
             {p ? platformLabel(p) : 'ทุกแพลตฟอร์ม'}
           </button>
         ))}
       </div>
-      <div className="mt-5 grid gap-4 sm:grid-cols-3" aria-live="polite">
+      <div className="mt-4 grid gap-4 sm:grid-cols-3" aria-live="polite">
         {error && <p className="text-sm text-muted sm:col-span-3">สุ่มไม่สำเร็จ ลองกด “สุ่มชุดใหม่” อีกครั้ง</p>}
         {!error && !items && [0, 1, 2].map((i) => <div key={i} className="card h-40 animate-pulse" />)}
         {!error && items?.map((c, i) => <CreatorCard key={`${c.name}-${i}`} creator={c} accent={PENLIGHT[i + 1]} />)}
@@ -171,10 +188,11 @@ function Pulse({ data }) {
   ].filter(Boolean);
   const hasSplit = (data.independent_debut_trend || []).length > 0;
   return (
-    <section aria-labelledby="pulse" className="mx-auto mt-20 grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[5fr_7fr] lg:items-center">
+    <section aria-labelledby="pulse" className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
+      <SectionHeading id="pulse">วงการนี้โตมาจากวีตัวเล็ก</SectionHeading>
+      <div className="mt-4 grid gap-8 lg:grid-cols-[5fr_7fr] lg:items-center">
       <div>
-        <h2 id="pulse" className="text-xl">วงการนี้โตมาจากวีตัวเล็ก</h2>
-        <dl className="mt-6 space-y-4">
+        <dl className="space-y-4">
           {facts.map(([v, l]) => (
             <div key={l} className="flex items-baseline gap-3">
               <dd className="font-display text-2xl tabular-nums">{v}</dd>
@@ -182,7 +200,7 @@ function Pulse({ data }) {
             </div>
           ))}
         </dl>
-        <a href="/analytics" className="btn btn-primary mt-8">ดูข้อมูลทั้งวงการ <ArrowRight size={16} aria-hidden="true" /></a>
+        <a href="/analytics" className="btn btn-primary mt-6">ดูข้อมูลทั้งวงการ <ArrowRight size={16} aria-hidden="true" /></a>
       </div>
       {years.length > 0 && (
         <div className="card p-5 sm:p-6">
@@ -202,13 +220,14 @@ function Pulse({ data }) {
           </div>
         </div>
       )}
+      </div>
     </section>
   );
 }
 
 function ContributeBand() {
   return (
-    <section className="mx-auto mt-20 max-w-6xl px-4 sm:px-6">
+    <section className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
       <div className="card flex flex-col items-start gap-5 p-7 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
           <h2 className="text-xl">รู้จักวีที่ยังไม่อยู่ในนี้?</h2>

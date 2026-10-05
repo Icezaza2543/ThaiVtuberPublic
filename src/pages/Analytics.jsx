@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, RotateCw } from 'lucide-react';
 import Layout, { PageTitle } from '../components/Layout.jsx';
+import { SectionHeading } from '../components/brand.jsx';
 import { HelpTip, Legend, PENLIGHT, platformColor, ShareBars, YearBars } from '../components/ui.jsx';
 import { fetchOverview, fmt, formatDate, pct, platformLabel, STATUS_LABELS } from '../lib/api.js';
 import { ChangeBars, Donut, Heatmap, Lollipop, MultiLine, StackedShare, Treemap, Waffle } from '../components/charts.jsx';
@@ -9,9 +10,9 @@ const byYear = (rows, key = 'count') => Object.fromEntries((rows || []).map((r) 
 
 function Section({ title, help, children }) {
   return (
-    <section className="mx-auto mt-14 max-w-6xl px-4 sm:px-6">
-      <h2 className="flex items-center gap-2 text-xl"><span className="size-2.5 rounded-full bg-gradient-to-br from-brand to-lemon shadow-[0_0_12px_#ff5fa2]" aria-hidden="true" />{title}{help && <HelpTip>{help}</HelpTip>}</h2>
-      <div className="mt-5">{children}</div>
+    <section className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
+      <SectionHeading extra={help && <HelpTip>{help}</HelpTip>}>{title}</SectionHeading>
+      <div className="mt-4">{children}</div>
     </section>
   );
 }
@@ -41,7 +42,7 @@ function KeyNumbers({ d }) {
     span.length > 0 && { value: `${pct(multi, d.total_vtubers)}%`, label: 'มีมากกว่าหนึ่งช่องทาง', color: PENLIGHT[4] },
   ].filter(Boolean);
   return (
-    <ul className="mx-auto mt-8 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:px-6 md:grid-cols-3 lg:grid-cols-5">
+    <ul className="mx-auto mt-6 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:px-6 md:grid-cols-3 lg:grid-cols-5">
       {cards.map((c) => (
         <li key={c.label} className="card p-4 sm:p-5" style={{ background: `linear-gradient(150deg, ${c.color}33, transparent 65%), var(--color-card)`, borderColor: `${c.color}55` }}>
           <span className="block h-1 w-8 rounded-full" style={{ background: c.color }} aria-hidden="true" />
