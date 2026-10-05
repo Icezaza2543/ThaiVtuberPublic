@@ -1,56 +1,150 @@
 # VThaiDex
 
-A lightweight public-facing overview of the Thai VTuber ecosystem.
+A privacy-first public-facing reference for the Thai VTuber ecosystem.
 
 ## Product scope
 
-This site intentionally exposes only simple, public-friendly information:
+VThaiDex intentionally exposes only simple, public-friendly information:
 
-- total reviewed VTuber records/personas
-- platform coverage by unique creator record
-- reviewed lifecycle status
-- partial debut-year trend where the debut year is known
-- a searchable public creator directory
+- total reviewed VTuber records/personas;
+- platform coverage by unique public creator record;
+- reviewed lifecycle status;
+- partial debut-year trend where a canonical debut date/year is known;
+- a searchable public creator directory.
 
-It does **not** expose internal IDs, evidence records, reviewer metadata, audience/network data, private archives, financial observations, or raw analytics.
+It deliberately excludes internal IDs, evidence/reviewer metadata, audience/network data, private archives, financial observations, and raw analytical data.
 
-## Data flow
-
-```text
-ThaiVtuber_DATA -> ThaiVtuberSNA -> ThaiVtuberMaster -> public exporter -> VThaiDex
-```
-
-Generate Master data first, then from `ThaiVtuberMaster` run:
-
-```bash
-python scripts/export_public.py --output ../ThaiVtuberPublic/data
-```
-
-This writes:
+## Architecture
 
 ```text
-data/public-summary.json
-data/public-creators.json
+ThaiVtuber_DATA
+      |
+      | read locally / operator side only
+      v
+sanitized VThaiDex projection
+      |
+      | signed push
+      v
+private Vercel Blob
+      |
+      +--> /api/stats
+      +--> /api/creators?cursor=...
+      |
+      v
+VThaiDex frontend
 ```
 
-If these files are absent, the frontend uses the data-free bootstrap state and displays `—` instead of invented metrics.
+VThaiDex production does **not** receive credentials that can read ThaiVtuber_DATA.
 
-## Local preview
+The public frontend does not ship a full creator JSON/CSV dataset. Directory access is paginated and bounded to 24 creator records per request.
+
+## Private contribution flow
+
+```text
+browser form
+   |
+   | AES-256-GCM content encryption
+   | RSA-OAEP-SHA256 key wrapping
+   v
+ciphertext-only intake
+   |
+   v
+private storage
+   |
+   | authenticated operator fetch
+   v
+ThaiVtuberMaster local review
+   |
+   | private key stays local
+   v
+canonical human-review workflow
+```
+
+Contribution is **disabled by default**. `VTHAIDEX_INTAKE_ENABLED=true` is set only after the public key, offline key backups, private storage, local decrypt/review flow, and preview submission have all been verified.
+
+## Public routes
+
+```text
+/
+/directory
+/about
+/terms
+/terms-of-use
+/privacy
+/data-license
+/contribute
+```
+
+Public content routes use clean URLs for SEO. `/contribute`, `/api/*`, and internal endpoints are noindex.
+
+## API boundaries
+
+```text
+GET  /api/stats
+GET  /api/creators?q=&platform=&status=&cursor=&limit=
+POST /api/intake
+GET  /api/intake-token
+
+POST /api/internal/publish
+GET|PATCH /api/internal/intake
+GET /api/maintenance
+```
+
+Internal endpoints require separate secrets. Public API responses never expose canonical IDs or review metadata.
+
+## Security boundaries
+
+Vercel may hold:
+
+- sanitized private snapshots;
+- encrypted intake ciphertext;
+- publish/cursor/operator/form-token/cron secrets.
+
+Vercel must **not** hold:
+
+- ThaiVtuber_DATA Google credentials;
+- the RSA intake private key;
+- the intake private-key passphrase.
+
+A VThaiDex application/storage breach alone should therefore not be enough to read stored intake plaintext or pivot into the canonical database.
+
+## Licensing
+
+- VThaiDex-authored UI, explanatory text, and documentation: **CC BY 4.0**
+- compiled database / dataset / API collection: **All Rights Reserved**
+- third-party names, marks, logos, media, and creator-owned material remain with their owners.
+
+See `LICENSE.md` and `/data-license`.
+
+## Development
+
+Requires Node.js 22+ for the API/unit test suite.
 
 ```bash
-python -m http.server 5501
+npm install
+npm test
 ```
 
-Open `http://127.0.0.1:5501`.
+The site remains mostly static HTML/CSS/JavaScript with Vercel Functions under `api/`.
 
-## Support link
+## Production provisioning
 
-VThaiDex includes an optional support call-to-action for the website developer:
+Admin-only provisioning and key-recovery steps are documented in:
 
-- EasyDonate: https://ezdn.app/icezaza
+```text
+docs/operations/vthaidex-production-provisioning.md
+```
 
-The UI explicitly states that donations support the website developer and are not connected to VTubers listed in the database.
+Do not enable private intake until every recovery and ciphertext-only verification gate in that runbook passes.
 
-## Deploy
+## Support
 
-The repository is static and Vercel-ready. After creating the GitHub repository and pushing `main`, connect it to Vercel with the project root at the repository root.
+EasyDonate for the website developer:
+
+https://ezdn.app/icezaza
+
+Support is for VThaiDex development/project costs and is not connected to VTubers listed in the directory.
+
+## Status
+
+This branch is a staged migration. Production cutover is intentionally blocked until private storage, environment secrets, the local intake key recovery drill, first canonical snapshot publish, encrypted intake preview test, and final security review have all passed.
