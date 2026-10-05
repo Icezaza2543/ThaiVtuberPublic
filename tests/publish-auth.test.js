@@ -33,3 +33,12 @@ test('timestamps outside five minute window fail',()=>{
 test('missing secret fails closed',()=>{
   assert.throws(()=>verifyPublishRequest({rawBody:body,timestamp,signature:'00'},{secret:'',now}),/configuration|secret/i);
 });
+
+
+import { readFileSync } from 'node:fs';
+
+test('Node verifier matches shared Python signing vector',()=>{
+  const vector=JSON.parse(readFileSync(new URL('./fixtures/publish-signature.json',import.meta.url),'utf8'));
+  const raw=Buffer.from(vector.raw_body,'utf8');
+  assert.equal(signingDigest(raw,vector.timestamp,vector.secret),vector.signature);
+});
