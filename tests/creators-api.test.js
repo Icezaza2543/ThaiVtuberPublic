@@ -63,7 +63,7 @@ test('search matches name and agency only and response exposes no forbidden fiel
 test('stats API returns summary only',async()=>{
   const storage=createMemoryStorage();await storage.writeSnapshot(snapshot());
   const response=await handleStats(new Request('https://vthaidex.test/api/stats'),{storage});
-  const payload=await body(response);assert.equal(payload.total_vtubers,30);assert.equal('creators' in payload,false);
+  const payload=await body(response);assert.equal(payload.total_vtubers,30);assert.equal(payload.meta.generated_at,'2026-10-05T10:00:00Z');assert.equal('creators' in payload,false);
 });
 
 test('publish API validates signature and rejects older snapshots without replacing current',async()=>{
