@@ -166,7 +166,11 @@ An invalid or incomplete publish must leave the previous production snapshot act
 
 Initial storage is Vercel Blob with private access. The browser never receives a Blob token or private Blob URL.
 
+Before provisioning, the implementation plan must include a quick cost/limit check for the current Vercel plan and expected snapshot/intake volume. Because VThaiDex stores small JSON projections and encrypted text submissions rather than media, the default remains Vercel Blob unless that check shows a material cost or quota problem.
+
 Versioned snapshots are retained privately to support atomic replacement and rollback. Old snapshots are pruned according to operational retention once a new snapshot is verified.
+
+Storage access is isolated behind a small repository module so that a future move to R2, Supabase Storage, or another private object store does not change the public API contract. This is an interface boundary, not a requirement to provision multiple providers now.
 
 If the public projection later grows large enough that search latency or memory use becomes unsuitable, the storage layer may be migrated behind the same API contract without changing the frontend data model.
 
@@ -406,7 +410,16 @@ It is not stored in:
 - VThaiDex private Blob storage;
 - the browser.
 
-The private key must be encrypted at rest and backed up offline. The reviewer decrypts intake locally.
+The private key must be encrypted at rest. Because the project may have a single operator, recovery is explicit rather than implicit:
+
+- keep one encrypted primary private-key file on the review machine;
+- keep two encrypted offline backups on separate removable media, stored separately from the review machine;
+- never store an unencrypted private key in cloud storage, GitHub, Vercel, browser storage, or normal synced folders;
+- keep the backup passphrase/recovery secret separate from the backup media;
+- record a checksum/fingerprint for each key and verify it after every backup/rotation;
+- perform a restore/decrypt drill after initial setup and after each key rotation.
+
+If the operator loses every copy of a private key, submissions encrypted to that key are intentionally unrecoverable. Recovery must never be implemented by uploading the private key to VThaiDex or Vercel. The reviewer decrypts intake locally.
 
 ### 11.3 Key rotation
 
@@ -444,7 +457,10 @@ Defense is layered:
 3. URL and field validation;
 4. strict payload and method validation;
 5. Vercel Firewall logging and rate-limit rules;
-6. challenge/deny only after staged traffic review.
+6. challenge/deny only after staged traffic review;
+7. an adaptive human-verification challenge reserved for suspicious/high-abuse traffic.
+
+The first release does not load a third-party CAPTCHA on every contribution page view because the contribution flow is privacy-sensitive. If spam pressure justifies it, VThaiDex may add Cloudflare Turnstile or an equivalent privacy-disclosed challenge only after the server or firewall marks the request as suspicious. Any such challenge must be documented in the Privacy Policy, must not receive the plaintext form body, and must not become a general analytics dependency.
 
 Vercel's platform DDoS protections remain enabled.
 
@@ -498,11 +514,18 @@ Application retention targets:
 
 | State | Retention |
 | --- | ---: |
-| Pending encrypted intake | 30 days |
+| Pending encrypted intake | 60 days |
 | Reviewed encrypted intake | 7 days |
 | Rejected encrypted intake | 7 days |
 
-Expired encrypted intake is deleted.
+ThaiVtuberMaster reviewer tooling must surface aging intake rather than letting it disappear silently:
+
+- normal queue view shows age in days;
+- `expiring` view lists pending items with 14 days or less remaining;
+- items with 7 days or less remaining are highlighted as urgent;
+- purge runs only after the item has crossed the configured retention deadline.
+
+The first version does not require an external email/SMS notification service; the operator queue itself is the required warning mechanism. Expired encrypted intake is deleted.
 
 Canonical public facts accepted through the normal review workflow are governed by the canonical DATA lifecycle rather than intake retention.
 
@@ -561,21 +584,30 @@ Legal copy must describe the system accurately and must not promise absolute ano
 - create private versioned snapshot storage;
 - expose `/api/stats` and bounded `/api/creators`.
 
-### Phase 3 — Remove public full-dataset files
+### Phase 3 — Prepare encrypted intake behind a disabled feature flag
 
-- migrate the frontend away from `public-summary.json` and `public-creators.json`;
-- delete public full-snapshot/export paths;
-- remove download/export controls;
-- rename “Open Data” to Methodology / Source Policy.
-
-### Phase 4 — Encrypted intake
-
-- generate the initial encryption keypair;
+- generate the initial encryption keypair and complete the offline-backup/restore drill;
 - publish only the public key;
-- add browser encryption;
+- add the three-step contribution wizard and browser encryption;
 - add encrypted intake storage;
 - add ThaiVtuberMaster local fetch/decrypt/review tooling;
-- verify that a Vercel-side storage dump contains no plaintext intake.
+- verify that a Vercel-side storage dump contains no plaintext intake;
+- keep public submission disabled until this verification passes.
+
+The existing GitHub-Issue contribution path is removed before public submission is re-enabled.
+
+### Phase 4 — Coordinated public-data + intake cutover
+
+Perform these changes in one controlled production cutover:
+
+- migrate the directory frontend away from `public-summary.json` and `public-creators.json`;
+- switch the public directory to `/api/stats` and bounded `/api/creators`;
+- delete public full-snapshot/export paths;
+- remove download/export controls;
+- rename “Open Data” to Methodology / Source Policy;
+- enable encrypted private contribution only after the verified Phase 3 intake path is available.
+
+This avoids a transition in which the old public contribution mechanism remains exposed or the new privacy-preserving intake is unexpectedly unavailable after cutover.
 
 ### Phase 5 — Firewall enforcement
 
@@ -623,7 +655,8 @@ The implementation is not complete until the following are verified.
 - `/api/*`, `/internal/*`, and `/contribute` are noindex;
 - sitemap includes only intended public pages;
 - robots policy excludes private/API paths;
-- firewall rules are reviewed in log mode before production blocking.
+- firewall rules are reviewed in log mode before production blocking;
+- if an adaptive CAPTCHA/challenge is enabled, it is not loaded for ordinary contribution traffic, receives no plaintext form body, and is disclosed in the Privacy Policy.
 
 ### Legal and license
 
