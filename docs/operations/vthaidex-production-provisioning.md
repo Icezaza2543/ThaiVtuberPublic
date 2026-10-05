@@ -43,6 +43,8 @@ Recommended minimums:
 
 Do not reuse one secret for another purpose.
 
+Generate **fresh values at the successful provisioning session**. Any value that appeared in a failed provisioning attempt, terminal transcript, chat/tool log, screenshot, or support ticket is considered burned and must not be reused.
+
 ## 3. Keep intake disabled during provisioning
 
 Set:
