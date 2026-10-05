@@ -74,3 +74,12 @@ test('publish API validates signature and rejects older snapshots without replac
   const request=new Request('https://vthaidex.test/api/internal/publish',{method:'POST',headers:{'content-type':'application/json','x-vthaidex-timestamp':ts,'x-vthaidex-signature':signingDigest(raw,ts,publishSecret)},body:raw});
   const response=await handlePublish(request,{storage,publishSecret,now});assert.equal(response.status,409);assert.equal((await storage.readCurrentSnapshot()).snapshot_id,'current');
 });
+
+
+test('stats and creators fail closed when private storage is unavailable',async()=>{
+  const broken={readCurrentSnapshot:async()=>{throw new Error('blob unavailable')}};
+  const stats=await handleStats(new Request('https://vthaidex.test/api/stats'),{storage:broken});
+  assert.equal(stats.status,503);assert.deepEqual(await body(stats),{error:'data_unavailable'});
+  const creators=await handleCreators(new Request('https://vthaidex.test/api/creators'),{storage:broken,cursorSecret,now});
+  assert.equal(creators.status,503);assert.deepEqual(await body(creators),{error:'data_unavailable'});
+});
