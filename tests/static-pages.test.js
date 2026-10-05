@@ -18,9 +18,10 @@ test('every public page has unique SEO metadata canonical and legal footer links
     for(const href of legalLinks) assert.ok(html.includes(`href="${href}"`),`${file} missing ${href}`);
   }
 });
-test('contribution page is noindex and contains no analytics scripts',()=>{
+test('contribution page is noindex and makes no analytics or third-party font requests',()=>{
   const html=text('contribute.html');assert.match(html,/<meta name="robots" content="noindex, nofollow">/);
   assert.equal(/gtag|googletagmanager|plausible|posthog/i.test(html),false);
+  assert.equal(/fonts\.googleapis\.com|fonts\.gstatic\.com/i.test(html),false);
 });
 test('navigation uses real routes instead of hash routes',()=>{
   for(const file of [...publicPages,'contribute.html']) assert.equal(/href="#(?:overview|directory|about|contribute)"/.test(text(file)),false);
