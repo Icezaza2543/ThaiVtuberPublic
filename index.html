@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#fafafc">
+  <meta name="description" content="ภาพรวม VTuber ไทยจากข้อมูลสาธารณะที่ผ่านการตรวจสอบและจัดระเบียบ">
+  <title>ThaiVtuberPublic — ภาพรวม VTuber ไทย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">ข้ามไปยังเนื้อหา</a>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="#overview" aria-label="ThaiVtuberPublic หน้าแรก">
+        <span class="brand-mark">✦</span>
+        <span><strong>ThaiVtuberPublic</strong><small>ภาพรวม VTuber ไทย</small></span>
+      </a>
+      <button class="menu-button" id="menuButton" aria-expanded="false" aria-controls="navLinks">เมนู</button>
+      <nav id="navLinks" class="nav-links" aria-label="เมนูหลัก">
+        <a href="#overview">ภาพรวม</a>
+        <a href="#directory">รายชื่อ VTuber</a>
+        <a href="#about">เกี่ยวกับข้อมูล</a>
+        <a class="support-nav" href="https://ezdn.app/icezaza" target="_blank" rel="noopener noreferrer">สนับสนุนผู้พัฒนา</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="overview" class="page page-active" aria-labelledby="overview-title">
+      <div class="hero shell">
+        <div>
+          <p class="eyebrow">THAI VTUBER OVERVIEW</p>
+          <h1 id="overview-title">VTuber ไทย มีประมาณกี่คน?</h1>
+          <p class="hero-copy">ภาพรวม VTuber ไทยจากข้อมูลสาธารณะที่ผ่านการตรวจสอบและจัดระเบียบ</p>
+          <p class="updated" id="updatedAt">อัปเดตล่าสุด: —</p>
+        </div>
+        <div class="hero-badge" aria-hidden="true">
+          <span>VT</span><i>✦</i>
+        </div>
+      </div>
+
+      <div class="shell stats-grid" id="summaryCards" aria-live="polite"></div>
+
+      <div class="shell content-grid two-col">
+        <section class="card panel">
+          <div class="section-head">
+            <div><p class="eyebrow">PLATFORMS</p><h2>VTuber ไทยอยู่ที่ไหนกันบ้าง?</h2></div>
+            <p>หนึ่งคนสามารถมีได้มากกว่าหนึ่งแพลตฟอร์ม</p>
+          </div>
+          <div id="platformChart" class="bar-chart empty-state">ยังไม่มีข้อมูล</div>
+        </section>
+
+        <section class="card panel">
+          <div class="section-head">
+            <div><p class="eyebrow">STATUS</p><h2>สถานะของ VTuber</h2></div>
+            <p>อิงจากสถานะในฐานข้อมูลที่ผ่านการตรวจสอบ</p>
+          </div>
+          <div id="lifecycleChart" class="status-list empty-state">ยังไม่มีข้อมูล</div>
+          <p class="note">สถานะนี้สะท้อนข้อมูลที่ระบบมีอยู่ และอาจไม่ครอบคลุมความเคลื่อนไหวทุกแพลตฟอร์ม</p>
+        </section>
+      </div>
+
+      <section class="shell card panel">
+        <div class="section-head">
+          <div><p class="eyebrow">TREND</p><h2>VTuber ไทยเพิ่มขึ้นอย่างไรในแต่ละปี?</h2></div>
+          <p id="trendCoverage">แสดงเฉพาะคนที่มีข้อมูลปีเดบิวต์</p>
+        </div>
+        <div id="trendChart" class="trend-wrap empty-state">ยังไม่มีข้อมูล</div>
+      </section>
+
+      <section class="shell support-card">
+        <div class="support-icon" aria-hidden="true">☕</div>
+        <div>
+          <p class="eyebrow">SUPPORT THE PROJECT</p>
+          <h2>ชอบโปรเจกต์นี้ไหม?</h2>
+          <p>ถ้าข้อมูลนี้มีประโยชน์ สามารถช่วยเป็นกำลังใจให้คนทำเว็บและสนับสนุนค่าใช้จ่ายของโปรเจกต์ได้</p>
+          <p class="support-note">การสนับสนุนนี้เป็นการสนับสนุนผู้พัฒนาเว็บไซต์ ไม่เกี่ยวข้องกับ VTuber ที่อยู่ในฐานข้อมูล</p>
+        </div>
+        <a class="button donate" href="https://ezdn.app/icezaza" target="_blank" rel="noopener noreferrer">สนับสนุนผ่าน EasyDonate ↗</a>
+      </section>
+
+      <section class="shell directory-cta card">
+        <div><p class="eyebrow">DIRECTORY</p><h2>อยากรู้ว่ามีใครบ้าง?</h2><p>ค้นหารายชื่อ VTuber ตามชื่อ แพลตฟอร์ม และสถานะได้แบบง่าย ๆ</p></div>
+        <a class="button secondary" href="#directory">ดูรายชื่อ VTuber</a>
+      </section>
+    </section>
+
+    <section id="directory" class="page" aria-labelledby="directory-title">
+      <div class="shell page-title">
+        <p class="eyebrow">DIRECTORY</p>
+        <h1 id="directory-title">รายชื่อ VTuber</h1>
+        <p>ค้นหาตามชื่อ แพลตฟอร์ม หรือสถานะ</p>
+      </div>
+      <div class="shell filters card">
+        <label class="search-field"><span>ค้นหา</span><input id="searchInput" type="search" placeholder="พิมพ์ชื่อ VTuber…" autocomplete="off"></label>
+        <label><span>แพลตฟอร์ม</span><select id="platformFilter"><option value="">ทั้งหมด</option></select></label>
+        <label><span>สถานะ</span><select id="statusFilter"><option value="">ทั้งหมด</option><option value="active">กำลังทำกิจกรรม</option><option value="hiatus">พักกิจกรรม</option><option value="inactive">ไม่ทำกิจกรรม</option><option value="graduated">Graduated</option><option value="unknown">ไม่ทราบ</option></select></label>
+      </div>
+      <div class="shell results-meta"><span id="resultCount">0 รายการ</span></div>
+      <div class="shell creator-grid" id="creatorGrid"></div>
+      <div class="shell load-more-wrap"><button id="loadMore" class="button secondary" hidden>โหลดเพิ่มเติม</button></div>
+    </section>
+
+    <section id="about" class="page" aria-labelledby="about-title">
+      <div class="shell page-title">
+        <p class="eyebrow">METHODOLOGY</p>
+        <h1 id="about-title">ข้อมูลนี้มาจากไหน?</h1>
+        <p>อธิบายแบบสั้น ๆ ว่าเว็บนี้นับและแสดงข้อมูลอย่างไร</p>
+      </div>
+      <div class="shell info-grid">
+        <article class="card info-card"><span>01</span><h2>เรานับเป็น “คน” อย่างไร?</h2><p>บัญชีหลายแพลตฟอร์มของ VTuber คนเดียวกันจะถูกรวมเป็นตัวตนเดียวเมื่อมีข้อมูลยืนยันเพียงพอ</p></article>
+        <article class="card info-card"><span>02</span><h2>ข้อมูลมาจากไหน?</h2><p>รวบรวมจากข้อมูลสาธารณะ แพลตฟอร์ม และแหล่งข้อมูลที่ตรวจสอบย้อนกลับได้ โดยมีการจัดระเบียบก่อนนำมาแสดง</p></article>
+        <article class="card info-card"><span>03</span><h2>Active หมายถึงอะไร?</h2><p>หน้าเว็บใช้สถานะที่มีอยู่ในฐานข้อมูล ไม่ได้สรุปจากการโพสต์ล่าสุดเพียงอย่างเดียว</p></article>
+        <article class="card info-card"><span>04</span><h2>ทำไมตัวเลขอาจเปลี่ยน?</h2><p>มี VTuber เปิดตัวใหม่ เปลี่ยนชื่อ ย้ายแพลตฟอร์ม พักกิจกรรม และกลับมาทำใหม่อยู่ตลอด</p></article>
+      </div>
+      <div class="shell methodology card">
+        <h2>หมายเหตุสำคัญ</h2>
+        <p>ตัวเลขทั้งหมดเป็น snapshot ตามวันที่อัปเดต การนับแพลตฟอร์มคือจำนวนตัวตนที่มีอย่างน้อยหนึ่งบัญชีบนแพลตฟอร์มนั้น จึงสามารถซ้ำกันข้ามแพลตฟอร์มได้</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <div><strong>ThaiVtuberPublic</strong><p>ภาพรวมข้อมูล VTuber ไทยสำหรับคนทั่วไป</p></div>
+      <div class="footer-links"><a href="#about">เกี่ยวกับข้อมูล</a><a href="https://ezdn.app/icezaza" target="_blank" rel="noopener noreferrer">EasyDonate ↗</a></div>
+    </div>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
