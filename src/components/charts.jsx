@@ -32,7 +32,7 @@ export function Donut({ segments, label, center, sub, size = 168 }) {
       <ul className="min-w-36 flex-1 space-y-1.5 text-sm">
         {segments.map((s) => (
           <li key={s.label} className="flex items-center gap-2">
-            <span className="size-2.5 shrink-0 rounded-sm" style={{ background: s.color }} aria-hidden="true" />
+            <span className="size-2.5 shrink-0 rounded-full" style={{ background: s.color }} aria-hidden="true" />
             <span>{s.label}</span>
             <span className="ml-auto tabular-nums text-muted">{Math.round((s.value / total) * 100)}%</span>
           </li>
@@ -55,13 +55,15 @@ export function Waffle({ parts, label }) {
   });
   return (
     <figure>
-      <div className="grid max-w-52 grid-cols-10 gap-1" role="img" aria-label={label}>
-        {cells.map((c, i) => <span key={i} className="aspect-square rounded-[3px]" style={{ background: c }} />)}
+      <div className="w-fit rounded-xl border border-line bg-paper p-3">
+        <div className="grid w-52 max-w-full grid-cols-10 gap-1" role="img" aria-label={label}>
+          {cells.map((c, i) => <span key={i} className="aspect-square rounded-[3px]" style={{ background: c }} />)}
+        </div>
       </div>
       <figcaption className="mt-3 space-y-1 text-sm">
         {parts.map((p) => (
           <p key={p.label} className="flex items-center gap-2">
-            <span className="size-2.5 rounded-sm" style={{ background: p.color }} aria-hidden="true" />
+            <span className="size-2.5 rounded-full" style={{ background: p.color }} aria-hidden="true" />
             {p.label}<span className="ml-auto pl-4 tabular-nums text-muted">{fmt(p.value)} คน</span>
           </p>
         ))}

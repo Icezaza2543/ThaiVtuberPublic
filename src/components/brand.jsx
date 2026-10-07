@@ -25,14 +25,23 @@ export function DbMark({ size = 14, mono = false, className = '' }) {
   );
 }
 
-/** Section heading: mark, title, optional extra, then a thin guide line that leads the eye across. */
-export function SectionHeading({ as: Tag = 'h2', id, children, extra, className = '' }) {
+const BARS = {
+  brand: 'bg-brand shadow-[0_0_14px_-2px_var(--color-brand)]',
+  sky: 'bg-sky shadow-[0_0_14px_-2px_var(--color-sky)]',
+};
+
+/** Section heading: a glowing stage-light bar, the title in the display face, optional extra and a quiet subline. */
+export function SectionHeading({ as: Tag = 'h2', id, children, extra, sub, tone = 'brand', className = '' }) {
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      <DbMark size={13} />
-      <Tag id={id} className="shrink-0 text-xl">{children}</Tag>
-      {extra}
-      <span className="h-px flex-1 bg-gradient-to-r from-line via-line/60 to-transparent" aria-hidden="true" />
+    <div className={`flex items-start gap-3 ${className}`}>
+      <span className={`mt-1.5 h-7 w-2.5 shrink-0 rounded-full sm:h-8 ${BARS[tone] || BARS.brand}`} aria-hidden="true" />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <Tag id={id} className="text-2xl sm:text-[1.75rem]">{children}</Tag>
+          {extra}
+        </div>
+        {sub && <p className="mt-0.5 text-sm text-faint">{sub}</p>}
+      </div>
     </div>
   );
 }

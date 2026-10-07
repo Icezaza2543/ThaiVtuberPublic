@@ -35,8 +35,8 @@ test('robots and sitemap expose only intended public surfaces',()=>{
   const sitemap=text('public/sitemap.xml');for(const path of ['/','/directory','/about','/terms','/terms-of-use','/privacy','/data-license']) assert.ok(sitemap.includes(`https://vthaidex.vercel.app${path}`));
   assert.equal(sitemap.includes('https://vthaidex.vercel.app/contribute'),false);
 });
-test('repository license separates CC BY site content, source code, public facts and compiled data rights',()=>{
-  const license=text('LICENSE.md');assert.match(license,/CC BY 4\.0/i);assert.match(license,/Database.*All Rights Reserved/is);assert.match(license,/third-party/i);
+test('repository license separates CC BY-NC-ND site content, source code, public facts and compiled data rights',()=>{
+  const license=text('LICENSE.md');assert.match(license,/CC BY-NC-ND 4\.0/i);assert.match(license,/Database.*All Rights Reserved/is);assert.match(license,/third-party/i);
   assert.match(license,/source code.*not covered by CC BY/i);
   assert.match(license,/underlying public facts.*where applicable law/i);
   const page=text('src/pages/legal.jsx');assert.match(page,/source code/i);assert.match(page,/ข้อเท็จจริงสาธารณะ/);

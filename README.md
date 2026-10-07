@@ -79,7 +79,7 @@ ThaiVtuber_DATA Google credentials, so a VThaiDex breach cannot pivot into the c
 ## Licensing
 
 - source code: **AGPL-3.0-only** (`LICENSE`) — anyone may use, modify and share it; a modified version offered to users over a network must publish its source under AGPL-3.0
-- VThaiDex-authored UI, explanatory text, and documentation: **CC BY 4.0**
+- VThaiDex-authored UI, explanatory text, and documentation: **CC BY-NC-ND 4.0**
 - compiled database / dataset / API collection: **All Rights Reserved**
 - third-party names, marks, logos, media, and creator-owned material remain with their owners.
 
