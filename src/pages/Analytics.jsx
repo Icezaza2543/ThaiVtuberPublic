@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, RotateCw } from 'lucide-react';
+import { ArrowRight, RotateCw, CalendarDays } from 'lucide-react';
 import Layout, { PageTitle } from '../components/Layout.jsx';
 import { SectionHeading } from '../components/brand.jsx';
 import PlatformIcon from '../components/PlatformIcon.jsx';
@@ -13,18 +13,18 @@ const byYear = (rows, key = 'count') => Object.fromEntries((rows || []).map((r) 
 
 function Section({ title, help, children }) {
   return (
-    <section className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
+    <section className="mx-auto mt-14 max-w-[1920px] px-4 sm:px-6 lg:px-8">
       <SectionHeading extra={help && <HelpTip>{help}</HelpTip>}>{title}</SectionHeading>
-      <div className="mt-4">{children}</div>
+      <div className="mt-6">{children}</div>
     </section>
   );
 }
 
 function Card({ title, help, aside, className = '', children }) {
   return (
-    <div className={`card p-4 sm:p-5 ${className}`}>
+    <div className={`card card-hover p-5 sm:p-6 ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="flex items-center gap-1.5 text-base">{title}{help && <HelpTip>{help}</HelpTip>}</h3>
+        <h3 className="flex items-center gap-1 text-base">{title}{help && <HelpTip>{help}</HelpTip>}</h3>
         {aside}
       </div>
       <div className="mt-4">{children}</div>
@@ -38,20 +38,23 @@ function KeyNumbers({ d }) {
   const years = (d.debut_trend || []).filter((r) => r.year < new Date().getFullYear() && r.known_debuts > 0);
   const last = years.at(-1);
   const cards = [
-    { value: fmt(d.total_vtubers), label: 'VTuber ไทยทั้งหมด', color: NEUTRAL },
-    Number.isFinite(d.independent_count) && { value: fmt(d.independent_count), label: 'วีอิสระ', sub: `${pct(d.independent_count, d.total_vtubers)}% ของทั้งหมด`, color: BRAND },
-    Number.isFinite(d.agency_total) && { value: fmt(d.agency_total), label: 'สังกัด', sub: `มีสมาชิก ${fmt(d.total_vtubers - d.independent_count)} คน`, color: NEUTRAL },
-    last && { value: fmt(last.known_debuts), label: `เดบิวต์ปี ${last.year}`, sub: 'เท่าที่ทราบปีเดบิวต์', color: NEUTRAL },
-    span.length > 0 && { value: `${pct(multi, d.total_vtubers)}%`, label: 'มีมากกว่าหนึ่งช่องทาง', color: NEUTRAL },
+    { value: fmt(d.total_vtubers), label: 'VTuber ไทยทั้งหมด' },
+    Number.isFinite(d.independent_count) && { value: fmt(d.independent_count), label: 'วีอิสระ', badge: `${pct(d.independent_count, d.total_vtubers)}% ของทั้งหมด`, hero: true },
+    Number.isFinite(d.agency_total) && { value: fmt(d.agency_total), label: 'สังกัด', sub: `มีสมาชิก ${fmt(d.total_vtubers - d.independent_count)} คน` },
+    last && { value: fmt(last.known_debuts), label: `เดบิวต์ปี ${last.year}`, sub: 'เท่าที่ทราบปีเดบิวต์' },
+    span.length > 0 && { value: `${pct(multi, d.total_vtubers)}%`, label: 'มีมากกว่าหนึ่งช่องทาง', sky: true },
   ].filter(Boolean);
   return (
-    <ul className="mx-auto mt-6 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:px-6 md:grid-cols-3 lg:grid-cols-5">
+    <ul className="mx-auto mt-8 grid max-w-[1920px] grid-flow-row-dense grid-cols-2 gap-4 px-4 sm:px-6 md:grid-cols-3 lg:grid-cols-5 lg:px-8">
       {cards.map((c) => (
-        <li key={c.label} className="card p-4 sm:p-5">
-          <span className="block h-1 w-8 rounded-full" style={{ background: c.color }} aria-hidden="true" />
-          <p className="mt-3 font-display text-2xl tabular-nums" style={{ color: c.color === BRAND ? BRAND : undefined }}>{c.value}</p>
-          <p className="text-sm">{c.label}</p>
-          {c.sub && <p className="text-xs text-faint">{c.sub}</p>}
+        <li key={c.label} className={`card relative overflow-hidden p-5 ${c.hero ? 'tile-hero col-span-2 md:col-span-1' : 'tile'}`}>
+          {c.hero && <span className="pointer-events-none absolute -bottom-4 -right-4 size-20 rounded-full bg-brand/15 blur-xl" aria-hidden="true" />}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className={`text-sm font-semibold ${c.hero ? 'text-brand' : 'text-muted'}`}>{c.label}</p>
+            {c.badge && <span className="rounded-full border border-brand/40 bg-brand/15 px-2 py-0.5 text-[11px] font-bold text-brand">{c.badge}</span>}
+          </div>
+          <p className={`mt-1 font-display text-[2.5rem] leading-tight tabular-nums ${c.hero ? 'text-brand' : c.sky ? 'text-sky' : 'text-ink'}`}>{c.value}</p>
+          {c.sub && <p className="mt-0.5 text-xs text-faint">{c.sub}</p>}
         </li>
       ))}
     </ul>
@@ -94,7 +97,7 @@ function WholeIndustry({ d }) {
   const breakdown = d.platform_breakdown || (d.platforms || []).map((p) => ({ platform: p.platform, count: p.count }));
   return (
     <Section title="ทั้งวงการ">
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 2xl:grid-cols-4">
         <Card
           title="เดบิวต์ต่อปี"
           help={`นับเฉพาะ ${fmt(d.known_debut_year_count)} คนที่ทราบปีเดบิวต์ (${pct(d.known_debut_year_count, d.total_vtubers)}%) ปีล่าสุดยังไม่จบปี`}
@@ -108,13 +111,16 @@ function WholeIndustry({ d }) {
         <Card title="เปลี่ยนแปลงจากปีก่อน" help="จำนวนเดบิวต์ปีนี้ลบปีก่อน แท่งสีชมพูคือปีที่เดบิวต์น้อยลง ปีล่าสุดยังไม่จบปี">
           <ChangeBars label="จำนวนเดบิวต์ที่เพิ่มหรือลดจากปีก่อน" points={years.map((y) => ({ year: y, value: all[y] }))} />
         </Card>
+        <Card title="สัดส่วนวีอิสระในคนเดบิวต์แต่ละปี" help="วีอิสระที่เดบิวต์ปีนั้น หารด้วยทุกคนที่เดบิวต์ปีนั้น (เท่าที่ทราบปีเดบิวต์)" className="md:col-span-3 2xl:col-span-1">
+          <IndieShareBars years={years} all={all} indie={indie} />
+        </Card>
         <Card
           className="md:col-span-3"
           title="อยู่บนแพลตฟอร์มไหน"
           help="หนึ่งคนอยู่ได้หลายแพลตฟอร์ม ผลรวมจึงเกินจำนวนวีทั้งหมด"
           aside={d.platform_breakdown && <Legend items={[{ label: 'สีเข้ม = วีอิสระ', color: 'var(--color-ink)' }, { label: 'สีจาง = มีสังกัด', color: 'var(--color-ink)', faded: true }]} />}
         >
-          <div className="grid gap-x-10 gap-y-3 md:grid-cols-2">
+          <div className="grid gap-x-12 gap-y-3 md:grid-cols-2">
             {[breakdown.slice(0, 6), breakdown.slice(6, 12)].map((rows, col) => (
               <ShareBars
                 key={col}
@@ -124,8 +130,33 @@ function WholeIndustry({ d }) {
             ))}
           </div>
         </Card>
+        <Card title="ค่ายมีขนาดแค่ไหน" help="จำนวนสังกัดแบ่งตามจำนวนสมาชิกในทะเบียน" className="md:col-span-3 2xl:col-span-1">
+          <Donut
+            size={150}
+            label="จำนวนสังกัดตามขนาด"
+            center={fmt(d.agency_total)}
+            sub="สังกัด"
+            segments={(d.agency_sizes || []).map((r, i) => ({ label: `สมาชิก ${r.size} คน`, value: r.agencies, color: RAMP[i % RAMP.length] }))}
+          />
+        </Card>
       </div>
     </Section>
+  );
+}
+
+/** Independent share of each year's known debuts, as labelled vertical bars. */
+function IndieShareBars({ years, all, indie }) {
+  const rows = years.filter((y) => all[y] >= 5).map((y) => ({ y, v: Math.round(((indie[y] || 0) / all[y]) * 100) }));
+  return (
+    <div className="flex h-40 items-end gap-1.5" role="img" aria-label="สัดส่วนวีอิสระในคนเดบิวต์แต่ละปี">
+      {rows.map((r) => (
+        <div key={r.y} className="flex flex-1 flex-col items-center gap-1">
+          <span className="text-[11px] tabular-nums text-muted">{r.v}%</span>
+          <span className="w-full rounded-t-md bg-brand" style={{ height: `${Math.max(2, r.v * 1.05)}px`, opacity: 0.45 + r.v / 200 }} />
+          <span className="text-[11px] text-faint">{String(r.y).slice(2)}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -142,7 +173,7 @@ function PlatformInsights({ d }) {
   });
   return (
     <Section title="ภาพรวมแพลตฟอร์ม">
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         <Card title="ขนาดของแต่ละแพลตฟอร์ม" help="พื้นที่ของแต่ละช่องตามจำนวนวีไทยที่อยู่บนแพลตฟอร์มนั้น">
           <Treemap label="จำนวนวีไทยต่อแพลตฟอร์ม" items={rows.slice(0, 10).map((r, i) => ({ key: r.platform, name: platformLabel(r.platform), icon: <PlatformIcon name={r.platform} size={18} mono />, value: r.count, color: colorOf(r, i) }))} />
         </Card>
@@ -178,15 +209,17 @@ function ByPlatform({ d }) {
     <Section title="แยกตามแพลตฟอร์ม">
       <div role="tablist" aria-label="แพลตฟอร์ม" className="flex flex-wrap gap-2">
         {rows.map((x) => (
-          <button key={x.platform} role="tab" type="button" id={`tab-${x.platform}`} aria-selected={x.platform === r.platform} aria-controls="platform-panel" className="chip !px-3" title={platformLabel(x.platform)} onClick={() => setSel(x.platform)}>
+          <button key={x.platform} role="tab" type="button" id={`tab-${x.platform}`} aria-selected={x.platform === r.platform} aria-controls="platform-panel" className="chip !min-h-10 !px-3.5" title={platformLabel(x.platform)} onClick={() => setSel(x.platform)}>
             <PlatformIcon name={x.platform} size={16} mono={x.platform === r.platform} />
+            <span className="hidden sm:inline">{platformLabel(x.platform)}</span>
+            <span className="text-xs tabular-nums opacity-70">{fmt(x.count)}</span>
           </button>
         ))}
       </div>
-      <div id="platform-panel" role="tabpanel" aria-labelledby={`tab-${r.platform}`} className="card mt-3 grid gap-6 p-4 sm:p-5 lg:grid-cols-[2fr_3fr]">
+      <div id="platform-panel" role="tabpanel" aria-labelledby={`tab-${r.platform}`} className="card mt-4 grid gap-6 p-5 sm:p-6 lg:grid-cols-[2fr_3fr]">
         <div>
           <p className="flex items-center gap-2 text-lg"><PlatformIcon name={r.platform} size={22} />{platformLabel(r.platform)}</p>
-          <p className="mt-2 font-display text-3xl tabular-nums">{fmt(r.count)}</p>
+          <p className="mt-2 font-display text-[2.5rem] leading-tight tabular-nums text-brand">{fmt(r.count)}</p>
           <p className="text-muted">วีไทยบน {platformLabel(r.platform)} คิดเป็น {pct(r.count, d.total_vtubers)}% ของทั้งหมด</p>
           <div className="mt-6">
             <Donut size={132} label={`วีอิสระกับวีมีสังกัดบน ${platformLabel(r.platform)}`} center={`${pct(r.independent, r.count)}%`} sub="วีอิสระ" segments={[{ label: 'วีอิสระ', value: r.independent, color }, { label: 'มีสังกัด', value: r.count - r.independent, color: NEUTRAL }]} />
@@ -214,7 +247,7 @@ function IndieVsAgency({ d }) {
   const life = (d.lifecycle || []).filter((r) => r.count > 0);
   return (
     <Section title="วีอิสระกับค่าย" help="ไม่มีการจัดอันดับค่าย เราแสดงเฉพาะว่าค่ายขนาดไหนมีกี่แห่ง เพราะอยากให้คนเห็นวีตัวเล็กมากกว่า">
-      <div className="grid gap-3 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
         {sizes.length > 0 && (
           <Card title="วีอยู่ที่ไหนกันบ้าง" className="lg:col-span-2">
             <ul className="space-y-4">
@@ -256,11 +289,12 @@ export default function Analytics() {
   const updated = formatDate(d?.meta?.generated_at);
   return (
     <Layout>
-      <PageTitle title="ข้อมูลวงการ VTuber ไทย">
-        {updated ? <span className="text-sm text-faint">อัปเดต {updated}</span> : null}
-      </PageTitle>
+      <PageTitle
+        title="ข้อมูลวงการ VTuber ไทย"
+        aside={updated ? <p className="flex w-fit items-center gap-2 rounded-xl border border-line bg-card px-4 py-2 text-sm text-muted"><CalendarDays size={16} className="text-brand" aria-hidden="true" />อัปเดต {updated}</p> : null}
+      />
       {error && (
-        <div className="mx-auto mt-8 max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto mt-8 max-w-[1920px] px-4 sm:px-6 lg:px-8">
           <div className="card p-6">
             <p className="font-medium">โหลดข้อมูลไม่สำเร็จ</p>
             <p className="mt-1 text-sm text-muted">เช็กอินเทอร์เน็ตแล้วลองอีกครั้ง</p>
@@ -268,11 +302,11 @@ export default function Analytics() {
           </div>
         </div>
       )}
-      {!d && !error && <div className="mx-auto mt-8 h-96 max-w-6xl animate-pulse rounded-2xl bg-card" aria-label="กำลังโหลดข้อมูล" />}
+      {!d && !error && <div className="mx-auto mt-8 max-w-[1920px] px-4 sm:px-6 lg:px-8"><div className="h-96 animate-pulse rounded-[1.25rem] bg-card" aria-label="กำลังโหลดข้อมูล" /></div>}
       {d && (
         <>
           <KeyNumbers d={d} />
-          {d.insights && <Section title="สิ่งที่ข้อมูลบอก"><Insights ins={d.insights} /></Section>}
+          {d.insights && <Section title="สิ่งที่ข้อมูลบอก"><Insights ins={d.insights} d={d} /></Section>}
           <WholeIndustry d={d} />
           <ByPlatform d={d} />
           <IndieVsAgency d={d} />

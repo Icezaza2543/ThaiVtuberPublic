@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info, Sun, Moon, Coffee } from 'lucide-react';
+import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info, Sun, Moon, Coffee, Shield, Gavel, Code, FileText, Database } from 'lucide-react';
 import { DONATE_URL, SOURCE_URL } from '../lib/api.js';
-import Backdrop from './Backdrop.jsx';
+import Backdrop, { StageBeams } from './Backdrop.jsx';
 
 const NAV = [
   { href: '/', label: 'หน้าแรก', icon: Orbit },
@@ -17,6 +17,8 @@ export const LEGAL_LINKS = [
   { href: '/data-license', label: 'สัญญาอนุญาต' },
 ];
 
+const ROUND_BTN = 'grid size-10 shrink-0 place-items-center rounded-full border border-line bg-card text-muted transition hover:border-brand hover:text-ink';
+
 function currentPath() {
   if (typeof location === 'undefined') return '/';
   return location.pathname.replace(/\.html$/, '').replace(/\/index$/, '/').replace(/(.)\/$/, '$1') || '/';
@@ -31,9 +33,21 @@ function ThemeToggle() {
     setTheme(next);
   };
   return (
-    <button type="button" onClick={toggle} className="rounded-lg p-2 text-muted hover:bg-raised hover:text-ink" aria-label={next === 'light' ? 'เปลี่ยนเป็นธีมสว่าง' : 'เปลี่ยนเป็นธีมมืด'} title={next === 'light' ? 'ธีมสว่าง' : 'ธีมมืด'}>
+    <button type="button" onClick={toggle} className={ROUND_BTN} aria-label={next === 'light' ? 'เปลี่ยนเป็นธีมสว่าง' : 'เปลี่ยนเป็นธีมมืด'} title={next === 'light' ? 'ธีมสว่าง' : 'ธีมมืด'}>
       {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
     </button>
+  );
+}
+
+/** Logo: the mark on a small glowing stage tile, then the wordmark. */
+function Logo({ small = false }) {
+  return (
+    <>
+      <span className={`grid shrink-0 place-items-center border border-line bg-raised shadow-[0_0_14px_-3px_var(--color-brand)] transition group-hover:border-brand ${small ? 'size-8 rounded-lg' : 'size-10 rounded-xl'}`}>
+        <img src="/assets/logo.svg" alt="" width={small ? 20 : 24} height={small ? 20 : 24} />
+      </span>
+      <span className={`font-display leading-none ${small ? 'text-xl' : 'text-[1.375rem]'}`}>VThai<span className="text-brand">Dex</span></span>
+    </>
   );
 }
 
@@ -41,33 +55,35 @@ function Header() {
   const [open, setOpen] = useState(false);
   const path = currentPath();
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
-        <a href="/" className="mr-auto flex items-center gap-2" aria-label="VThaiDex หน้าแรก">
-          <img src="/assets/logo.svg" alt="" width="28" height="28" />
-          <span className="font-display text-xl">VThai<span className="text-brand">Dex</span></span>
+    <header className="sticky top-0 z-40 border-b border-line/80 bg-deep/90 shadow-[0_8px_30px_-12px_rgb(14_10_42/0.8)] backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-[1920px] items-center gap-3 px-4 sm:px-6 lg:px-8">
+        <a href="/" className="group mr-auto flex items-center gap-2.5" aria-label="VThaiDex หน้าแรก">
+          <Logo />
         </a>
-        <nav aria-label="เมนูหลัก" className="hidden items-center gap-1 md:flex">
-          {NAV.map(({ href, label, icon: Icon }) => (
+        <nav aria-label="เมนูหลัก" className="hidden items-center gap-1 rounded-full border border-line bg-well p-1 md:flex">
+          {NAV.map(({ href, label }) => (
             <a
               key={href}
               href={href}
               aria-current={path === href ? 'page' : undefined}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-muted hover:text-ink aria-[current=page]:bg-raised aria-[current=page]:text-ink"
+              className="rounded-full px-4 py-1.5 text-sm font-medium text-muted transition hover:text-ink aria-[current=page]:bg-brand aria-[current=page]:font-semibold aria-[current=page]:text-on-brand aria-[current=page]:shadow-[0_0_16px_-2px_var(--color-brand)]"
             >
-              <Icon size={15} aria-hidden="true" />
               {label}
             </a>
           ))}
         </nav>
-        <a href="/contribute" className="btn btn-secondary hidden !px-3 !py-1.5 text-sm md:inline-flex">
-          <PenLine size={15} aria-hidden="true" />
+        <a
+          href="/contribute"
+          aria-current={path === '/contribute' ? 'page' : undefined}
+          className="hidden h-10 items-center gap-1.5 rounded-full border border-line bg-card px-4 text-sm font-medium text-muted transition hover:border-brand hover:text-ink aria-[current=page]:border-brand aria-[current=page]:text-ink md:inline-flex"
+        >
+          <PenLine size={16} className="text-brand" aria-hidden="true" />
           แจ้งข้อมูล
         </a>
         <ThemeToggle />
         <button
           type="button"
-          className="rounded-lg p-2 md:hidden"
+          className={`${ROUND_BTN} md:hidden`}
           aria-expanded={open}
           aria-controls="mobile-nav"
           onClick={() => setOpen((v) => !v)}
@@ -77,15 +93,15 @@ function Header() {
         </button>
       </div>
       {open && (
-        <nav id="mobile-nav" aria-label="เมนูหลัก" className="space-y-1 px-4 pb-4 md:hidden">
+        <nav id="mobile-nav" aria-label="เมนูหลัก" className="mx-4 mb-4 space-y-1 rounded-2xl border border-line bg-well p-2 md:hidden">
           {[...NAV, { href: '/contribute', label: 'แจ้งข้อมูล', icon: PenLine }].map(({ href, label, icon: Icon }) => (
             <a
               key={href}
               href={href}
               aria-current={path === href ? 'page' : undefined}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink aria-[current=page]:bg-raised"
+              className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-ink aria-[current=page]:bg-brand aria-[current=page]:font-semibold aria-[current=page]:text-on-brand"
             >
-              <Icon size={17} className="text-muted" aria-hidden="true" />
+              <Icon size={18} className="opacity-75" aria-hidden="true" />
               {label}
             </a>
           ))}
@@ -95,45 +111,54 @@ function Header() {
   );
 }
 
+function SupportBand() {
+  return (
+    <section aria-label="สนับสนุนคนทำ VThaiDex" className="mx-auto mt-20 max-w-[1920px] px-4 sm:px-6 lg:px-8">
+      <div className="card card-well flex flex-col items-start gap-6 p-6 sm:p-8 md:flex-row md:items-center md:justify-between lg:p-10">
+        <div className="flex items-start gap-5 md:items-center">
+          <span className="icon-tile size-14 text-peach"><Coffee size={28} aria-hidden="true" /></span>
+          <div>
+            <p className="font-display text-xl sm:text-2xl">สนับสนุนคนทำ VThaiDex</p>
+            <p className="mt-1 max-w-[60ch] text-muted">เว็บนี้ทำโดยคนคนเดียว ไม่มีโฆษณา ถ้าชอบที่นี่ เลี้ยงกาแฟหนึ่งแก้วช่วยค่าเซิร์ฟเวอร์และเวลาทำข้อมูลได้ เงินนี้ไม่ได้ไปถึงวีในรายชื่อ</p>
+          </div>
+        </div>
+        <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary w-full shrink-0 md:w-auto">
+          <Coffee size={18} aria-hidden="true" /> เลี้ยงกาแฟผ่าน EasyDonate
+        </a>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   return (
-    <footer className="mt-16 bg-deep/80 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
-        <div className="card flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4">
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand/12 text-brand"><Coffee size={22} aria-hidden="true" /></span>
-            <div>
-              <p className="font-display text-lg">สนับสนุนคนทำ VThaiDex</p>
-              <p className="mt-0.5 max-w-[52ch] text-sm text-muted">เว็บนี้ทำโดยคนคนเดียว ไม่มีโฆษณา ถ้าชอบที่นี่ เลี้ยงกาแฟหนึ่งแก้วช่วยค่าเซิร์ฟเวอร์และเวลาทำข้อมูลได้ เงินนี้ไม่ได้ไปถึงวีในรายชื่อ</p>
-            </div>
-          </div>
-          <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary shrink-0">
-            <Coffee size={16} aria-hidden="true" /> เลี้ยงกาแฟผ่าน EasyDonate
+    <footer className="mt-14 border-t border-line bg-deep">
+      <div className="mx-auto grid max-w-[1920px] gap-10 px-4 py-12 text-sm sm:px-6 md:grid-cols-12 md:gap-12 md:py-16 lg:px-8">
+        <div className="md:col-span-5">
+          <a href="/" className="group flex w-fit items-center gap-2" aria-label="VThaiDex หน้าแรก">
+            <Logo small />
+            <span className="ml-1 rounded-full border border-line bg-raised px-2.5 py-0.5 text-xs font-semibold text-muted">สารบบอิสระ</span>
           </a>
+          <p className="mt-4 max-w-md text-muted">สารบบ VTuber ไทย ทำขึ้นเพื่อให้วีตัวเล็กถูกมองเห็นมากขึ้น ไม่เกี่ยวข้องกับครีเอเตอร์หรือแพลตฟอร์มใด</p>
         </div>
-      </div>
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 text-sm sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
-        <div>
-          <p className="font-display text-base">VThai<span className="text-brand">Dex</span></p>
-          <p className="mt-2 max-w-xs text-muted">สารบบ VTuber ไทย ทำขึ้นเพื่อให้วีตัวเล็กถูกมองเห็นมากขึ้น ไม่เกี่ยวข้องกับครีเอเตอร์หรือแพลตฟอร์มใด</p>
-        </div>
-        <nav aria-label="นโยบาย">
-          <p className="text-faint">นโยบาย</p>
-          <ul className="mt-3 space-y-2 text-muted">
+        <nav aria-label="นโยบาย" className="md:col-span-3">
+          <p className="flex items-center gap-1.5 font-bold text-ink"><Shield size={16} className="text-sky" aria-hidden="true" />นโยบาย</p>
+          <ul className="mt-4 space-y-2.5 text-muted">
             {LEGAL_LINKS.map((l) => (
-              <li key={l.href}><a className="hover:text-ink" href={l.href}>{l.label}</a></li>
+              <li key={l.href}><a className="transition hover:text-brand" href={l.href}>{l.label}</a></li>
             ))}
           </ul>
         </nav>
-        <div className="text-muted">
-          <p className="text-faint">สิทธิ์การใช้งาน</p>
-          <ul className="mt-3 space-y-2">
-            <li>โค้ด: <a className="hover:text-ink hover:underline" href={SOURCE_URL} target="_blank" rel="noopener noreferrer">AGPL-3.0 บน GitHub</a></li>
-            <li>ข้อความ: CC BY 4.0</li>
-            <li>ฐานข้อมูล: สงวนสิทธิ์</li>
+        <div className="md:col-span-4">
+          <p className="flex items-center gap-1.5 font-bold text-ink"><Gavel size={16} className="text-lemon" aria-hidden="true" />สิทธิ์การใช้งาน</p>
+          <ul className="mt-4 space-y-3 rounded-xl border border-line bg-well p-4 text-muted">
+            <li className="flex items-start gap-2"><Code size={16} className="mt-1 shrink-0 text-sky" aria-hidden="true" /><span>โค้ด: <a className="transition hover:text-brand hover:underline" href={SOURCE_URL} target="_blank" rel="noopener noreferrer">AGPL-3.0 บน GitHub</a></span></li>
+            <li className="flex items-start gap-2"><FileText size={16} className="mt-1 shrink-0 text-brand" aria-hidden="true" /><span>ข้อความ: CC BY-NC-ND 4.0</span></li>
+            <li className="flex items-start gap-2"><Database size={16} className="mt-1 shrink-0 text-lemon" aria-hidden="true" /><span>ฐานข้อมูล: สงวนสิทธิ์</span></li>
           </ul>
         </div>
       </div>
+      <p className="mx-auto max-w-[1920px] border-t border-line/50 px-4 py-5 text-sm text-faint sm:px-6 lg:px-8">© 2027 VThaiDex Project.</p>
     </footer>
   );
 }
@@ -147,16 +172,35 @@ export default function Layout({ children }) {
       <Backdrop />
       <Header />
       <main id="main">{children}</main>
+      <SupportBand />
       <Footer />
     </>
   );
 }
 
-export function PageTitle({ title, children }) {
+/**
+ * Page title on the stage: display-face heading with a soft pink glow, stage-light haze and two light beams behind
+ * it. `center` for hero-style pages, `aside` for a right-hand note (e.g. the data date), `eyebrow` for a small pill.
+ */
+export function PageTitle({ title, children, eyebrow, aside, center = false, wide = false }) {
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6 sm:pt-14">
-      <h1 className="w-fit text-2xl sm:text-3xl">{title}</h1>
-      {children && <div className="mt-2 max-w-[60ch] text-muted">{children}</div>}
+    <div className="relative">
+      {/* Behind the page content (same layer as <Backdrop>), fading out instead of ending in a hard edge. */}
+      <div className="pointer-events-none absolute inset-x-0 -top-6 -z-10 h-80 overflow-hidden [mask-image:linear-gradient(to_bottom,black_50%,transparent)]" aria-hidden="true">
+        <div className={`absolute top-0 h-56 w-[min(720px,90vw)] rounded-full bg-brand/15 blur-[100px] ${center ? 'left-1/2 -translate-x-1/2' : 'left-0 sm:left-[8%]'}`} />
+        <div className={`absolute top-10 h-40 w-[min(460px,70vw)] rounded-full bg-sky/10 blur-[90px] ${center ? 'left-1/2 -translate-x-1/2' : 'left-[30%]'}`} />
+        <StageBeams className={`absolute top-6 h-32 w-full max-w-4xl opacity-40 ${center ? 'left-1/2 -translate-x-1/2' : 'left-0'}`} />
+      </div>
+      <div className="relative mx-auto max-w-[1920px] px-4 pt-10 sm:px-6 sm:pt-14 lg:px-8">
+        <div className={center ? 'flex flex-col items-center text-center' : 'flex flex-col gap-4 md:flex-row md:items-end md:justify-between'}>
+          <div className={center ? 'flex flex-col items-center' : 'min-w-0'}>
+            {eyebrow && <div className="mb-3">{eyebrow}</div>}
+            <h1 className="text-[2rem] leading-tight drop-shadow-[0_2px_16px_rgb(255_95_162/0.35)] sm:text-[2.75rem]">{title}</h1>
+            {children && <div className={`mt-2 text-muted ${wide ? "max-w-[110ch]" : "max-w-[62ch]"}`}>{children}</div>}
+          </div>
+          {aside}
+        </div>
+      </div>
     </div>
   );
 }
