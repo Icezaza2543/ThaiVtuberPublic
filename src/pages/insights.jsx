@@ -3,12 +3,13 @@
 import { ArrowRight } from 'lucide-react';
 import { BRAND, NEUTRAL, RAMP } from '../components/ui.jsx';
 import PlatformIcon from '../components/PlatformIcon.jsx';
-import { Waffle } from '../components/charts.jsx';
+import { Donut, Waffle } from '../components/charts.jsx';
 import { fmt, pct } from '../lib/api.js';
 
-const TIERS = ['independent', 'small_mid', 'big'];
-const TIER_LABEL = { independent: 'วีอิสระ', small_mid: 'ค่ายเล็ก/กลาง', big: 'ค่ายใหญ่' };
-const TIER_COLOR = { independent: BRAND, small_mid: RAMP[2], big: NEUTRAL };
+const TIERS = ['independent', 'small', 'mid', 'big'];
+const TIER_LABEL = { independent: 'วีอิสระ', small: 'ค่ายเล็ก', mid: 'ค่ายกลาง', big: 'ค่ายใหญ่' };
+const TIER_COLOR = { independent: BRAND, small: 'var(--color-lilac)', mid: 'var(--color-lemon)', big: 'var(--color-sky)' };
+const TIER_NOTE = 'ระดับค่ายดูจากยอดผู้ติดตาม YouTube รวมของสมาชิก: ใหญ่ 1M ขึ้นไป · กลาง 100K–1M · เล็กต่ำกว่า 100K';
 const BAND_LABEL = { '<1K': 'ต่ำกว่า 1K', '1K-10K': '1K–10K', '10K-100K': '10K–100K', '100K+': '100K ขึ้นไป' };
 const sumTiers = (r) => TIERS.reduce((a, t) => a + (r[t] || 0), 0);
 const Hi = ({ children }) => <span className="text-brand">{children}</span>;
@@ -17,7 +18,7 @@ function TierLegend({ tiers = TIERS }) {
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
       {tiers.map((t) => (
-        <li key={t} className="flex items-center gap-1.5"><span className="size-2.5 rounded-sm" style={{ background: TIER_COLOR[t] }} aria-hidden="true" />{TIER_LABEL[t]}</li>
+        <li key={t} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: TIER_COLOR[t] }} aria-hidden="true" />{TIER_LABEL[t]}</li>
       ))}
     </ul>
   );
@@ -25,8 +26,8 @@ function TierLegend({ tiers = TIERS }) {
 
 function InsightCard({ title, children, note, className = '' }) {
   return (
-    <article className={`card flex flex-col p-5 sm:p-6 ${className}`}>
-      <h3 className="text-xl leading-snug sm:text-2xl">{title}</h3>
+    <article className={`card card-hover flex flex-col p-6 ${className}`}>
+      <h3 className="font-display text-[1.375rem] font-normal leading-snug sm:text-2xl">{title}</h3>
       <div className="mt-5 flex-1">{children}</div>
       {note && <p className="mt-5 border-t border-line pt-3 text-xs text-faint">{note}</p>}
     </article>
@@ -42,12 +43,13 @@ function StackRows({ rows, keys, colors, labelWidth = '6.5rem' }) {
         return (
           <li key={r.label} className="grid items-center gap-3 text-sm" style={{ gridTemplateColumns: `${labelWidth} 1fr` }}>
             <span className="font-medium">{r.label}</span>
-            <span className="flex h-8 overflow-hidden rounded-md" title={keys.map((k) => `${k}: ${fmt(r.values[k] || 0)}`).join(' / ')}>
+            <span className="flex h-8 overflow-hidden rounded-lg bg-deep" title={keys.map((k) => `${k}: ${fmt(r.values[k] || 0)}`).join(' / ')}>
               {keys.map((k) => {
                 const p = ((r.values[k] || 0) / total) * 100;
                 return (
-                  <span key={k} className="flex items-center px-2 text-xs font-semibold" style={{ width: `${p}%`, background: colors[k], color: k === keys[0] ? 'var(--color-on-brand)' : 'var(--color-ink)' }}>
-                    {p >= 9 ? `${Math.round(p)}%` : ''}
+                  <span key={k} className="@container flex items-center px-1.5 text-xs font-bold" style={{ width: `${p}%`, background: colors[k], color: 'var(--color-on-brand)' }}>
+                    {/* The label shows only when its own segment is wide enough, at any screen width. */}
+                    {p > 0 && <span className="hidden @min-[1.5rem]:inline">{Math.round(p)}%</span>}
                   </span>
                 );
               })}
@@ -64,7 +66,7 @@ function TierShare({ ins }) {
   const total = sumTiers(c);
   const notBig = 100 - (pct(c.big, total) ?? 0);
   return (
-    <InsightCard title={<><Hi>{notBig}%</Hi> ของวีไทย<br />ไม่ได้อยู่ค่ายใหญ่</>} note={`ค่ายใหญ่ = สมาชิกในทะเบียน 5 คนขึ้นไป และยอดผู้ติดตาม YouTube รวม 500K ขึ้นไป (ตอนนี้มี ${ins.big_agency_count} ค่าย) · 1 ช่อง = 1%`}>
+    <InsightCard title={<><Hi>{notBig}%</Hi> ของวีไทย<br />ไม่ได้อยู่ค่ายใหญ่</>} note={`${TIER_NOTE} (ตอนนี้มีค่ายใหญ่ ${ins.big_agency_count} ค่าย) · 1 ช่อง = 1%`}>
       <Waffle label="สัดส่วนวีตามประเภทสังกัด" parts={TIERS.map((t) => ({ label: TIER_LABEL[t], value: c[t], color: TIER_COLOR[t] }))} />
     </InsightCard>
   );
@@ -115,7 +117,7 @@ function BandsByTier({ ins }) {
   const rows = ins.size_bands.map((b) => ({ label: BAND_LABEL[b.band] || b.band, values: b }));
   const small = ins.size_bands.filter((b) => b.band === '<1K' || b.band === '1K-10K');
   const smallTotal = small.reduce((a, b) => a + sumTiers(b), 0);
-  const smallNotBig = small.reduce((a, b) => a + b.independent + b.small_mid, 0);
+  const smallNotBig = small.reduce((a, b) => a + b.independent + b.small + b.mid, 0);
   return (
     <InsightCard title={<>ช่องเล็ก <Hi>{pct(smallNotBig, smallTotal)}%</Hi><br />ไม่ใช่ค่ายใหญ่</>} note={`ใช้ช่อง YouTube ที่มีผู้ติดตามมากที่สุดของแต่ละคน · ${fmt(ins.basis.with_youtube_followers)} ช่องที่มียอดผู้ติดตาม`}>
       <TierLegend />
@@ -129,7 +131,7 @@ function BandLines({ ins }) {
   const share = (b, t) => (sumTiers(b) ? (b[t] / sumTiers(b)) * 100 : 0);
   const last = bands.at(-1);
   const indieLeads = share(last, 'independent') >= share(last, 'big');
-  const W = 560, H = 220, padL = 34, padR = 96, padY = 14;
+  const W = 560, H = 220, padL = 34, padR = 118, padY = 14; // padR fits the longest end label, "11% ค่ายเล็ก/กลาง"
   const X = (i) => padL + (i * (W - padL - padR)) / (bands.length - 1);
   const Y = (v) => H - padY - (v / 100) * (H - 2 * padY);
   return (
@@ -161,7 +163,7 @@ function TierBands({ ins }) {
   return (
     <InsightCard title={<>ช่องค่ายใหญ่ <Hi>{pct((big['10K-100K'] || 0) + (big['100K+'] || 0), bigTotal)}%</Hi><br />อยู่ระดับ 10K ขึ้นไป</>} note="ช่วงยอดผู้ติดตามของช่อง YouTube หลัก แยกตามประเภทสังกัด">
       <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
-        {order.map((b) => <li key={b} className="flex items-center gap-1.5"><span className="size-2.5 rounded-sm" style={{ background: colors[b] }} aria-hidden="true" />{BAND_LABEL[b]}</li>)}
+        {order.map((b) => <li key={b} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: colors[b] }} aria-hidden="true" />{BAND_LABEL[b]}</li>)}
       </ul>
       <div className="mt-4"><StackRows rows={rows} keys={order} colors={colors} labelWidth="7rem" /></div>
     </InsightCard>
@@ -170,7 +172,7 @@ function TierBands({ ins }) {
 
 function SmallChoices({ ins }) {
   const small = ins.size_bands.filter((b) => b.band === '<1K' || b.band === '1K-10K');
-  const notBig = small.reduce((a, b) => a + b.independent + b.small_mid, 0);
+  const notBig = small.reduce((a, b) => a + b.independent + b.small + b.mid, 0);
   const indie = small.reduce((a, b) => a + b.independent, 0);
   const big = small.reduce((a, b) => a + b.big, 0);
   const rounded = Math.floor(notBig / 100) * 100;
@@ -180,7 +182,7 @@ function SmallChoices({ ins }) {
       <div className="mt-2 flex items-center gap-3">
         <div className="flex h-12 flex-1 overflow-hidden rounded-md">
           <span style={{ width: `${(indie / notBig) * 100}%`, background: TIER_COLOR.independent }} />
-          <span style={{ width: `${((notBig - indie) / notBig) * 100}%`, background: TIER_COLOR.small_mid }} />
+          <span style={{ width: `${((notBig - indie) / notBig) * 100}%`, background: TIER_COLOR.small }} />
         </div>
         <span className="font-display text-2xl tabular-nums">{fmt(notBig)}</span>
       </div>
@@ -229,7 +231,7 @@ function LiveWhere({ ins }) {
   const multi = combos.filter((c) => c.platforms.length > 1).reduce((a, c) => a + c.count, 0);
   const max = Math.max(...combos.map((c) => c.count), 1);
   return (
-    <InsightCard className="lg:col-span-2" title={<>วีไทย <Hi>{pct(ytOnly?.count, total)}%</Hi> อยู่บน YouTube อย่างเดียว<br />อีก <Hi>{pct(multi, total)}%</Hi> อยู่หลายแพลตฟอร์มพร้อมกัน</>} note={`นับจากบัญชี YouTube / Twitch / TikTok ที่ยืนยันแล้ว ไม่ได้ดูว่าไลฟ์พร้อมกันจริงไหม · อีก ${fmt(ins.no_live_platform)} คนไม่มีบัญชีบนสามแพลตฟอร์มนี้`}>
+    <InsightCard className="md:col-span-2" title={<>วีไทย <Hi>{pct(ytOnly?.count, total)}%</Hi> อยู่บน YouTube อย่างเดียว<br />อีก <Hi>{pct(multi, total)}%</Hi> อยู่หลายแพลตฟอร์มพร้อมกัน</>} note={`นับจากบัญชี YouTube / Twitch / TikTok ที่ยืนยันแล้ว ไม่ได้ดูว่าไลฟ์พร้อมกันจริงไหม · อีก ${fmt(ins.no_live_platform)} คนไม่มีบัญชีบนสามแพลตฟอร์มนี้`}>
       <ul className="grid gap-x-10 gap-y-3 md:grid-cols-2">
         {combos.filter((c) => c.count > 0).map((c) => (
           <li key={c.platforms.join('+')} className="grid grid-cols-[5.5rem_1fr_3.5rem] items-center gap-3 text-sm" title={`${fmt(c.count)} คน · วีอิสระ ${fmt(c.independent)}`}>
@@ -243,19 +245,185 @@ function LiveWhere({ ins }) {
         ))}
       </ul>
       <p className="mt-4 flex flex-wrap gap-x-4 text-sm text-muted">
-        <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-sm bg-brand" aria-hidden="true" />วีอิสระ</span>
-        <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-sm" style={{ background: NEUTRAL }} aria-hidden="true" />มีสังกัด</span>
+        <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-brand" aria-hidden="true" />วีอิสระ</span>
+        <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: NEUTRAL }} aria-hidden="true" />มีสังกัด</span>
       </p>
     </InsightCard>
   );
 }
 
 /** The whole "what the data says" block; renders nothing until the snapshot carries insights. */
-export default function Insights({ ins }) {
+
+// ---- More views (computed from the same public summary; no new data sources) ----
+const PLATFORM_NAME = { youtube: 'YouTube', twitch: 'Twitch', tiktok: 'TikTok', x: 'X', facebook: 'Facebook', bluesky: 'Bluesky', instagram: 'Instagram', easydonate: 'EasyDonate', website: 'เว็บไซต์', tipme: 'Tipme', tipjai: 'Tipjai', ganknow: 'Gank' };
+const pname = (p) => PLATFORM_NAME[p] || p;
+// Livestream platforms only (owner 2026-10-08): donation, social and website links are not counted here.
+const LIVE_PLATFORMS = ['youtube', 'twitch', 'tiktok', 'facebook', 'kick'];
+
+function Bars({ rows, color = BRAND, unit = '' }) {
+  const max = Math.max(1, ...rows.map((r) => r.value));
+  return (
+    <ul className="space-y-2.5">
+      {rows.map((r) => (
+        <li key={r.label} className="grid grid-cols-[minmax(0,8rem)_1fr_3.75rem] items-center gap-3 text-sm">
+          <span className="truncate font-medium" title={r.label}>{r.label}</span>
+          <span className="h-2.5 overflow-hidden rounded-full bg-deep"><span className="block h-full rounded-full" style={{ width: `${(r.value / max) * 100}%`, background: r.color || color }} /></span>
+          <span className="text-right tabular-nums text-muted">{fmt(r.value)}{unit}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Vertical bars with value labels; the highlighted bar is brand pink, the rest lilac. */
+function VBars({ rows, highlight, label }) {
+  const max = Math.max(1, ...rows.map((r) => r.value));
+  return (
+    <div className="flex h-44 items-end gap-1.5" role="img" aria-label={label}>
+      {rows.map((r) => (
+        <div key={r.label} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+          <span className="text-[11px] tabular-nums text-muted">{fmt(r.value)}</span>
+          <span className="w-full rounded-t-md" style={{ height: `${Math.max(2, (r.value / max) * 120)}px`, background: r.label === highlight ? BRAND : 'var(--color-lilac)', opacity: r.label === highlight ? 1 : 0.7 }} />
+          <span className="truncate text-[11px] text-faint">{r.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TopAgencies({ d }) {
+  const rows = (d.agencies || []).slice(0, 8).map((a) => ({ label: a.name, value: a.count }));
+  if (!rows.length) return null;
+  return (
+    <InsightCard title={<>ค่ายที่สมาชิกเยอะที่สุด<br /><Hi>{rows[0].label}</Hi></>} note="นับสมาชิกในทะเบียนของแต่ละสังกัด ไม่ใช่ยอดผู้ติดตาม">
+      <Bars rows={rows} color="var(--color-lilac)" />
+    </InsightCard>
+  );
+}
+
+function IndieByPlatform({ d }) {
+  const rows = (d.platform_breakdown || []).filter((r) => LIVE_PLATFORMS.includes(r.platform) && r.count >= 50 && Number.isFinite(r.independent))
+    .map((r) => ({ label: pname(r.platform), value: Math.round((r.independent / r.count) * 100) }))
+    .sort((a, b) => b.value - a.value).slice(0, 8);
+  if (!rows.length) return null;
+  return (
+    <InsightCard title={<>แพลตฟอร์มที่วีอิสระเยอะสุด<br /><Hi>{rows[0].label} {rows[0].value}%</Hi></>} note="เฉพาะแพลตฟอร์มไลฟ์ (YouTube, Twitch, TikTok, Facebook, Kick) ที่มี 50 คนขึ้นไป ไม่นับแพลตฟอร์มโดเนต">
+      <Bars rows={rows} unit="%" />
+    </InsightCard>
+  );
+}
+
+function FastestPlatform({ d }) {
+  const yr = (r, y) => (r.debut_years || []).find((x) => x.year === y)?.count || 0;
+  const years = (d.debut_trend || []).map((r) => r.year);
+  const last = years.at(-2), prev = years.at(-3); // the newest year is still running, so compare the two before it
+  if (!last || !prev) return null;
+  const rows = (d.platform_breakdown || []).filter((r) => LIVE_PLATFORMS.includes(r.platform))
+    .map((r) => ({ label: pname(r.platform), a: yr(r, prev), b: yr(r, last) }))
+    .filter((r) => r.a >= 5).map((r) => ({ ...r, value: Math.round(((r.b - r.a) / r.a) * 100) }))
+    .sort((x, y) => y.value - x.value);
+  if (!rows.length) return null;
+  const sign = (v) => (v > 0 ? `+${v}` : `${v}`);
+  return (
+    <InsightCard title={rows[0].value > 0 ? <>เดบิวต์ปี {last} เทียบปี {prev}<br />โตสุดบน <Hi>{rows[0].label}</Hi></> : <>ปี {last} วีเดบิวต์น้อยลงเกือบทุกที่<br /><Hi>{rows[0].label}</Hi> ทรงตัวที่สุด</>} note="เฉพาะแพลตฟอร์มไลฟ์ · จำนวนวีที่เดบิวต์บนแพลตฟอร์มนั้น (เท่าที่ทราบปีเดบิวต์) · ปีที่ยังไม่จบไม่นับ">
+      <ul className="space-y-2.5 text-sm">
+        {rows.map((r) => (
+          <li key={r.label} className="flex items-center justify-between gap-3 rounded-lg bg-deep/60 px-3 py-2">
+            <span className="font-medium">{r.label}</span>
+            <span className="tabular-nums text-muted">{fmt(r.a)} → {fmt(r.b)} <b className={r.value >= 0 ? 'text-mint' : 'text-peach'}>{sign(r.value)}%</b></span>
+          </li>
+        ))}
+      </ul>
+    </InsightCard>
+  );
+}
+
+function PeakYear({ d }) {
+  const t = (d.debut_trend || []).filter((r) => r.known_debuts > 0);
+  if (!t.length) return null;
+  const peak = t.reduce((a, b) => (b.known_debuts > a.known_debuts ? b : a));
+  return (
+    <InsightCard title={<>ปีที่วีไทยเดบิวต์มากที่สุด<br />คือ <Hi>ปี {peak.year}</Hi> ({fmt(peak.known_debuts)} คน)</>} note={`จากวีที่ทราบปีเดบิวต์ ${fmt(d.known_debut_year_count)} คน · ปีล่าสุดยังไม่จบปี`}>
+      <VBars label="จำนวนเดบิวต์ต่อปี" highlight={String(peak.year)} rows={t.map((r) => ({ label: String(r.year), value: r.known_debuts }))} />
+    </InsightCard>
+  );
+}
+
+function SmallAgencies({ d }) {
+  const sizes = d.agency_sizes || [];
+  const total = sizes.reduce((a, r) => a + r.agencies, 0);
+  const one = sizes.find((r) => r.size === '1')?.agencies || 0;
+  if (!total) return null;
+  return (
+    <InsightCard title={<>ค่าย <Hi>{pct(one, total)}%</Hi><br />มีสมาชิกคนเดียว</>} note={`จากทั้งหมด ${fmt(total)} สังกัดที่มีสมาชิกในทะเบียน`}>
+      <Bars rows={sizes.map((r) => ({ label: `${r.size} คน`, value: r.agencies }))} color="var(--color-sky)" unit=" ค่าย" />
+    </InsightCard>
+  );
+}
+
+function BigAgencyAvg({ ins }) {
+  const c = Object.fromEntries(ins.tiers.map((t) => [t.tier, t.count]));
+  const n = ins.big_agency_count || 0;
+  if (!n) return null;
+  return (
+    <InsightCard title={<>ค่ายใหญ่ {n} ค่าย<br />รวมกันมี <Hi>{fmt(c.big)}</Hi> คน (เฉลี่ย {(c.big / n).toFixed(1)})</>} note={TIER_NOTE}>
+      <Donut size={140} label="สัดส่วนคนตามประเภทสังกัด" center={`${pct(c.big, sumTiers(c))}%`} sub="ค่ายใหญ่" segments={TIERS.map((t) => ({ label: TIER_LABEL[t], value: c[t] || 0, color: TIER_COLOR[t] }))} />
+    </InsightCard>
+  );
+}
+
+function UnderOneK({ ins }) {
+  const order = ['<1K', '1K-10K', '10K-100K', '100K+'];
+  const colors = { '<1K': BRAND, '1K-10K': 'var(--color-lilac)', '10K-100K': 'var(--color-sky)', '100K+': 'var(--color-lemon)' };
+  const by = Object.fromEntries(ins.size_bands.map((x) => [x.band, sumTiers(x)]));
+  const total = order.reduce((a, b) => a + (by[b] || 0), 0);
+  if (!total) return null;
+  return (
+    <InsightCard title={<>ช่อง YouTube <Hi>{pct(by['<1K'], total)}%</Hi><br />ยังมีผู้ติดตามไม่ถึง 1K</>} note={`ช่อง YouTube หลักของแต่ละคน ${fmt(total)} ช่อง · ทุกคนเริ่มจากศูนย์ ไปกดติดตามกันได้`}>
+      <Donut size={140} label="ช่วงยอดผู้ติดตาม YouTube" center={fmt(by['<1K'])} sub="ช่องต่ำกว่า 1K" segments={order.map((b) => ({ label: BAND_LABEL[b], value: by[b] || 0, color: colors[b] }))} />
+    </InsightCard>
+  );
+}
+
+function AvgChannels({ d }) {
+  const span = d.platform_span || [];
+  const people = span.reduce((a, r) => a + r.count, 0);
+  if (!people) return null;
+  const avg = span.reduce((a, r) => a + r.platforms * r.count, 0) / people;
+  const last = span.at(-1)?.platforms;
+  return (
+    <InsightCard title={<>วีไทยหนึ่งคน<br />มีเฉลี่ย <Hi>{avg.toFixed(1)}</Hi> ช่องทาง</>} note="นับทุกแพลตฟอร์มที่ยืนยันแล้วของแต่ละคน">
+      <VBars label="จำนวนช่องทางต่อคน" highlight="1" rows={span.map((r) => ({ label: r.platforms === last ? `${r.platforms}+` : String(r.platforms), value: r.count }))} />
+      <p className="mt-2 text-center text-xs text-faint">จำนวนช่องทางต่อคน</p>
+    </InsightCard>
+  );
+}
+
+function Graduated({ d }) {
+  const g = (d.lifecycle || []).find((r) => r.status === 'graduated')?.count || 0;
+  if (!g) return null;
+  return (
+    <InsightCard title={<>จบกิจกรรมแล้ว<br />อย่างน้อย <Hi>{fmt(g)}</Hi> คน</>} note="นับเฉพาะที่มีหลักฐานว่าจบกิจกรรม คนที่ไม่ทราบสถานะไม่ได้นับว่ายังทำอยู่">
+      <Donut size={140} label="สถานะในทะเบียน" center={`${pct(g, d.total_vtubers)}%`} sub="จบกิจกรรม" segments={[{ label: 'จบกิจกรรมแล้ว', value: g, color: 'var(--color-peach)' }, { label: 'ไม่ทราบสถานะ', value: d.total_vtubers - g, color: 'var(--color-raised)' }]} />
+    </InsightCard>
+  );
+}
+
+function DebutCoverage({ d }) {
+  const known = d.known_debut_year_count || 0;
+  if (!d.total_vtubers) return null;
+  return (
+    <InsightCard title={<>รู้ปีเดบิวต์แล้ว<br /><Hi>{pct(known, d.total_vtubers)}%</Hi> ของทะเบียน</>} note="ช่วยเติมปีเดบิวต์ได้ที่หน้าแจ้งข้อมูล">
+      <Donut size={140} label="ความครบของปีเดบิวต์" center={fmt(known)} sub="คนที่รู้ปี" segments={[{ label: 'รู้ปีเดบิวต์', value: known, color: 'var(--color-mint)' }, { label: 'ยังไม่รู้', value: d.total_vtubers - known, color: 'var(--color-raised)' }]} />
+    </InsightCard>
+  );
+}
+
+export default function Insights({ ins, d }) {
   if (!ins) return null;
   return (
     <>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         <TierShare ins={ins} />
         <StillActive ins={ins} />
         <ActiveDots ins={ins} />
@@ -265,6 +433,18 @@ export default function Insights({ ins }) {
         <TierBands ins={ins} />
         <NewDebuts ins={ins} />
         <LiveWhere ins={ins} />
+        {d && <>
+          <TopAgencies d={d} />
+          <IndieByPlatform d={d} />
+          <FastestPlatform d={d} />
+          <PeakYear d={d} />
+          <SmallAgencies d={d} />
+          <BigAgencyAvg ins={ins} />
+          <UnderOneK ins={ins} />
+          <AvgChannels d={d} />
+          <Graduated d={d} />
+          <DebutCoverage d={d} />
+        </>}
       </div>
       <p className="mt-3 text-right text-xs text-faint">ข้อมูลประมาณการ ณ {ins.basis.data_as_of} · ไม่ควรใช้อ้างอิงทางวิชาการ</p>
     </>

@@ -1,20 +1,13 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useState } from 'react';
-import { Search, Shuffle, X, BarChart3, ArrowRight, Sparkles, ListFilter, PenLine, ChevronDown, Scale, Dices, EyeOff } from 'lucide-react';
+import { Search, Shuffle, X, BarChart3, ArrowRight, Sparkles, ListFilter, PenLine, ChevronDown, Scale, Dices, EyeOff, RefreshCw } from 'lucide-react';
 import Layout from '../components/Layout.jsx';
-import { DbMark, SectionHeading } from '../components/brand.jsx';
-import { BRAND, CreatorCard } from '../components/ui.jsx';
+import { SectionHeading } from '../components/brand.jsx';
+import { CreatorCard } from '../components/ui.jsx';
 import { fetchOverview, fetchSpotlight, platformLabel } from '../lib/api.js';
 
 const Universe = lazy(() => import('../components/Universe.jsx'));
 const SPOTLIGHT_PLATFORMS = ['', 'youtube', 'twitch', 'tiktok'];
 // One line of personality per visit, in our own data-registry voice.
-const QUIPS = [
-  'SELECT * FROM วีอิสระ WHERE ยังไม่มีคนรู้จัก',
-  'ฐานข้อมูลนี้ไม่มียอดซับ มีแต่ความน่ารัก',
-  'ทุก row คือคนจริงที่อยู่หลังโมเดล',
-  'index วีไทยแบบไม่จัดอันดับ ใครก็เป็นดาวได้',
-  'โมเดลหลุดวาร์ปไม่เป็นไร ข้อมูลเราไม่หลุด',
-];
 
 class WebGLBoundary extends Component {
   state = { failed: false };
@@ -36,19 +29,20 @@ function usePicker() {
   return { picked, picking, pick, clear: () => setPicked(null) };
 }
 
-/** Full-screen hero: the universe fills the screen and stays playable; copy sits on a glass panel. */
+const TOGGLE = 'flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-white/55 transition hover:text-white aria-pressed:bg-white/10 aria-pressed:text-white';
+
+/** Full-screen hero: the universe fills the screen and stays playable; copy sits on the left of the stage. */
 function Hero() {
   const [stats, setStats] = useState(null);
   const [showIndies, setShowIndies] = useState(true);
   const [showAgencies, setShowAgencies] = useState(true);
   const [hover, setHover] = useState(null);
   const [sunClicks, setSunClicks] = useState(0);
-  const [quip] = useState(() => QUIPS[Math.floor(Math.random() * QUIPS.length)]);
   const { picked, picking, pick, clear } = usePicker();
   useEffect(() => { fetchOverview().then(setStats, () => setStats(null)); }, []);
 
   return (
-    <section className="relative isolate h-[calc(100svh-3.5rem)] min-h-[620px] overflow-hidden bg-[#0c0922]">
+    <section className="relative isolate h-[calc(100svh-4rem)] min-h-[640px] overflow-hidden border-b border-line/40 bg-[#0c0922] bg-clip-padding">
       <div className="absolute inset-0">
         {stats && (
           <WebGLBoundary>
@@ -66,90 +60,92 @@ function Hero() {
           </WebGLBoundary>
         )}
       </div>
+      {/* Stage lighting: a soft pink/sky haze behind the galaxy and a dark wash behind the copy. */}
+      <div className="pointer-events-none absolute -right-24 top-1/2 size-[640px] -translate-y-1/2 rounded-full bg-gradient-to-tr from-[#ff5fa2]/15 via-[#2e2470]/30 to-[#43e0ff]/15 blur-3xl" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 bg-[#0c0922]/55 sm:bg-transparent sm:bg-gradient-to-r sm:from-[#0c0922]/90 sm:via-[#0c0922]/30 sm:to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--bg-top)] to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[var(--bg-top)] to-transparent" />
 
-      <div className="pointer-events-none relative mx-auto flex h-full max-w-6xl flex-col justify-center px-4 sm:px-6">
-        <div className="pointer-events-auto max-w-lg text-[#fbf9ff]">
-          <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm text-white/75 backdrop-blur">
-            <DbMark size={11} /> <span className="truncate">{quip}</span>
-          </p>
-          <h1 className="mt-5 text-3xl leading-tight sm:text-[2.75rem]">
-            ค้นพบ <span className="text-[#ff5fa2]">VTuber ไทย</span><br />ที่คุณยังไม่รู้จัก
+      <div className="pointer-events-none relative mx-auto flex h-full max-w-[1920px] flex-col justify-center px-4 sm:px-6 lg:justify-start lg:pl-[20%] lg:pr-8 lg:pt-[18vh]">
+        <div className="pointer-events-auto flex max-w-xl flex-col items-start gap-6 text-[#fbf9ff]">
+          <h1 className="font-sans text-[2.25rem] font-bold leading-tight tracking-tight sm:text-5xl">
+            ค้นพบ <span className="font-display font-normal text-[#ff5fa2] drop-shadow-[0_0_24px_rgba(255,95,162,0.6)]">VTuber ไทย</span><br />ที่คุณยังไม่รู้จัก
           </h1>
-          <p className="mt-4 max-w-[42ch] text-white/75">
+          <p className="max-w-[44ch] text-base leading-relaxed text-[#c9c0f2] sm:text-lg">
             ดาวทุกดวงในภาพนี้คือวีไทยหนึ่งคน คลิกดาวสักดวงแล้วไปทักทายเขา โดยเฉพาะวีตัวเล็กที่ยังไม่มีใครพาไปเจอ
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <button type="button" onClick={pick} disabled={picking} className="btn bg-[#ff5fa2] text-[#1a0b2e] shadow-[0_8px_22px_-10px_#ff5fa2] hover:bg-[#ff7fb5]">
-              <Shuffle size={16} aria-hidden="true" /> {picking ? 'กำลังสุ่ม…' : 'สุ่มเจอวีอิสระ'}
+          <div className="flex flex-wrap gap-3 pt-1">
+            <button type="button" onClick={pick} disabled={picking} className="btn bg-[#ff5fa2] px-7 text-[#1a0b2e] shadow-[0_0_22px_rgba(255,95,162,0.5)] hover:bg-[#ff78b2]">
+              <Shuffle size={18} aria-hidden="true" /> {picking ? 'กำลังสุ่ม…' : 'สุ่มเจอวีอิสระ'}
             </button>
-            <a href="/directory" className="btn border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/15">
-              <Search size={16} aria-hidden="true" /> ค้นหาชื่อ
+            <a href="/directory" className="btn border border-[#3b3088] bg-[#1b1540]/85 px-7 text-[#c9c0f2] backdrop-blur hover:border-[#ff5fa2] hover:text-white">
+              <Search size={18} aria-hidden="true" /> ค้นหาชื่อ
             </a>
           </div>
         </div>
       </div>
 
       {/* Universe controls and feedback */}
-      <div className="absolute right-4 top-4 flex flex-wrap justify-end gap-2 sm:right-6" role="group" aria-label="เลือกสิ่งที่แสดงในจักรวาล">
-        <button type="button" className="chip border-white/20 text-white/80 backdrop-blur aria-pressed:border-white/50 aria-pressed:bg-white/20 aria-pressed:text-white" aria-pressed={showIndies} onClick={() => setShowIndies((v) => !v)}>
-          <span className="size-2 rounded-full bg-[#43e0ff]" aria-hidden="true" />วีอิสระ
+      <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full border border-[#3b3088] bg-[#1b1540]/85 p-1 shadow-lg backdrop-blur-md sm:right-6 lg:right-8" role="group" aria-label="เลือกสิ่งที่แสดงในจักรวาล">
+        <button type="button" className={TOGGLE} aria-pressed={showIndies} onClick={() => setShowIndies((v) => !v)}>
+          <span className={`size-2.5 rounded-full bg-[#43e0ff] ${showIndies ? 'shadow-[0_0_8px_rgba(67,224,255,0.9)]' : 'opacity-40'}`} aria-hidden="true" />วีอิสระ
         </button>
-        <button type="button" className="chip border-white/20 text-white/80 backdrop-blur aria-pressed:border-white/50 aria-pressed:bg-white/20 aria-pressed:text-white" aria-pressed={showAgencies} onClick={() => setShowAgencies((v) => !v)}>
-          <span className="size-2 rounded-full bg-[#ff5fa2]" aria-hidden="true" />มีสังกัด
+        <span className="text-[#3b3088]" aria-hidden="true">/</span>
+        <button type="button" className={TOGGLE} aria-pressed={showAgencies} onClick={() => setShowAgencies((v) => !v)}>
+          <span className={`size-2.5 rounded-full bg-[#ff5fa2] ${showAgencies ? 'shadow-[0_0_8px_rgba(255,95,162,0.9)]' : 'opacity-40'}`} aria-hidden="true" />มีสังกัด
         </button>
       </div>
       {hover && !picked && (
-        <div className="pointer-events-none absolute right-4 top-16 rounded-lg bg-[#1d1747]/95 px-3 py-2 text-sm text-white sm:right-6">
-          <p className="font-medium">{hover.name}</p>
-          <p className="text-white/60">คลิกเพื่อดูรายชื่อในสังกัด</p>
+        <div className="pointer-events-none absolute right-4 top-20 rounded-xl border border-[#3b3088] bg-[#1b1540]/95 px-3 py-2 text-sm text-white shadow-lg sm:right-6 lg:right-8">
+          <p className="font-semibold">{hover.name}</p>
+          <p className="text-[#c9c0f2]">คลิกเพื่อดูรายชื่อในสังกัด</p>
         </div>
       )}
       {sunClicks >= 3 && !picked && (
-        <p role="status" className="absolute inset-x-4 top-16 mx-auto w-fit rounded-lg bg-[#1d1747]/95 px-3 py-2 text-sm text-white">
+        <p role="status" className="absolute inset-x-4 top-20 mx-auto w-fit rounded-xl border border-[#3b3088] bg-[#1b1540]/95 px-3 py-2 text-sm text-white shadow-lg">
           <Sparkles size={14} className="mr-1 inline text-[#ffe45c]" aria-hidden="true" />
           ดวงอาทิตย์นี้คือทุกคนรวมกัน ถ้าไม่มีวีตัวเล็ก ก็ไม่มีจักรวาลนี้
         </p>
       )}
       {picked && (
-        <div className="absolute bottom-28 right-4 w-[min(22rem,calc(100%-2rem))] sm:right-6" aria-live="polite">
+        <div className="absolute bottom-28 right-4 w-[min(22rem,calc(100%-2rem))] sm:right-6 lg:right-8" aria-live="polite">
           <div className="relative">
-            <button type="button" onClick={clear} className="absolute right-2 top-2 z-10 rounded-full p-1.5 text-faint hover:bg-raised hover:text-ink">
+            <button type="button" onClick={clear} className="absolute right-2 top-3 z-10 grid size-8 place-items-center rounded-full text-faint transition hover:bg-raised hover:text-ink">
               <X size={16} aria-hidden="true" /><span className="sr-only">ปิด</span>
             </button>
-            <CreatorCard creator={picked} accent={BRAND} />
+            <CreatorCard creator={picked} />
           </div>
           <button type="button" onClick={pick} disabled={picking} className="btn btn-secondary mt-2 w-full">
-            <Shuffle size={15} aria-hidden="true" /> {picking ? 'กำลังสุ่ม…' : 'สุ่มอีกคน'}
+            <Shuffle size={16} aria-hidden="true" /> {picking ? 'กำลังสุ่ม…' : 'สุ่มอีกคน'}
           </button>
         </div>
       )}
 
-      <a href="#explore" className="absolute bottom-20 left-1/2 flex -translate-x-1/2 flex-col items-center rounded-full bg-black/30 px-3 py-1 text-xs text-white/80 backdrop-blur hover:text-white">
-        เลื่อนดูต่อ <ChevronDown size={18} className="motion-safe:animate-bounce" aria-hidden="true" />
+      <a href="#explore" className="group absolute bottom-16 left-1/2 flex -translate-x-1/2 flex-col items-center gap-0.5 text-xs font-semibold tracking-wider text-[#9a90d0] transition hover:text-[#ff5fa2]">
+        เลื่อนดูต่อ <ChevronDown size={22} className="motion-safe:animate-bounce" aria-hidden="true" />
       </a>
     </section>
   );
 }
 
 const PATHS = [
-  { icon: Dices, title: 'สุ่มเจอวีอิสระ', body: 'ไม่ต้องรู้ชื่อก่อน กดสุ่มแล้วไปเจอวีที่ยังไม่มีค่ายคอยดัน', cta: 'ลองสุ่มด้านล่าง', href: '#spotlight' },
-  { icon: ListFilter, title: 'ค้นหาตามแพลตฟอร์ม', body: 'อยากดูวีบน Twitch หรือ TikTok เลือกแพลตฟอร์มแล้วกรองเฉพาะวีอิสระได้', cta: 'เปิดรายชื่อ', href: '/directory?scope=independent' },
-  { icon: BarChart3, title: 'ดูภาพรวมทั้งวงการ', body: 'วงการโตแค่ไหน วีอยู่แพลตฟอร์มไหน ค่ายใหญ่แค่ไหน ดูเป็นกราฟได้ในหน้าเดียว', cta: 'ดูข้อมูลวงการ', href: '/analytics' },
+  { icon: Dices, tone: 'text-brand', hover: 'hover:!border-brand', title: 'สุ่มเจอวีอิสระ', body: 'ไม่ต้องรู้ชื่อก่อน กดสุ่มแล้วไปเจอวีที่ยังไม่มีค่ายคอยดัน', cta: 'ลองสุ่มด้านล่าง', href: '#spotlight' },
+  { icon: ListFilter, tone: 'text-sky', hover: 'hover:!border-sky', title: 'ค้นหาตามแพลตฟอร์ม', body: 'อยากดูวีบน Twitch หรือ TikTok เลือกแพลตฟอร์มแล้วกรองเฉพาะวีอิสระได้', cta: 'เปิดรายชื่อ', href: '/directory?scope=independent' },
+  { icon: BarChart3, tone: 'text-lemon', hover: 'hover:!border-lemon', title: 'ดูภาพรวมทั้งวงการ', body: 'วงการโตแค่ไหน วีอยู่แพลตฟอร์มไหน ค่ายใหญ่แค่ไหน ดูเป็นกราฟได้ในหน้าเดียว', cta: 'ดูข้อมูลวงการ', href: '/analytics' },
 ];
 
 function Explore() {
   return (
-    <section id="explore" className="mx-auto max-w-6xl scroll-mt-16 px-4 pt-14 sm:px-6">
+    <section id="explore" className="mx-auto max-w-[1920px] scroll-mt-20 px-4 sm:px-6 lg:px-8">
       <SectionHeading>ทำอะไรได้ที่นี่</SectionHeading>
-      <ul className="mt-5 grid gap-4 md:grid-cols-3">
-        {PATHS.map(({ icon: Icon, title, body, cta, href }) => (
-          <li key={title} className="card flex flex-col p-6">
-            <span className="grid size-11 place-items-center rounded-xl bg-brand/12 text-brand"><Icon size={22} aria-hidden="true" /></span>
-            <h3 className="mt-4 text-lg">{title}</h3>
-            <p className="mt-1 text-muted">{body}</p>
-            <a href={href} className="btn btn-secondary mt-6 self-start">{cta} <ArrowRight size={15} aria-hidden="true" /></a>
+      <ul className="mt-8 grid gap-6 md:grid-cols-3">
+        {PATHS.map(({ icon: Icon, tone, hover, title, body, cta, href }) => (
+          <li key={title} className={`card card-well group flex flex-col p-6 transition hover:bg-card ${hover}`}>
+            <span className={`icon-tile size-14 transition group-hover:scale-105 ${tone}`}><Icon size={28} aria-hidden="true" /></span>
+            <h3 className="mt-5 text-xl">{title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
+            <a href={href} className={`mt-6 inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold transition hover:underline group-hover:translate-x-1 ${tone}`}>
+              {cta} <ArrowRight size={16} aria-hidden="true" />
+            </a>
           </li>
         ))}
       </ul>
@@ -161,54 +157,62 @@ function Spotlight() {
   const [platform, setPlatform] = useState('');
   const [items, setItems] = useState(null);
   const [error, setError] = useState(false);
+  const [spin, setSpin] = useState(0);
   const load = useCallback(() => {
     setError(false);
     fetchSpotlight({ n: 3, platform }).then(setItems, () => setError(true));
   }, [platform]);
   useEffect(load, [load]);
+  const reroll = () => { setSpin((n) => n + 1); load(); };
   return (
-    <section id="spotlight" aria-labelledby="spotlight-title" className="mx-auto max-w-6xl scroll-mt-16 px-4 pt-14 sm:px-6">
-      <SectionHeading id="spotlight-title">วีอิสระที่น่าทำความรู้จัก</SectionHeading>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="แพลตฟอร์ม">
-          {SPOTLIGHT_PLATFORMS.map((p) => (
-            <button key={p || 'all'} type="button" className="chip" aria-pressed={platform === p} onClick={() => setPlatform(p)}>
-              {p ? platformLabel(p) : 'ทุกแพลตฟอร์ม'}
-            </button>
-          ))}
+    <section id="spotlight" aria-labelledby="spotlight-title" className="mx-auto max-w-[1920px] scroll-mt-20 px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <SectionHeading id="spotlight-title" tone="sky" sub="การสุ่มเลือกเฉพาะวีอิสระ และทุกคนมีโอกาสถูกสุ่มเท่ากัน">วีอิสระที่น่าทำความรู้จัก</SectionHeading>
+        <div className="flex w-full flex-wrap items-center gap-2 sm:gap-3 lg:w-auto">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="แพลตฟอร์ม">
+            {SPOTLIGHT_PLATFORMS.map((p) => (
+              <button key={p || 'all'} type="button" className="chip" aria-pressed={platform === p} onClick={() => setPlatform(p)}>
+                {p ? platformLabel(p) : 'ทุกแพลตฟอร์ม'}
+              </button>
+            ))}
+          </div>
+          <button type="button" onClick={reroll} className="btn btn-primary ml-auto lg:ml-2">
+            <RefreshCw key={spin} size={17} className={spin ? 'spin-once' : ''} aria-hidden="true" /> สุ่มชุดใหม่
+          </button>
         </div>
-        <button type="button" onClick={load} className="btn btn-primary"><Shuffle size={15} aria-hidden="true" /> สุ่มชุดใหม่</button>
       </div>
-      <div className="mt-4 grid gap-4 sm:grid-cols-3" aria-live="polite">
-        {error && <p className="text-sm text-muted sm:col-span-3">สุ่มไม่สำเร็จ ลองกด “สุ่มชุดใหม่” อีกครั้ง</p>}
-        {!error && !items && [0, 1, 2].map((i) => <div key={i} className="card h-40 animate-pulse" />)}
-        {!error && items?.map((c, i) => <CreatorCard key={`${c.name}-${i}`} creator={c} accent={BRAND} />)}
+      <div className="mt-8 grid gap-6 md:grid-cols-3" aria-live="polite">
+        {error && <p className="text-sm text-muted md:col-span-3">สุ่มไม่สำเร็จ ลองกด “สุ่มชุดใหม่” อีกครั้ง</p>}
+        {!error && !items && [0, 1, 2].map((i) => <div key={i} className="card card-well h-48 animate-pulse" />)}
+        {!error && items?.map((c, i) => <CreatorCard key={`${c.name}-${i}`} creator={c} variant={i} />)}
       </div>
     </section>
   );
 }
 
 const PRINCIPLES = [
-  { icon: Scale, title: 'ไม่จัดอันดับ', body: 'ไม่มีท็อป 10 ไม่มีใครได้ที่หนึ่ง ทุกคนอยู่ในสารบบเท่ากัน' },
-  { icon: EyeOff, title: 'ไม่โชว์ยอดซับ', body: 'ยอดผู้ติดตามไม่ได้บอกว่าใครน่าดู เราเลยไม่เอามาตัดสิน' },
-  { icon: Dices, title: 'สุ่มอย่างยุติธรรม', body: 'การสุ่มเลือกเฉพาะวีอิสระ และทุกคนมีโอกาสถูกสุ่มเท่ากัน' },
+  { icon: Scale, tone: 'text-sky', title: 'ไม่จัดอันดับ', body: 'ไม่มีท็อป 10 ไม่มีใครได้ที่หนึ่ง ทุกคนอยู่ในสารบบเท่ากัน' },
+  { icon: EyeOff, tone: 'text-brand', title: 'ไม่โชว์ยอดซับ', body: 'ยอดผู้ติดตามไม่ได้บอกว่าใครน่าดู เราเลยไม่เอามาตัดสิน' },
+  { icon: Dices, tone: 'text-mint', title: 'สุ่มอย่างยุติธรรม', body: 'การสุ่มเลือกเฉพาะวีอิสระ และทุกคนมีโอกาสถูกสุ่มเท่ากัน' },
 ];
 
 function Why() {
   return (
-    <section className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
-      <SectionHeading>ทำไมต้องมี VThaiDex</SectionHeading>
-      <div className="mt-5 grid gap-8 lg:grid-cols-[5fr_7fr] lg:items-start">
-        <p className="max-w-[46ch] text-lg leading-relaxed">
-          วีค่ายใหญ่มีคนดูแลและมีคนเห็นอยู่แล้ว แต่วีตัวเล็กอีกหลายพันคนทำคอนเทนต์ทุกวันโดยแทบไม่มีใครเจอ
-          <span className="text-brand"> เราทำที่นี่เพื่อให้พวกเขาถูกมองเห็น</span>
-        </p>
-        <ul className="grid gap-4 sm:grid-cols-3">
-          {PRINCIPLES.map(({ icon: Icon, title, body }) => (
-            <li key={title}>
-              <Icon size={22} className="text-brand" aria-hidden="true" />
-              <h3 className="mt-2 text-base">{title}</h3>
-              <p className="mt-1 text-sm text-muted">{body}</p>
+    <section className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
+      <div className="card card-well flex flex-col gap-10 p-6 sm:p-8 lg:flex-row lg:items-center lg:p-12">
+        <div className="flex flex-col gap-5 lg:w-1/2">
+          <SectionHeading>ทำไมต้องมี VThaiDex</SectionHeading>
+          <p className="max-w-[50ch] text-base leading-relaxed text-muted sm:text-lg">
+            วีค่ายใหญ่มีคนดูแลและมีคนเห็นอยู่แล้ว แต่วีตัวเล็กอีกหลายพันคนทำคอนเทนต์ทุกวันโดยแทบไม่มีใครเจอ
+            <span className="font-semibold text-brand drop-shadow-[0_0_10px_rgba(255,95,162,0.45)]"> เราทำที่นี่เพื่อให้พวกเขาถูกมองเห็น</span>
+          </p>
+        </div>
+        <ul className="grid gap-4 sm:grid-cols-3 lg:w-1/2">
+          {PRINCIPLES.map(({ icon: Icon, tone, title, body }) => (
+            <li key={title} className="flex flex-col items-center gap-3 rounded-2xl border border-line bg-card p-5 text-center shadow-md">
+              <span className={`icon-tile size-12 rounded-xl ${tone}`}><Icon size={24} aria-hidden="true" /></span>
+              <h3 className="text-base">{title}</h3>
+              <p className="text-sm text-muted">{body}</p>
             </li>
           ))}
         </ul>
@@ -219,29 +223,34 @@ function Why() {
 
 function ContributeBox() {
   return (
-    <section className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
-      <div className="card relative overflow-hidden p-8 sm:p-10">
-        <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-brand/15 blur-3xl" aria-hidden="true" />
+    <section className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
+      <div className="relative overflow-hidden rounded-[1.5rem] border border-brand/40 bg-gradient-to-r from-well via-card to-well p-6 shadow-[0_0_30px_-6px_color-mix(in_srgb,var(--color-brand)_30%,transparent)] sm:p-8 lg:p-12">
+        <div className="pointer-events-none absolute -left-16 -top-16 size-56 rounded-full bg-brand/15 blur-3xl" aria-hidden="true" />
         <div className="relative flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl">รู้จักวีที่ยังไม่อยู่ในนี้?</h2>
-            <p className="mt-2 max-w-[52ch] text-muted">ส่งชื่อกับลิงก์ช่องมาได้เลย เราตรวจจากหน้าโปรไฟล์สาธารณะแล้วพาเขาเข้าจักรวาล ใช้เวลาไม่ถึง 3 นาที</p>
+            <h2 className="text-2xl sm:text-3xl">รู้จักวีที่ยังไม่อยู่ในนี้?</h2>
+            <p className="mt-2 max-w-[56ch] text-muted">ส่งชื่อกับลิงก์ช่องมาได้เลย เราตรวจจากหน้าโปรไฟล์สาธารณะแล้วพาเขาเข้าจักรวาล ใช้เวลาไม่ถึง 3 นาที</p>
           </div>
-          <a href="/contribute" className="btn btn-primary shrink-0 !px-6 !py-3"><PenLine size={16} aria-hidden="true" /> แนะนำวีให้เรารู้จัก</a>
+          <a href="/contribute" className="btn btn-primary shrink-0 px-7"><PenLine size={18} aria-hidden="true" /> แนะนำวีให้เรารู้จัก</a>
         </div>
       </div>
     </section>
   );
 }
 
+/** Full-width section band with a stage-line divider; every other band is slightly lighter (Stitch layout). */
+function Band({ tint = false, children }) {
+  return <div className={`border-b border-line/40 py-16 md:py-20 ${tint ? 'bg-paper/45' : ''}`}>{children}</div>;
+}
+
 export default function Home() {
   return (
     <Layout>
       <Hero />
-      <Explore />
-      <Spotlight />
-      <Why />
-      <ContributeBox />
+      <Band><Explore /></Band>
+      <Band tint><Spotlight /></Band>
+      <Band><Why /></Band>
+      <Band tint><ContributeBox /></Band>
     </Layout>
   );
 }
