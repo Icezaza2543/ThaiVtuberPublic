@@ -1,7 +1,7 @@
 // Data access for the VThaiDex pages. Plain JS (no JSX) so node --test can import it directly.
 
 export const PAGE_SIZE = 24;
-export const SOURCE_URL = 'https://github.com/Icezaza2543/ThaiVtuberPublic';
+export const SOURCE_URL = 'https://github.com/Icezaza2543/VThaiDex';
 export const DONATE_URL = 'https://ezdn.app/icezaza';
 // Paste the Google Form share link here once it exists; empty keeps the button disabled.
 export const CONTRIBUTE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfNPPagmSf9dv7flBl21iGwT0YDr6uKft9RNRlzTmb97khOeA/viewform';
