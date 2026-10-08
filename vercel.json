@@ -1,9 +1,4 @@
 {
-  "git": {
-    "deploymentEnabled": {
-      "main": false
-    }
-  },
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
