@@ -1,52 +1,95 @@
 @import 'tailwindcss';
-@import '@fontsource/mitr/thai-400.css';
-@import '@fontsource/mitr/latin-400.css';
-@import '@fontsource/mitr/thai-500.css';
-@import '@fontsource/mitr/latin-500.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/thai-400.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/latin-400.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/thai-500.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/latin-500.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/thai-600.css';
-@import '@fontsource/ibm-plex-sans-thai-looped/latin-600.css';
+@import '@fontsource/sriracha/thai-400.css';
+@import '@fontsource/sriracha/latin-400.css';
+@import '@fontsource/sarabun/thai-400.css';
+@import '@fontsource/sarabun/latin-400.css';
+@import '@fontsource/sarabun/thai-500.css';
+@import '@fontsource/sarabun/latin-500.css';
+@import '@fontsource/sarabun/thai-600.css';
+@import '@fontsource/sarabun/latin-600.css';
+@import '@fontsource/sarabun/thai-700.css';
+@import '@fontsource/sarabun/latin-700.css';
 
 /*
- * VThaiDex tokens. Neutral night base; the brand pink is reserved for the one primary action per area.
- * Penlight colours (pink/sky/lemon/lilac/mint/peach) are data colours only.
- * Type scale: 1.25 ratio from a 15px body (12 / 15 / 18.75 / 23.4 / 29.3 / 36.6).
+ * "Night Stage" skin (Google Stitch design, 2026-10): a dark concert-stage purple with one hot-pink brand colour,
+ * a sky accent used sparingly, and chart colours (lilac, lemon, mint, peach) kept inside charts and icons.
+ * Dark is the default; html[data-theme='light'] redefines every token. Body text is 16px with Thai-friendly
+ * line heights; Sriracha is the display face, Sarabun everything else.
  */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 @theme {
-  --color-paper: #110f24;
-  --color-card: #1a1733;
-  --color-raised: #231f42;
-  --color-deep: #0b0a19;
-  --color-ink: #ece9f7;
-  --color-muted: #9d97b8;
-  --color-faint: #6f6990;
-  --color-line: #2a2645;
+  --color-paper: #150f3a;
+  --color-well: #1b1540;
+  --color-card: #211a55;
+  --color-raised: #2e2470;
+  --color-deep: #0e0a2a;
+  --color-ink: #fbf9ff;
+  --color-muted: #c9c0f2;
+  --color-faint: #9a90d0;
+  --color-line: #3b3088;
   --color-brand: #ff5fa2;
-  --color-brand-hover: #ff7fb5;
+  --color-brand-deep: #db2f74;
+  --color-brand-hover: #ff78b2;
+  --color-on-brand: #1a0b2e;
+  --color-neutral: #9d84e6;
   --color-sky: #43e0ff;
   --color-lemon: #ffe45c;
   --color-lilac: #b48cff;
   --color-mint: #7dffb3;
   --color-peach: #ff9f5c;
 
-  --font-display: 'Mitr', 'IBM Plex Sans Thai Looped', system-ui, sans-serif;
-  --font-sans: 'IBM Plex Sans Thai Looped', system-ui, sans-serif;
+  --font-display: 'Sriracha', 'Sarabun', system-ui, sans-serif;
+  --font-sans: 'Sarabun', system-ui, sans-serif;
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.8125rem;
-  --text-base: 0.9375rem;
-  --text-lg: 1.171875rem;
-  --text-xl: 1.4648rem;
-  --text-2xl: 1.831rem;
-  --text-3xl: 2.289rem;
+  /* Thai script needs room for tone marks: keep line heights at 1.6 or more. */
+  --text-xs--line-height: 1.6;
+  --text-sm--line-height: 1.65;
+  --text-base--line-height: 1.7;
+  --text-lg--line-height: 1.65;
+  --text-xl--line-height: 1.55;
+}
+
+:root {
+  --bg-top: #120c37;
+  --bg-bottom: #0f0a2e;
+  --card-shadow: 0 8px 24px -4px rgb(14 10 42 / 0.6);
+  --glow: 0 0 22px -4px color-mix(in srgb, var(--color-brand) 70%, transparent);
+  --focus: var(--color-lemon);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --color-paper: #f6f3fc;
+  --color-well: #f1ecfa;
+  --color-card: #ffffff;
+  --color-raised: #ebe4f8;
+  --color-deep: #ebe5f7;
+  --color-ink: #1d1638;
+  --color-muted: #554d72;
+  --color-faint: #766e92;
+  --color-line: #ddd5ee;
+  --color-brand: #db2f74;
+  --color-brand-deep: #b81d5d;
+  --color-brand-hover: #c4245f;
+  --color-on-brand: #ffffff;
+  --color-neutral: #8f7bd3;
+  --color-sky: #0b72a0;
+  --color-lemon: #8a6c00;
+  --color-lilac: #7a4fd6;
+  --color-mint: #127a4a;
+  --color-peach: #b4520c;
+  --bg-top: #fbf9ff;
+  --bg-bottom: #f1ecfa;
+  --card-shadow: 0 10px 30px -18px rgb(60 30 120 / 0.28);
+  --glow: 0 8px 22px -10px color-mix(in srgb, var(--color-brand) 80%, transparent);
+  --focus: #6d3df5;
+  color-scheme: light;
 }
 
 @layer base {
   html {
-    background: var(--color-paper);
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%) fixed var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-size: 100%;
@@ -54,16 +97,27 @@
   }
   body {
     min-height: 100dvh;
-    font-size: var(--text-base);
+    font-size: 1rem;
     line-height: 1.7;
+    background: transparent; /* the html gradient + <Backdrop> show through */
   }
-  h1, h2, h3 {
+  h1, h2 {
     font-family: var(--font-display);
-    font-weight: 500;
-    line-height: 1.3;
+    font-weight: 400; /* Sriracha ships one weight */
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+  }
+  h3 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  ::selection {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
   }
   :focus-visible {
-    outline: 2px solid var(--color-lemon);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -75,56 +129,227 @@
 }
 
 @layer components {
+  /* Surfaces: solid cards with a thin stage-line border and a soft violet shadow (no transparent card behind charts). */
   .card {
     background: var(--color-card);
     border: 1px solid var(--color-line);
-    border-radius: 1rem;
+    border-radius: 1.25rem;
+    box-shadow: var(--card-shadow);
   }
+  .card-well { background: var(--color-well); }
+  /* Analytics stat tiles: a faint top-to-bottom stage gradient; the hero tile glows pink. */
+  .tile { background: linear-gradient(180deg, var(--color-card), var(--color-well)); }
+  .tile-hero {
+    border-color: color-mix(in srgb, var(--color-brand) 40%, transparent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--color-brand) 12%, var(--color-card)), var(--color-card));
+  }
+  .card-hover { transition: border-color 160ms, background-color 160ms, box-shadow 160ms; }
+  .card-hover:hover {
+    border-color: color-mix(in srgb, var(--color-brand) 75%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-brand) 35%, transparent), 0 8px 30px -4px color-mix(in srgb, var(--color-brand) 25%, transparent);
+  }
+  .card-well.card-hover:hover { background: var(--color-card); }
+
+  /* Buttons: friendly pills with a 44px touch height. */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: 0.625rem;
-    padding: 0.625rem 1.125rem;
+    min-height: 2.75rem;
+    border-radius: 999px;
+    padding: 0.5rem 1.375rem;
     font-weight: 600;
-    font-size: var(--text-base);
+    font-size: 1rem;
     line-height: 1.4;
+    transition: filter 160ms, background-color 160ms, border-color 160ms, color 160ms, transform 120ms;
   }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.6; cursor: progress; }
   .btn-primary {
     background: var(--color-brand);
-    color: var(--color-deep);
+    color: var(--color-on-brand);
+    box-shadow: var(--glow);
   }
   .btn-primary:hover { background: var(--color-brand-hover); }
   .btn-secondary {
-    background: var(--color-raised);
-    color: var(--color-ink);
+    background: var(--color-well);
+    color: var(--color-muted);
     border: 1px solid var(--color-line);
   }
-  .btn-secondary:hover { border-color: var(--color-faint); }
+  .btn-secondary:hover { color: var(--color-ink); border-color: var(--color-brand); }
+  .btn-sm { min-height: 2.25rem; padding: 0.25rem 0.875rem; font-size: 0.875rem; }
+
+  /* Filter chips and tabs: active = brand pink with a stage glow. */
   .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    border-radius: 999px;
+    padding: 0 1.125rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    background: var(--color-well);
+    border: 1px solid var(--color-line);
+    transition: background-color 160ms, color 160ms, border-color 160ms;
+  }
+  .chip:hover { color: var(--color-ink); background: var(--color-raised); }
+  .chip[aria-pressed='true'], .chip[aria-selected='true'] {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    border-color: var(--color-brand);
+    font-weight: 600;
+    box-shadow: var(--glow);
+  }
+
+  /* Segmented control (directory scope). */
+  .seg {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-paper) 80%, transparent);
+    border: 1px solid var(--color-line);
+  }
+  .seg > button {
+    min-height: 2.25rem;
+    border-radius: 999px;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    transition: background-color 160ms, color 160ms;
+  }
+  .seg > button:hover { color: var(--color-ink); background: var(--color-raised); }
+  .seg > button[aria-pressed='true'] { background: var(--color-brand); color: var(--color-on-brand); box-shadow: var(--glow); }
+
+  /* Form fields. */
+  .field {
+    display: flex;
+    align-items: center;
+    min-height: 3rem;
+    border-radius: 0.875rem;
+    background: var(--color-raised);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink);
+    transition: border-color 160ms, box-shadow 160ms;
+  }
+  .field:focus-within {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 25%, transparent);
+  }
+
+  /* Small labels. */
+  .tag {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
     border-radius: 999px;
-    padding: 0.375rem 0.875rem;
-    font-size: var(--text-sm);
-    font-weight: 500;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.6;
     color: var(--color-muted);
-    background: transparent;
+    background: var(--color-raised);
+    border: 1px solid var(--color-line);
+    overflow-wrap: anywhere;
+  }
+  .tag-indie { color: var(--color-sky); }
+
+  /* A creator's channel link, tinted with the platform colour (set --pc inline). */
+  .pchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-height: 2.25rem;
+    border-radius: 999px;
+    padding: 0 0.8rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--pc, var(--color-neutral)) 50%, var(--color-ink));
+    background: color-mix(in srgb, var(--pc, var(--color-neutral)) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--pc, var(--color-neutral)) 34%, transparent);
+    transition: background-color 160ms, border-color 160ms;
+  }
+  .pchip:hover {
+    background: color-mix(in srgb, var(--pc, var(--color-neutral)) 28%, transparent);
+    border-color: var(--pc, var(--color-neutral));
+  }
+
+  /* Neutral link chip on creator cards ("ไปที่ YouTube ↗"). */
+  .link-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    border-radius: 999px;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    transition: background-color 160ms, color 160ms, border-color 160ms;
+  }
+  .link-chip:hover { background: var(--color-brand); border-color: var(--color-brand); color: var(--color-on-brand); }
+
+  /* Icon tile used on feature cards, footer and form cards. */
+  .icon-tile {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 1rem;
+    background: var(--color-raised);
     border: 1px solid var(--color-line);
   }
-  .chip:hover { color: var(--color-ink); }
-  .chip[aria-pressed='true'], .chip[aria-selected='true'] {
-    background: var(--color-ink);
-    color: var(--color-deep);
-    border-color: var(--color-ink);
-  }
+
   .bar-grow {
     transform-origin: left;
     animation: bar-grow 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
   @keyframes bar-grow {
     from { transform: scaleX(0); }
+  }
+  .spin-once { animation: spin-once 450ms ease-out; }
+  @keyframes spin-once { to { transform: rotate(360deg); } }
+}
+
+/* Backdrop layers (see components/Backdrop.jsx): stage-light glows, a stage-line dot grid, star dust. */
+@layer components {
+  .glow {
+    position: absolute;
+    border-radius: 50%;
+  }
+  .glow-pink { left: 22%; top: -8rem; width: 34rem; height: 30rem; background: color-mix(in srgb, var(--color-brand) 12%, transparent); filter: blur(140px); }
+  .glow-sky { right: -6rem; top: 30%; width: 30rem; height: 32rem; background: color-mix(in srgb, var(--color-sky) 10%, transparent); filter: blur(150px); }
+  .glow-violet { left: 30%; bottom: -4rem; width: 38rem; height: 22rem; background: color-mix(in srgb, var(--color-raised) 55%, transparent); filter: blur(120px); }
+  :root[data-theme='light'] .glow { opacity: 0.6; }
+  .dot-grid {
+    background-image: radial-gradient(color-mix(in srgb, var(--color-line) 34%, transparent) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  :root[data-theme='light'] .dot-grid { background-image: radial-gradient(color-mix(in srgb, var(--color-line) 80%, transparent) 1px, transparent 1px); }
+  .stardust {
+    background-image:
+      radial-gradient(1px 1px at 40px 60px, #ffffff, transparent),
+      radial-gradient(1.5px 1.5px at 180px 120px, var(--color-brand), transparent),
+      radial-gradient(1px 1px at 320px 40px, var(--color-sky), transparent),
+      radial-gradient(1.5px 1.5px at 560px 180px, #ffffff, transparent),
+      radial-gradient(1px 1px at 800px 70px, var(--color-lemon), transparent),
+      radial-gradient(1.5px 1.5px at 1040px 140px, #ffffff, transparent),
+      radial-gradient(1px 1px at 1280px 50px, var(--color-brand), transparent);
+    background-size: 350px 350px, 400px 400px, 280px 280px, 450px 450px, 320px 320px, 500px 500px, 390px 390px;
+    opacity: 0.8;
+  }
+  :root[data-theme='light'] .stardust { display: none; }
+  .twinkle { animation: twinkle 3.6s ease-in-out infinite; transform-box: fill-box; }
+  :root[data-theme='light'] .twinkle { opacity: 0.5; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .twinkle { animation: none; }
   }
 }
