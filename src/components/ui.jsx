@@ -2,10 +2,23 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { CircleHelp, ExternalLink } from 'lucide-react';
 import { creatorSummary, fmt } from '../lib/api.js';
 
-// Data colours (idol penlights). A platform keeps its colour across every chart via platformColor().
-export const PENLIGHT = ['#ff5fa2', '#43e0ff', '#ffe45c', '#b48cff', '#7dffb3', '#ff9f5c'];
-const ORDER = ['youtube', 'x', 'twitch', 'bluesky', 'tiktok', 'easydonate'];
-export const platformColor = (name, i = 0) => PENLIGHT[ORDER.indexOf(name) >= 0 ? ORDER.indexOf(name) : i % PENLIGHT.length];
+// Colour discipline: BRAND marks what matters (independent creators, the main series), NEUTRAL (lilac) is agency
+// creators and everything else, RAMP runs pink → lilac → sky for ordered categories, and platforms use their own
+// brand colour.
+export const BRAND = 'var(--color-brand)';
+export const NEUTRAL = 'var(--color-neutral)';
+export const RAMP = [
+  'var(--color-brand)',
+  'color-mix(in srgb, var(--color-brand) 50%, var(--color-lilac))',
+  'var(--color-lilac)',
+  'color-mix(in srgb, var(--color-lilac) 50%, var(--color-sky))',
+  'var(--color-sky)',
+];
+const PLATFORM_COLORS = {
+  youtube: '#ff0033', twitch: '#9146ff', bluesky: '#1185fe', facebook: '#0866ff', instagram: '#e1306c',
+  tiktok: '#00c2ba', kofi: '#ff6433', buymeacoffee: '#e6b800', streamlabs: '#31c3a2', x: 'var(--color-ink)',
+};
+export const platformColor = (name) => PLATFORM_COLORS[name] || NEUTRAL;
 
 /** Help icon that opens on click/tap (hover does not exist on touch screens). */
 export function HelpTip({ children, label = 'คำอธิบาย' }) {
@@ -22,12 +35,12 @@ export function HelpTip({ children, label = 'คำอธิบาย' }) {
   }, [open]);
   return (
     <span ref={ref} className="relative inline-flex align-middle">
-      <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((v) => !v)} className="rounded-full p-0.5 text-faint hover:text-ink">
-        <CircleHelp size={15} aria-hidden="true" />
+      <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((v) => !v)} className="grid size-7 place-items-center rounded-full text-faint transition hover:bg-raised hover:text-ink">
+        <CircleHelp size={16} aria-hidden="true" />
         <span className="sr-only">{label}</span>
       </button>
       {open && (
-        <span id={id} role="note" className="absolute left-1/2 top-7 z-30 w-64 -translate-x-1/2 rounded-lg border border-line bg-raised p-3 text-sm font-normal leading-relaxed text-ink shadow-xl">
+        <span id={id} role="note" className="absolute left-1/2 top-8 z-30 w-64 -translate-x-1/2 rounded-xl border border-line bg-raised p-3 font-sans text-sm font-normal leading-relaxed text-ink shadow-xl">
           {children}
         </span>
       )}
@@ -35,20 +48,51 @@ export function HelpTip({ children, label = 'คำอธิบาย' }) {
   );
 }
 
-/** One creator: name, agency/debut as quiet secondary text, and real channel buttons (the clickable part). */
-export function CreatorCard({ creator, accent = PENLIGHT[0] }) {
+/** Agency pill; an independent creator gets the sky "วีอิสระ" tag (a classification, never "unknown"). */
+export function AgencyTag({ agency }) {
+  if (!agency || agency === 'Independent') {
+    return <span className="tag tag-indie"><span className="size-1.5 rounded-full bg-sky" aria-hidden="true" />วีอิสระ</span>;
+  }
+  return <span className="tag">{agency}</span>;
+}
+
+/** Status chip, shown only for a verified status (e.g. graduated); quiet, never alarming. */
+export function StatusChip({ label }) {
+  if (!label) return null;
+  return <span className="tag border-faint/60 bg-transparent">{label}</span>;
+}
+
+/** A channel link tinted with its platform colour. */
+export function PlatformLink({ link, creatorName }) {
+  return (
+    <a href={link.url} target="_blank" rel="noopener noreferrer" className="pchip" style={{ '--pc': platformColor(link.name) }} aria-label={creatorName ? `${link.label} ของ ${creatorName} (เปิดในแท็บใหม่)` : undefined}>
+      {link.label}
+      <ExternalLink size={12} className="opacity-70" aria-hidden="true" />
+    </a>
+  );
+}
+
+const CARD_ACCENTS = [
+  'from-brand via-brand-deep to-brand',
+  'from-brand via-lilac to-brand',
+  'from-brand via-peach to-brand',
+];
+
+/** One creator as a stage "sticker" card: tag + debut, the name (wraps, never cut) and real channel buttons. */
+export function CreatorCard({ creator, variant = 0 }) {
   const c = creatorSummary(creator);
   return (
-    <article className="card flex h-full flex-col p-5">
-      <span className="mb-3 block h-1 w-10 rounded-full" style={{ background: accent }} aria-hidden="true" />
-      <h3 className="break-words text-lg">{c.name}</h3>
-      <p className="mt-0.5 text-sm text-faint">
-        {c.agency === 'Independent' ? 'วีอิสระ' : c.agency}
-        {c.debutYear ? ` · เดบิวต์ ${c.debutYear}` : ''}
-      </p>
-      <div className="mt-auto flex flex-wrap gap-2 pt-5">
+    <article className="card card-well card-hover relative flex h-full flex-col overflow-hidden p-6">
+      <span className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${CARD_ACCENTS[variant % CARD_ACCENTS.length]}`} aria-hidden="true" />
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 pr-6">
+        <AgencyTag agency={c.agency} />
+        {c.debutYear && <span className="text-xs text-faint">เดบิวต์ {c.debutYear}</span>}
+      </div>
+      <h3 className="mt-4 break-words text-lg [overflow-wrap:anywhere]">{c.name}</h3>
+      {c.statusLabel && <div className="mt-2"><StatusChip label={c.statusLabel} /></div>}
+      <div className="mt-auto flex flex-wrap gap-2 pt-6">
         {c.links.slice(0, 3).map((l) => (
-          <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary !px-3 !py-1.5 text-sm">
+          <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="link-chip">
             ไปที่ {l.label} <ExternalLink size={13} aria-hidden="true" />
           </a>
         ))}
@@ -58,7 +102,7 @@ export function CreatorCard({ creator, accent = PENLIGHT[0] }) {
 }
 
 /** Vertical bars for discrete years. series: [{key, color, values: {year: n}}] stacked bottom-up. */
-export function YearBars({ years, series, height = 200, label }) {
+export function YearBars({ years, series, height = 150, label }) {
   const totals = years.map((y) => series.reduce((a, s) => a + (s.values[y] || 0), 0));
   const max = Math.max(...totals, 1);
   return (
@@ -67,7 +111,7 @@ export function YearBars({ years, series, height = 200, label }) {
         {years.map((y, i) => (
           <div key={y} className="group relative flex h-full flex-1 flex-col justify-end" title={`${y}: ${fmt(totals[i])}`}>
             <span className="mb-1 text-center text-[11px] tabular-nums text-faint opacity-0 group-hover:opacity-100">{fmt(totals[i])}</span>
-            <div className="flex w-full flex-col-reverse overflow-hidden rounded-t" style={{ height: `${(totals[i] / max) * 100}%` }}>
+            <div className="flex w-full flex-col-reverse overflow-hidden rounded-t-md" style={{ height: `${(totals[i] / max) * 100}%` }}>
               {series.map((s) => (
                 <span key={s.key} className="block w-full shrink-0" style={{ background: s.color, height: `${totals[i] ? ((s.values[y] || 0) / totals[i]) * 100 : 0}%` }} />
               ))}
@@ -92,9 +136,9 @@ export function ShareBars({ rows, max }) {
   return (
     <ul className="space-y-3">
       {rows.map((r, i) => (
-        <li key={r.key} className="grid grid-cols-[5.5rem_1fr_3.5rem] items-center gap-3 text-sm">
+        <li key={r.key} className="grid grid-cols-[1.75rem_1fr_3.5rem] items-center gap-3 text-sm" title={r.name}>
           <span className="truncate">{r.label}</span>
-          <span className="relative h-2 rounded-full bg-deep" aria-hidden="true">
+          <span className="relative h-2.5 rounded-full bg-deep" aria-hidden="true">
             <span className="bar-grow absolute inset-y-0 left-0 rounded-full opacity-35" style={{ width: `${(r.value / top) * 100}%`, background: r.color, animationDelay: `${i * 40}ms` }} />
             {r.part != null && (
               <span className="bar-grow absolute inset-y-0 left-0 rounded-full" style={{ width: `${(r.part / top) * 100}%`, background: r.color, animationDelay: `${i * 40}ms` }} />
@@ -111,8 +155,8 @@ export function Legend({ items }) {
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
       {items.map((it) => (
-        <li key={it.label} className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-sm" style={{ background: it.color, opacity: it.faded ? 0.35 : 1 }} aria-hidden="true" />
+        <li key={it.key ?? it.label} className="flex items-center gap-1.5" title={it.name}>
+          <span className="size-2.5 rounded-full" style={{ background: it.color, opacity: it.faded ? 0.35 : 1 }} aria-hidden="true" />
           {it.label}
         </li>
       ))}

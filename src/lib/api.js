@@ -4,7 +4,7 @@ export const PAGE_SIZE = 24;
 export const SOURCE_URL = 'https://github.com/Icezaza2543/ThaiVtuberPublic';
 export const DONATE_URL = 'https://ezdn.app/icezaza';
 // Paste the Google Form share link here once it exists; empty keeps the button disabled.
-export const CONTRIBUTE_FORM_URL = '';
+export const CONTRIBUTE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfNPPagmSf9dv7flBl21iGwT0YDr6uKft9RNRlzTmb97khOeA/viewform';
 
 export const PLATFORM_LABELS = {
   youtube: 'YouTube', x: 'X', twitch: 'Twitch', tiktok: 'TikTok', bluesky: 'Bluesky',
