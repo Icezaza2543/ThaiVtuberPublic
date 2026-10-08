@@ -158,7 +158,7 @@ directory.
 
 ## Status
 
-Feature-complete (owner, 2026-10-08) and merged to `main`. Automatic production deploys from `main` are
-paused with `"git": {"deploymentEnabled": {"main": false}}` in `vercel.json`, so vthaidex.vercel.app
-still serves the previous release. To launch: remove that setting, publish a fresh snapshot from
-ThaiVtuberData, and deploy.
+Feature-complete and launched (owner approved the deploy on 2026-10-08): `main` deploys to production
+automatically, and ThaiVtuberData publishes the snapshot (`master/scripts/publish_vthaidex.py`). Pages add
+GSAP stage motion (scroll reveals, count-ups, parallax, pointer tilt/spotlight); it is decoration only and
+turns off under `prefers-reduced-motion`.
