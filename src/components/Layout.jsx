@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info, Sun, Moon, Coffee, Shield, Gavel, Code, FileText, Database } from 'lucide-react';
 import { DONATE_URL, SOURCE_URL } from '../lib/api.js';
 import Backdrop, { StageBeams } from './Backdrop.jsx';
+import StageMotion from './Motion.jsx';
 
 const NAV = [
   { href: '/', label: 'หน้าแรก', icon: Orbit },
@@ -43,7 +44,7 @@ function ThemeToggle() {
 function Logo({ small = false }) {
   return (
     <>
-      <span className={`grid shrink-0 place-items-center border border-line bg-raised shadow-[0_0_14px_-3px_var(--color-brand)] transition group-hover:border-brand ${small ? 'size-8 rounded-lg' : 'size-10 rounded-xl'}`}>
+      <span className={`grid shrink-0 place-items-center border border-line bg-raised shadow-[0_0_14px_-3px_var(--color-brand)] logo-tile transition group-hover:border-brand ${small ? 'size-8 rounded-lg' : 'size-10 rounded-xl'}`}>
         <img src="/assets/logo.svg" alt="" width={small ? 20 : 24} height={small ? 20 : 24} />
       </span>
       <span className={`font-display leading-none ${small ? 'text-xl' : 'text-[1.375rem]'}`}>VThai<span className="text-brand">Dex</span></span>
@@ -55,7 +56,7 @@ function Header() {
   const [open, setOpen] = useState(false);
   const path = currentPath();
   return (
-    <header className="sticky top-0 z-40 border-b border-line/80 bg-deep/90 shadow-[0_8px_30px_-12px_rgb(14_10_42/0.8)] backdrop-blur-xl">
+    <header className="glass-bar sticky top-0 z-40 border-b border-line/80 bg-deep/90 shadow-[0_8px_30px_-12px_rgb(14_10_42/0.8)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1920px] items-center gap-3 px-4 sm:px-6 lg:px-8">
         <a href="/" className="group mr-auto flex items-center gap-2.5" aria-label="VThaiDex หน้าแรก">
           <Logo />
@@ -114,7 +115,7 @@ function Header() {
 function SupportBand() {
   return (
     <section aria-label="สนับสนุนคนทำ VThaiDex" className="mx-auto mt-20 max-w-[1920px] px-4 sm:px-6 lg:px-8">
-      <div className="card card-well flex flex-col items-start gap-6 p-6 sm:p-8 md:flex-row md:items-center md:justify-between lg:p-10">
+      <div className="card card-well glow-follow flex flex-col items-start gap-6 p-6 sm:p-8 md:flex-row md:items-center md:justify-between lg:p-10">
         <div className="flex items-start gap-5 md:items-center">
           <span className="icon-tile size-14 text-peach"><Coffee size={28} aria-hidden="true" /></span>
           <div>
@@ -170,6 +171,7 @@ export default function Layout({ children }) {
         ข้ามไปยังเนื้อหา
       </a>
       <Backdrop />
+      <StageMotion />
       <Header />
       <main id="main">{children}</main>
       <SupportBand />
@@ -186,19 +188,19 @@ export function PageTitle({ title, children, eyebrow, aside, center = false, wid
   return (
     <div className="relative">
       {/* Behind the page content (same layer as <Backdrop>), fading out instead of ending in a hard edge. */}
-      <div className="pointer-events-none absolute inset-x-0 -top-6 -z-10 h-80 overflow-hidden [mask-image:linear-gradient(to_bottom,black_50%,transparent)]" aria-hidden="true">
-        <div className={`absolute top-0 h-56 w-[min(720px,90vw)] rounded-full bg-brand/15 blur-[100px] ${center ? 'left-1/2 -translate-x-1/2' : 'left-0 sm:left-[8%]'}`} />
+      <div data-parallax="70" className="pointer-events-none absolute inset-x-0 -top-6 -z-10 h-80 overflow-hidden [mask-image:linear-gradient(to_bottom,black_50%,transparent)]" aria-hidden="true">
+        <div className={`absolute top-0 h-56 w-[min(720px,90vw)] rounded-full bg-brand/15 blur-[100px] stage-breathe ${center ? 'left-1/2 -translate-x-1/2' : 'left-0 sm:left-[8%]'}`} />
         <div className={`absolute top-10 h-40 w-[min(460px,70vw)] rounded-full bg-sky/10 blur-[90px] ${center ? 'left-1/2 -translate-x-1/2' : 'left-[30%]'}`} />
         <StageBeams className={`absolute top-6 h-32 w-full max-w-4xl opacity-40 ${center ? 'left-1/2 -translate-x-1/2' : 'left-0'}`} />
       </div>
       <div className="relative mx-auto max-w-[1920px] px-4 pt-10 sm:px-6 sm:pt-14 lg:px-8">
         <div className={center ? 'flex flex-col items-center text-center' : 'flex flex-col gap-4 md:flex-row md:items-end md:justify-between'}>
           <div className={center ? 'flex flex-col items-center' : 'min-w-0'}>
-            {eyebrow && <div className="mb-3">{eyebrow}</div>}
-            <h1 className="text-[2rem] leading-tight drop-shadow-[0_2px_16px_rgb(255_95_162/0.35)] sm:text-[2.75rem]">{title}</h1>
-            {children && <div className={`mt-2 text-muted ${wide ? "max-w-[110ch]" : "max-w-[62ch]"}`}>{children}</div>}
+            {eyebrow && <div data-hero-item className="mb-3">{eyebrow}</div>}
+            <h1 data-hero-item className="title-glow text-[2rem] leading-tight drop-shadow-[0_2px_16px_rgb(255_95_162/0.35)] sm:text-[2.75rem]">{title}</h1>
+            {children && <div data-hero-item className={`mt-2 text-muted ${wide ? "max-w-[110ch]" : "max-w-[62ch]"}`}>{children}</div>}
           </div>
-          {aside}
+          {aside && <div data-hero-item>{aside}</div>}
         </div>
       </div>
     </div>

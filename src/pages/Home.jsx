@@ -61,20 +61,20 @@ function Hero() {
         )}
       </div>
       {/* Stage lighting: a soft pink/sky haze behind the galaxy and a dark wash behind the copy. */}
-      <div className="pointer-events-none absolute -right-24 top-1/2 size-[640px] -translate-y-1/2 rounded-full bg-gradient-to-tr from-[#ff5fa2]/15 via-[#2e2470]/30 to-[#43e0ff]/15 blur-3xl" aria-hidden="true" />
+      <div className="stage-breathe pointer-events-none absolute -right-24 top-1/2 size-[640px] -translate-y-1/2 rounded-full bg-gradient-to-tr from-[#ff5fa2]/15 via-[#2e2470]/30 to-[#43e0ff]/15 blur-3xl" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 bg-[#0c0922]/55 sm:bg-transparent sm:bg-gradient-to-r sm:from-[#0c0922]/90 sm:via-[#0c0922]/30 sm:to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[var(--bg-top)] to-transparent" />
 
       <div className="pointer-events-none relative mx-auto flex h-full max-w-[1920px] flex-col justify-center px-4 sm:px-6 lg:justify-start lg:pl-[20%] lg:pr-8 lg:pt-[18vh]">
-        <div className="pointer-events-auto flex max-w-xl flex-col items-start gap-6 text-[#fbf9ff]">
-          <h1 className="font-sans text-[2.25rem] font-bold leading-tight tracking-tight sm:text-5xl">
-            ค้นพบ <span className="font-display font-normal text-[#ff5fa2] drop-shadow-[0_0_24px_rgba(255,95,162,0.6)]">VTuber ไทย</span><br />ที่คุณยังไม่รู้จัก
+        <div data-hero-copy className="pointer-events-auto flex max-w-xl flex-col items-start gap-6 text-[#fbf9ff]">
+          <h1 data-hero-item className="font-sans text-[2.25rem] font-bold leading-tight tracking-tight sm:text-5xl">
+            ค้นพบ <span className="neon-text font-display font-normal text-[#ff5fa2] drop-shadow-[0_0_24px_rgba(255,95,162,0.6)]">VTuber ไทย</span><br />ที่คุณยังไม่รู้จัก
           </h1>
-          <p className="max-w-[44ch] text-base leading-relaxed text-[#c9c0f2] sm:text-lg">
+          <p data-hero-item className="max-w-[44ch] text-base leading-relaxed text-[#c9c0f2] sm:text-lg">
             ดาวทุกดวงในภาพนี้คือวีไทยหนึ่งคน คลิกดาวสักดวงแล้วไปทักทายเขา โดยเฉพาะวีตัวเล็กที่ยังไม่มีใครพาไปเจอ
           </p>
-          <div className="flex flex-wrap gap-3 pt-1">
-            <button type="button" onClick={pick} disabled={picking} className="btn bg-[#ff5fa2] px-7 text-[#1a0b2e] shadow-[0_0_22px_rgba(255,95,162,0.5)] hover:bg-[#ff78b2]">
+          <div data-hero-item className="flex flex-wrap gap-3 pt-1">
+            <button type="button" onClick={pick} disabled={picking} className="btn btn-shine bg-[#ff5fa2] px-7 text-[#1a0b2e] shadow-[0_0_22px_rgba(255,95,162,0.5)] hover:bg-[#ff78b2]">
               <Shuffle size={18} aria-hidden="true" /> {picking ? 'กำลังสุ่ม…' : 'สุ่มเจอวีอิสระ'}
             </button>
             <a href="/directory" className="btn border border-[#3b3088] bg-[#1b1540]/85 px-7 text-[#c9c0f2] backdrop-blur hover:border-[#ff5fa2] hover:text-white">
@@ -136,10 +136,10 @@ const PATHS = [
 function Explore() {
   return (
     <section id="explore" className="mx-auto max-w-[1920px] scroll-mt-20 px-4 sm:px-6 lg:px-8">
-      <SectionHeading>ทำอะไรได้ที่นี่</SectionHeading>
+      <div data-reveal><SectionHeading>ทำอะไรได้ที่นี่</SectionHeading></div>
       <ul className="mt-8 grid gap-6 md:grid-cols-3">
         {PATHS.map(({ icon: Icon, tone, hover, title, body, cta, href }) => (
-          <li key={title} className={`card card-well group flex flex-col p-6 transition hover:bg-card ${hover}`}>
+          <li key={title} className={`card card-well card-hover tilt group flex flex-col p-6 transition hover:bg-card ${hover}`}>
             <span className={`icon-tile size-14 transition group-hover:scale-105 ${tone}`}><Icon size={28} aria-hidden="true" /></span>
             <h3 className="mt-5 text-xl">{title}</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
@@ -183,7 +183,7 @@ function Spotlight() {
       </div>
       <div className="mt-8 grid gap-6 md:grid-cols-3" aria-live="polite">
         {error && <p className="text-sm text-muted md:col-span-3">สุ่มไม่สำเร็จ ลองกด “สุ่มชุดใหม่” อีกครั้ง</p>}
-        {!error && !items && [0, 1, 2].map((i) => <div key={i} className="card card-well h-48 animate-pulse" />)}
+        {!error && !items && [0, 1, 2].map((i) => <div key={i} data-no-reveal className="card card-well h-48 animate-pulse" />)}
         {!error && items?.map((c, i) => <CreatorCard key={`${c.name}-${i}`} creator={c} variant={i} />)}
       </div>
     </section>
@@ -209,7 +209,7 @@ function Why() {
         </div>
         <ul className="grid gap-4 sm:grid-cols-3 lg:w-1/2">
           {PRINCIPLES.map(({ icon: Icon, tone, title, body }) => (
-            <li key={title} className="flex flex-col items-center gap-3 rounded-2xl border border-line bg-card p-5 text-center shadow-md">
+            <li key={title} className="tilt glow-follow relative flex flex-col items-center gap-3 rounded-2xl border border-line bg-card p-5 text-center shadow-md">
               <span className={`icon-tile size-12 rounded-xl ${tone}`}><Icon size={24} aria-hidden="true" /></span>
               <h3 className="text-base">{title}</h3>
               <p className="text-sm text-muted">{body}</p>
@@ -224,14 +224,14 @@ function Why() {
 function ContributeBox() {
   return (
     <section className="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-8">
-      <div className="relative overflow-hidden rounded-[1.5rem] border border-brand/40 bg-gradient-to-r from-well via-card to-well p-6 shadow-[0_0_30px_-6px_color-mix(in_srgb,var(--color-brand)_30%,transparent)] sm:p-8 lg:p-12">
+      <div data-reveal className="glow-follow aurora-border relative overflow-hidden rounded-[1.5rem] border border-brand/40 bg-gradient-to-r from-well via-card to-well p-6 shadow-[0_0_30px_-6px_color-mix(in_srgb,var(--color-brand)_30%,transparent)] sm:p-8 lg:p-12">
         <div className="pointer-events-none absolute -left-16 -top-16 size-56 rounded-full bg-brand/15 blur-3xl" aria-hidden="true" />
         <div className="relative flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-2xl sm:text-3xl">รู้จักวีที่ยังไม่อยู่ในนี้?</h2>
             <p className="mt-2 max-w-[56ch] text-muted">ส่งชื่อกับลิงก์ช่องมาได้เลย เราตรวจจากหน้าโปรไฟล์สาธารณะแล้วพาเขาเข้าจักรวาล ใช้เวลาไม่ถึง 3 นาที</p>
           </div>
-          <a href="/contribute" className="btn btn-primary shrink-0 px-7"><PenLine size={18} aria-hidden="true" /> แนะนำวีให้เรารู้จัก</a>
+          <a href="/contribute" className="btn btn-primary btn-shine shrink-0 px-7"><PenLine size={18} aria-hidden="true" /> แนะนำวีให้เรารู้จัก</a>
         </div>
       </div>
     </section>

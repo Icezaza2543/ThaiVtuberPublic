@@ -82,8 +82,8 @@ const CARD_ACCENTS = [
 export function CreatorCard({ creator, variant = 0 }) {
   const c = creatorSummary(creator);
   return (
-    <article className="card card-well card-hover relative flex h-full flex-col overflow-hidden p-6">
-      <span className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${CARD_ACCENTS[variant % CARD_ACCENTS.length]}`} aria-hidden="true" />
+    <article className="card card-well card-hover tilt relative flex h-full flex-col overflow-hidden p-6">
+      <span className={`accent-flow absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${CARD_ACCENTS[variant % CARD_ACCENTS.length]}`} aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-2 pt-1 pr-6">
         <AgencyTag agency={c.agency} />
         {c.debutYear && <span className="text-xs text-faint">เดบิวต์ {c.debutYear}</span>}
