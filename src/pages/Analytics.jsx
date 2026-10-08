@@ -47,13 +47,13 @@ function KeyNumbers({ d }) {
   return (
     <ul className="mx-auto mt-8 grid max-w-[1920px] grid-flow-row-dense grid-cols-2 gap-4 px-4 sm:px-6 md:grid-cols-3 lg:grid-cols-5 lg:px-8">
       {cards.map((c) => (
-        <li key={c.label} className={`card relative overflow-hidden p-5 ${c.hero ? 'tile-hero col-span-2 md:col-span-1' : 'tile'}`}>
+        <li key={c.label} className={`card card-hover tilt relative overflow-hidden p-5 ${c.hero ? 'tile-hero col-span-2 md:col-span-1' : 'tile'}`}>
           {c.hero && <span className="pointer-events-none absolute -bottom-4 -right-4 size-20 rounded-full bg-brand/15 blur-xl" aria-hidden="true" />}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className={`text-sm font-semibold ${c.hero ? 'text-brand' : 'text-muted'}`}>{c.label}</p>
             {c.badge && <span className="rounded-full border border-brand/40 bg-brand/15 px-2 py-0.5 text-[11px] font-bold text-brand">{c.badge}</span>}
           </div>
-          <p className={`mt-1 font-display text-[2.5rem] leading-tight tabular-nums ${c.hero ? 'text-brand' : c.sky ? 'text-sky' : 'text-ink'}`}>{c.value}</p>
+          <p data-countup className={`mt-1 font-display text-[2.5rem] leading-tight tabular-nums ${c.hero ? 'text-brand' : c.sky ? 'text-sky' : 'text-ink'}`}>{c.value}</p>
           {c.sub && <p className="mt-0.5 text-xs text-faint">{c.sub}</p>}
         </li>
       ))}
