@@ -11,9 +11,10 @@ const SPARKLES = [
 export default function Backdrop() {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      <div className="glow glow-pink" />
-      <div className="glow glow-sky" />
-      <div className="glow glow-violet" />
+      <div className="aurora" />
+      <div data-parallax="-60" className="absolute inset-0"><div className="glow glow-pink" /></div>
+      <div data-parallax="90" className="absolute inset-0"><div className="glow glow-sky" /></div>
+      <div data-parallax="40" className="absolute inset-0"><div className="glow glow-violet" /></div>
       <div className="dot-grid absolute inset-0" />
       <div className="stardust absolute inset-0" />
       <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
@@ -43,7 +44,7 @@ export function StageBeams({ className = '' }) {
           <stop offset="1" stopColor="var(--color-lemon)" stopOpacity="0.1" />
         </linearGradient>
       </defs>
-      <path d="M0 40C200 90 600 -10 800 40" stroke="url(#beam-a)" strokeDasharray="4 6" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+      <path className="beam-march" d="M0 40C200 90 600 -10 800 40" stroke="url(#beam-a)" strokeDasharray="4 6" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
       <path d="M0 80C260 20 540 120 800 70" stroke="url(#beam-b)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
     </svg>
   );
