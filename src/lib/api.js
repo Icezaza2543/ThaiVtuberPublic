@@ -9,7 +9,7 @@ export const CONTRIBUTE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfN
 export const PLATFORM_LABELS = {
   youtube: 'YouTube', x: 'X', twitch: 'Twitch', tiktok: 'TikTok', bluesky: 'Bluesky',
   facebook: 'Facebook', instagram: 'Instagram', website: 'เว็บไซต์', easydonate: 'EasyDonate',
-  tipjai: 'Tipjai', kofi: 'Ko-fi', ganknow: 'Gank', sociabuzz: 'Sociabuzz',
+  tipjai: 'Tipjai', tipme: 'Tipme', soop: 'SOOP', kofi: 'Ko-fi', ganknow: 'Gank', sociabuzz: 'Sociabuzz',
   buymeacoffee: 'Buy Me a Coffee', fansly: 'Fansly', streamlabs: 'Streamlabs',
   streamelements: 'StreamElements', other: 'อื่น ๆ',
 };
