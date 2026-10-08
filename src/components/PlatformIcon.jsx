@@ -1,7 +1,7 @@
 // Platform brand icons (simple-icons, CC0). Platforms without a published mark use a generic lucide icon.
 // Every icon carries the platform name for screen readers and as a hover tooltip.
 import { siBluesky, siBuymeacoffee, siFacebook, siInstagram, siKofi, siStreamlabs, siTiktok, siTwitch, siX, siYoutube } from 'simple-icons';
-import { Gem, Globe, HandHeart, Link2 } from 'lucide-react';
+import { Gem, Globe, HandHeart, Link2, Radio } from 'lucide-react';
 import { platformLabel } from '../lib/api.js';
 
 const BRANDS = {
@@ -9,7 +9,7 @@ const BRANDS = {
   facebook: siFacebook, instagram: siInstagram, kofi: siKofi, buymeacoffee: siBuymeacoffee, streamlabs: siStreamlabs,
 };
 const FALLBACK = {
-  website: Globe, easydonate: HandHeart, tipjai: HandHeart, sociabuzz: HandHeart, streamelements: HandHeart,
+  website: Globe, soop: Radio, easydonate: HandHeart, tipjai: HandHeart, tipme: HandHeart, sociabuzz: HandHeart, streamelements: HandHeart,
   ganknow: Gem, fansly: Gem,
 };
 // Brand colours that disappear on our dark background are drawn in near-white instead.

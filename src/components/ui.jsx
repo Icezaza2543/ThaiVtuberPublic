@@ -16,7 +16,7 @@ export const RAMP = [
 ];
 const PLATFORM_COLORS = {
   youtube: '#ff0033', twitch: '#9146ff', bluesky: '#1185fe', facebook: '#0866ff', instagram: '#e1306c',
-  tiktok: '#00c2ba', kofi: '#ff6433', buymeacoffee: '#e6b800', streamlabs: '#31c3a2', x: 'var(--color-ink)',
+  tiktok: '#00c2ba', soop: '#3d8bff', kofi: '#ff6433', buymeacoffee: '#e6b800', streamlabs: '#31c3a2', x: 'var(--color-ink)',
 };
 export const platformColor = (name) => PLATFORM_COLORS[name] || NEUTRAL;
 
