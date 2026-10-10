@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info, Sun, Moon, Coffee, Shield, Gavel, Code, FileText, Database } from 'lucide-react';
-import { DONATE_URL, SOURCE_URL } from '../lib/api.js';
+import { useEffect, useState } from 'react';
+import { Menu, X, PenLine, Orbit, BarChart3, ListFilter, Info, Sun, Moon, Coffee, Shield, Gavel, Code, FileText, Database, Eye } from 'lucide-react';
+import { DONATE_URL, SOURCE_URL, fetchVisits, fmt } from '../lib/api.js';
 import Backdrop, { StageBeams } from './Backdrop.jsx';
 import StageMotion from './Motion.jsx';
 
@@ -131,6 +131,20 @@ function SupportBand() {
   );
 }
 
+function VisitCounter() {
+  const [visits, setVisits] = useState(null);
+  useEffect(() => { fetchVisits().then(setVisits).catch(() => {}); }, []);
+  if (!visits) return null;
+  return (
+    <p className="flex items-center gap-1.5" aria-label={`ผู้เข้าชมวันนี้ ${fmt(visits.today)} คน ทั้งหมด ${fmt(visits.total)} คน`}>
+      <Eye size={15} className="text-sky" aria-hidden="true" />
+      <span>วันนี้ <span className="font-semibold text-muted tabular-nums">{fmt(visits.today)}</span></span>
+      <span aria-hidden="true">·</span>
+      <span>ทั้งหมด <span className="font-semibold text-muted tabular-nums">{fmt(visits.total)}</span></span>
+    </p>
+  );
+}
+
 function Footer() {
   return (
     <footer className="mt-14 border-t border-line bg-deep">
@@ -159,7 +173,10 @@ function Footer() {
           </ul>
         </div>
       </div>
-      <p className="mx-auto max-w-[1920px] border-t border-line/50 px-4 py-5 text-sm text-faint sm:px-6 lg:px-8">© 2027 VThaiDex Project.</p>
+      <div className="mx-auto flex max-w-[1920px] flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-line/50 px-4 py-5 text-sm text-faint sm:px-6 lg:px-8">
+        <p>© 2027 VThaiDex Project.</p>
+        <VisitCounter />
+      </div>
     </footer>
   );
 }
