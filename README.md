@@ -3,7 +3,7 @@
 A privacy-first public directory and industry overview of Thai VTubers, built so that small and
 independent creators are as easy to find as the big agencies. No rankings, no follower leaderboards.
 
-Live site: https://vthaidex.vercel.app (production deploys are paused; see [Status](#status)).
+Live site: https://vthaidex.vercel.app (see [Status](#status)).
 
 ## Product scope
 
@@ -138,6 +138,34 @@ npm run build    # dist/
 `VTHAIDEX_SNAPSHOT_FILE=<snapshot.json> npm run dev` serves every `/api` route from a local snapshot
 through the real handlers, e.g. to preview a new snapshot before it is published. Vercel builds with
 `npm run build` and serves `dist/` plus the functions in `api/`.
+
+## Production env vars
+
+Configure these on the Vercel project for the intended environment. Never prefix secrets with
+`VITE_` or include them in the frontend bundle.
+
+| Variable | Required for | What breaks without it |
+|---|---|---|
+| `BLOB_STORE_ID` | Blob with OIDC (current production authentication) | `/api/stats`, `/api/creators`, `/api/spotlight` and snapshot publishing fail; `/api/health` returns 503. |
+| `VERCEL_OIDC_TOKEN` | Vercel-managed rotating Blob authentication, with `BLOB_STORE_ID` | OIDC Blob access fails. Vercel provides/rotates this token; do not set it manually. |
+| `BLOB_READ_WRITE_TOKEN` | Alternative Blob authentication, including local operations without OIDC | Blob access fails if neither this token nor OIDC + store ID is available. Not required when OIDC is working. |
+| `KV_REST_API_URL` | Upstash visitor counter | `/api/visits` returns 503; health reports counter `missing_config`. |
+| `KV_REST_API_TOKEN` | Upstash visitor counter | `/api/visits` returns 503; health reports counter `missing_config`. |
+| `VTHAIDEX_CURSOR_SECRET` | Exactly 32 random bytes encoded as base64url; creator pagination and daily visitor hashing | `/api/creators` and POST `/api/visits` return 503 if missing or invalid; counter GET can still read. |
+| `VTHAIDEX_PUBLISH_SECRET` | Signed snapshot publishing (at least 48 random bytes, base64url) | `/api/internal/publish` cannot accept new snapshots; existing data remains readable. |
+
+**check /api/health after adding any Vercel integration**. It reads the current snapshot and uses
+Redis PING without changing data, returns snapshot ID/generated time plus `blob` and `counter`
+statuses (`ok`, `missing_config`, `error`), and never returns env values. Status is 200 when Blob
+is readable, otherwise 503; counter failure is reported independently. Responses are noindex and
+no-store. Missing configuration and provider failures are logged with the endpoint and a redacted
+error message. Health does not validate the publish/cursor secrets.
+
+POST `/api/visits` counts at most once per salted IP hash per Bangkok day using Redis SET NX EX.
+Only the SHA-256 hash (IP + day + cursor secret) is stored, expiring at Bangkok midnight; raw IPs
+are not stored in Redis. Duplicate POSTs return the existing counts. Missing IP/secret or Redis
+failure fails closed; a failed increment after acquiring the gate may undercount that day.
+People sharing an IP share the daily gate. The existing browser date marker remains an extra guard.
 
 ## Production provisioning
 
