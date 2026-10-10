@@ -74,3 +74,16 @@ export async function fetchSpotlight({ n = 3, platform = '' } = {}, fetchImpl = 
   if (!Array.isArray(payload.items)) throw new Error('invalid spotlight response');
   return payload.items;
 }
+
+// Visitor counter: one POST per browser per Bangkok day (remembered in localStorage), otherwise GET.
+const VISIT_KEY = 'vthaidex-visit-day';
+export const bangkokDay = (now = new Date()) => new Date(now.getTime() + 7 * 3600e3).toISOString().slice(0, 10);
+export async function fetchVisits(fetchImpl = fetch, store = globalThis.localStorage, now = new Date()) {
+  const day = bangkokDay(now);
+  let seen = null;
+  try { seen = store?.getItem(VISIT_KEY); } catch { /* storage blocked */ }
+  const isNew = seen !== day;
+  const data = await json(await fetchImpl('/api/visits', { method: isNew ? 'POST' : 'GET', headers: { Accept: 'application/json' } }));
+  if (isNew) { try { store?.setItem(VISIT_KEY, day); } catch { /* storage blocked */ } }
+  return data;
+}
