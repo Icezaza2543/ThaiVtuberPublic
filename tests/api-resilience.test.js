@@ -15,7 +15,8 @@ const storage = { readCurrentSnapshot: async () => ({ snapshot_id: 'current', me
 
 test('config guard names missing vars and accepts either Blob authentication mode', () => {
   assert.throws(() => requireBlobConfig({ VERCEL_OIDC_TOKEN: 'test' }), /missing BLOB_STORE_ID/);
-  assert.throws(() => requireBlobConfig({ BLOB_STORE_ID: 'test' }), /missing BLOB_READ_WRITE_TOKEN/);
+  // the runtime OIDC token arrives per request, so a store ID alone is accepted
+  assert.doesNotThrow(() => requireBlobConfig({ BLOB_STORE_ID: 'test' }));
   assert.doesNotThrow(() => requireBlobConfig(env));
   assert.doesNotThrow(() => requireBlobConfig({ BLOB_READ_WRITE_TOKEN: 'test' }));
   assert.throws(() => requireCounterConfig({}), /missing KV_REST_API_URL/);
