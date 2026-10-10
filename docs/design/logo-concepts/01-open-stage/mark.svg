@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t d">
+  <title id="t">วีไทยเด็กซ์ — เวทีที่เปิดให้ทุกคน</title>
+  <desc id="d">ลำแสงสองข้างโอบประกายดาวเหนือฐานเวที สื่อถึงพื้นที่ให้วีทูบเบอร์อิสระได้เป็นที่มองเห็น</desc>
+  <path d="M12 8H16L31 48H27Q22 48 20 44L6 14Q4 8 12 8Z" fill="#7C5CFC"/>
+  <path d="M52 8H48L33 48H37Q42 48 44 44L58 14Q60 8 52 8Z" fill="#E85D9E"/>
+  <path d="M32 12Q34 20 40 22Q34 24 32 32Q30 24 24 22Q30 20 32 12Z" fill="#43B7D5"/>
+  <rect x="10" y="54" width="44" height="6" rx="3" fill="#7C5CFC"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t d">
+  <title id="t">วีไทยเด็กซ์ — ท้องฟ้าร่วมกัน</title>
+  <desc id="d">ประกายดาวห้าดวงขนาดเท่ากันเชื่อมเป็นรูปตัววี สื่อถึงครีเอเตอร์หลากหลายที่มีพื้นที่เท่าเทียมกันในสารบบ</desc>
+  <path d="M12 14 32 50 52 14" fill="none" stroke="#7C5CFC" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#E85D9E">
+    <path d="M12 6Q14 12 20 14Q14 16 12 22Q10 16 4 14Q10 12 12 6Z"/>
+    <path d="M22 24Q24 30 30 32Q24 34 22 40Q20 34 14 32Q20 30 22 24Z"/>
+    <path d="M32 42Q34 48 40 50Q34 52 32 58Q30 52 24 50Q30 48 32 42Z"/>
+    <path d="M42 24Q44 30 50 32Q44 34 42 40Q40 34 34 32Q40 30 42 24Z"/>
+    <path d="M52 6Q54 12 60 14Q54 16 52 22Q50 16 44 14Q50 12 52 6Z"/>
+  </g>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" role="img" aria-labelledby="t d">
+  <title id="t">วีไทยเด็กซ์ — ท้องฟ้าร่วมกัน พร้อมชื่อแบรนด์</title>
+  <desc id="d">ประกายดาวห้าดวงขนาดเท่ากันเชื่อมเป็นรูปตัววี สื่อถึงครีเอเตอร์หลากหลายที่มีพื้นที่เท่าเทียมกันในสารบบ ชื่อ VThaiDex วาดด้วยเส้นพาธทุกตัวอักษร ไม่มีการพึ่งพาฟอนต์</desc>
+  <path d="M12 14 32 50 52 14" fill="none" stroke="#7C5CFC" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#E85D9E">
+    <path d="M12 6Q14 12 20 14Q14 16 12 22Q10 16 4 14Q10 12 12 6Z"/>
+    <path d="M22 24Q24 30 30 32Q24 34 22 40Q20 34 14 32Q20 30 22 24Z"/>
+    <path d="M32 42Q34 48 40 50Q34 52 32 58Q30 52 24 50Q30 48 32 42Z"/>
+    <path d="M42 24Q44 30 50 32Q44 34 42 40Q40 34 34 32Q40 30 42 24Z"/>
+    <path d="M52 6Q54 12 60 14Q54 16 52 22Q50 16 44 14Q50 12 52 6Z"/>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 20 89 44Q90 47 91 44L100 20"/>
+    <path d="M106 20H124M115 20V45"/>
+    <path d="M132 20V45M132 35C132 25 148 25 148 35V45"/>
+    <path d="M171 29V45M171 35C171 25 155 25 155 36S171 48 171 37"/>
+    <path d="M181 30V45"/>
+    <path d="M183.4 22A2.4 2.4 0 1 1 178.6 22A2.4 2.4 0 1 1 183.4 22Z" fill="currentColor" stroke="none"/>
+    <path d="M192 20V45H199C218 45 218 20 199 20Z"/>
+    <path d="M224 36H239C239 24 222 26 222 36S232 49 239 42"/>
+    <path d="M248 29 261 45M261 29 248 45"/>
+  </g>
+</svg>

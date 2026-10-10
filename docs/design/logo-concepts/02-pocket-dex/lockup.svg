@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" role="img" aria-labelledby="t d">
+  <title id="t">วีไทยเด็กซ์ — บัตรสารบบพกพา พร้อมชื่อแบรนด์</title>
+  <desc id="d">บัตรมุมมนพร้อมแท็บและช่องว่างรูปตัววี สื่อถึงสารบบที่ค้นหาได้ง่ายและเปิดพื้นที่ให้ครีเอเตอร์ทุกคน ชื่อ VThaiDex วาดด้วยเส้นพาธทุกตัวอักษร ไม่มีการพึ่งพาฟอนต์</desc>
+  <path fill="#7C5CFC" fill-rule="evenodd" d="M18 15H31V10Q31 6 35 6H48Q55 6 55 13V49Q55 58 46 58H18Q9 58 9 49V24Q9 15 18 15ZM18 25H25L32 41 39 25H46L35 50H29Z"/>
+  <rect x="36" y="10" width="13" height="6" rx="3" fill="#43B7D5"/>
+  <g fill="none" stroke="currentColor" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 20 89 44Q90 47 91 44L100 20"/>
+    <path d="M106 20H124M115 20V45"/>
+    <path d="M132 20V45M132 35C132 25 148 25 148 35V45"/>
+    <path d="M171 29V45M171 35C171 25 155 25 155 36S171 48 171 37"/>
+    <path d="M181 30V45"/>
+    <path d="M183.4 22A2.4 2.4 0 1 1 178.6 22A2.4 2.4 0 1 1 183.4 22Z" fill="currentColor" stroke="none"/>
+    <path d="M192 20V45H199C218 45 218 20 199 20Z"/>
+    <path d="M224 36H239C239 24 222 26 222 36S232 49 239 42"/>
+    <path d="M248 29 261 45M261 29 248 45"/>
+  </g>
+</svg>

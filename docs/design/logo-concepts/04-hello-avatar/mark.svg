@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t d">
+  <title id="t">วีไทยเด็กซ์ — อวตารที่เป็นมิตร</title>
+  <desc id="d">กรอบอวตารทรงมนพร้อมหูเชิงนามธรรมและรอยยิ้มรูปตัววี สื่อถึงตัวตนเสมือนโดยไม่อ้างอิงตัวละครใด</desc>
+  <path fill="#7C5CFC" fill-rule="evenodd" d="M12 9 24 17Q32 14 40 17L52 9V28C56 34 54 44 47 49L32 58 17 49C10 44 8 34 12 28ZM20 25Q32 19 44 25Q49 29 47 37Q45 45 32 50Q19 45 17 37Q15 29 20 25Z"/>
+  <path d="M23 32 30 39Q32 41 34 39L41 32" fill="none" stroke="#E85D9E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

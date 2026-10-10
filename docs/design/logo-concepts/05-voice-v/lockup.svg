@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" role="img" aria-labelledby="t d">
+  <title id="t">วีไทยเด็กซ์ — เสียงของตัววี พร้อมชื่อแบรนด์</title>
+  <desc id="d">ตัววีรองรับหัวไมโครโฟนและฐานสั้น สื่อถึงเสียงของครีเอเตอร์อิสระและชื่อวีไทยเด็กซ์ด้วยรูปทรงเดียว ชื่อ VThaiDex วาดด้วยเส้นพาธทุกตัวอักษร ไม่มีการพึ่งพาฟอนต์</desc>
+  <path fill="#7C5CFC" fill-rule="evenodd" d="M32 5C26 5 23 9 23 15V26C23 32 27 36 32 36S41 32 41 26V15C41 9 38 5 32 5ZM32 12Q29 12 29 16V25Q29 29 32 29T35 25V16Q35 12 32 12Z"/>
+  <path d="M10 23 27 45Q32 51 37 45L54 23" fill="none" stroke="#E85D9E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="29" y="48" width="6" height="11" rx="3" fill="#7C5CFC"/>
+  <rect x="20" y="56" width="24" height="6" rx="3" fill="#7C5CFC"/>
+  <g fill="none" stroke="currentColor" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 20 89 44Q90 47 91 44L100 20"/>
+    <path d="M106 20H124M115 20V45"/>
+    <path d="M132 20V45M132 35C132 25 148 25 148 35V45"/>
+    <path d="M171 29V45M171 35C171 25 155 25 155 36S171 48 171 37"/>
+    <path d="M181 30V45"/>
+    <path d="M183.4 22A2.4 2.4 0 1 1 178.6 22A2.4 2.4 0 1 1 183.4 22Z" fill="currentColor" stroke="none"/>
+    <path d="M192 20V45H199C218 45 218 20 199 20Z"/>
+    <path d="M224 36H239C239 24 222 26 222 36S232 49 239 42"/>
+    <path d="M248 29 261 45M261 29 248 45"/>
+  </g>
+</svg>

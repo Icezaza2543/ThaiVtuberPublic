@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" role="img" aria-labelledby="t d">
+  <title id="t">วีไทยเด็กซ์ — เวทีที่เปิดให้ทุกคน พร้อมชื่อแบรนด์</title>
+  <desc id="d">ลำแสงสองข้างโอบประกายดาวเหนือฐานเวที สื่อถึงพื้นที่ให้วีทูบเบอร์อิสระได้เป็นที่มองเห็น ชื่อ VThaiDex วาดด้วยเส้นพาธทุกตัวอักษร ไม่มีการพึ่งพาฟอนต์</desc>
+  <path d="M12 8H16L31 48H27Q22 48 20 44L6 14Q4 8 12 8Z" fill="#7C5CFC"/>
+  <path d="M52 8H48L33 48H37Q42 48 44 44L58 14Q60 8 52 8Z" fill="#E85D9E"/>
+  <path d="M32 12Q34 20 40 22Q34 24 32 32Q30 24 24 22Q30 20 32 12Z" fill="#43B7D5"/>
+  <rect x="10" y="54" width="44" height="6" rx="3" fill="#7C5CFC"/>
+  <g fill="none" stroke="currentColor" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 20 89 44Q90 47 91 44L100 20"/>
+    <path d="M106 20H124M115 20V45"/>
+    <path d="M132 20V45M132 35C132 25 148 25 148 35V45"/>
+    <path d="M171 29V45M171 35C171 25 155 25 155 36S171 48 171 37"/>
+    <path d="M181 30V45"/>
+    <path d="M183.4 22A2.4 2.4 0 1 1 178.6 22A2.4 2.4 0 1 1 183.4 22Z" fill="currentColor" stroke="none"/>
+    <path d="M192 20V45H199C218 45 218 20 199 20Z"/>
+    <path d="M224 36H239C239 24 222 26 222 36S232 49 239 42"/>
+    <path d="M248 29 261 45M261 29 248 45"/>
+  </g>
+</svg>

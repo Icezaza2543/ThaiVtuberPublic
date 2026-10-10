@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t d">
+  <title id="t">วีไทยเด็กซ์ — เสียงของตัววี</title>
+  <desc id="d">ตัววีรองรับหัวไมโครโฟนและฐานสั้น สื่อถึงเสียงของครีเอเตอร์อิสระและชื่อวีไทยเด็กซ์ด้วยรูปทรงเดียว</desc>
+  <path fill="#7C5CFC" fill-rule="evenodd" d="M32 5C26 5 23 9 23 15V26C23 32 27 36 32 36S41 32 41 26V15C41 9 38 5 32 5ZM32 12Q29 12 29 16V25Q29 29 32 29T35 25V16Q35 12 32 12Z"/>
+  <path d="M10 23 27 45Q32 51 37 45L54 23" fill="none" stroke="#E85D9E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="29" y="48" width="6" height="11" rx="3" fill="#7C5CFC"/>
+  <rect x="20" y="56" width="24" height="6" rx="3" fill="#7C5CFC"/>
+</svg>
