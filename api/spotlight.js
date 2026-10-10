@@ -1,3 +1,4 @@
+import { logApiError } from '../lib/api-error.js';
 import { randomInt } from 'node:crypto';
 import * as defaultStorage from '../lib/storage.js';
 import { jsonResponse, noIndexHeaders } from '../lib/http.js';
@@ -14,8 +15,8 @@ export async function handleSpotlight(request,{storage=defaultStorage,random=ran
   if(n<1||n>MAX) return jsonResponse(400,{error:'invalid_query'},noIndexHeaders());
   const platform=(params.get('platform')??'').trim().toLowerCase().slice(0,32);
   let snapshot;
-  try{snapshot=await storage.readCurrentSnapshot();}catch{return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());}
-  if(!snapshot) return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());
+  try{snapshot=await storage.readCurrentSnapshot();}catch(err){logApiError('/api/spotlight',err);return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());}
+  if(!snapshot){logApiError('/api/spotlight',new Error('snapshot unavailable'));return jsonResponse(503,{error:'data_unavailable'},noIndexHeaders());}
   const pool=snapshot.creators.filter(c=>!c.agency&&(c.platforms||[]).some(p=>p.url&&(!platform||p.name===platform)));
   const picked=[];
   const taken=new Set();

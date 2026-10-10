@@ -1,36 +1,30 @@
 import { jsonResponse, noIndexHeaders } from '../lib/http.js';
+import { logApiError } from '../lib/api-error.js';
+import { upstashFromEnv, bangkokDay, TOTAL, dayKey, visitKey, secondsUntilBangkokMidnight } from '../lib/counter.js';
+export { upstashFromEnv, bangkokDay } from '../lib/counter.js';
 
-// Anonymous visitor counter in Upstash Redis (Vercel integration env vars). Stores two numbers only:
-// the all-time total and today's count (Asia/Bangkok day). The browser decides "new today" from a
-// localStorage date, so no cookie, IP or identifier ever reaches the server.
-const TOTAL = 'visits:total';
-const dayKey = day => `visits:day:${day}`;
-export const bangkokDay = (now = new Date()) => new Date(now.getTime() + 7 * 3600e3).toISOString().slice(0, 10);
-
-export function upstashFromEnv(env = process.env, fetchImpl = fetch) {
-  const url = env.KV_REST_API_URL, token = env.KV_REST_API_TOKEN;
-  if (!url || !token) return null;
-  return async commands => {
-    const r = await fetchImpl(`${url.replace(/\/$/, '')}/pipeline`, {
-      method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(commands),
-    });
-    if (!r.ok) throw new Error(`upstash ${r.status}`);
-    return (await r.json()).map(x => x.result);
-  };
-}
-
-export async function handleVisits(request, { redis = upstashFromEnv(), now = new Date() } = {}) {
+// Store aggregate totals plus a daily salted SHA-256 gate, expiring at Bangkok midnight.
+// No raw IP, browser ID or stable cross-day identifier is stored in Redis.
+export async function handleVisits(request, { redis, env = process.env, salt = env.VTHAIDEX_CURSOR_SECRET, now = new Date() } = {}) {
   if (request.method !== 'GET' && request.method !== 'POST')
     return jsonResponse(405, { error: 'method_not_allowed' }, { ...noIndexHeaders(), Allow: 'GET, POST' });
-  if (!redis) return jsonResponse(503, { error: 'counter_unavailable' }, noIndexHeaders());
-  const day = dayKey(bangkokDay(now));
   try {
-    const res = request.method === 'POST'
+    if (redis === undefined) redis = upstashFromEnv(env);
+    if (!redis) throw new Error('counter configuration unavailable');
+    const day = dayKey(bangkokDay(now));
+    let count = false;
+    if (request.method === 'POST') {
+      const key = visitKey(request, now, salt);
+      const [acquired] = await redis([['SET', key, '1', 'NX', 'EX', secondsUntilBangkokMidnight(now)]]);
+      if (acquired !== 'OK' && acquired !== null) throw new Error('counter rate limit failed');
+      count = acquired === 'OK';
+    }
+    const res = count
       ? await redis([['INCR', TOTAL], ['INCR', day], ['EXPIRE', day, 172800]])
       : await redis([['GET', TOTAL], ['GET', day]]);
     return jsonResponse(200, { total: Number(res[0]) || 0, today: Number(res[1]) || 0 }, noIndexHeaders());
-  } catch {
+  } catch (err) {
+    logApiError('/api/visits', err, env);
     return jsonResponse(503, { error: 'counter_unavailable' }, noIndexHeaders());
   }
 }

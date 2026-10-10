@@ -5,7 +5,8 @@ import { fetchVisits } from '../src/lib/api.js';
 
 function fakeRedis(){
   const db=new Map(), calls=[];
-  const redis=async cmds=>cmds.map(([op,k])=>{calls.push(op);
+  const redis=async cmds=>cmds.map(([op,k,value])=>{calls.push(op);
+    if(op==='SET'){if(db.has(k))return null;db.set(k,value);return 'OK';}
     if(op==='INCR'){db.set(k,(db.get(k)||0)+1);return db.get(k);}
     if(op==='GET') return db.has(k)?String(db.get(k)):null; return 1;});
   return {redis,calls};
@@ -15,8 +16,8 @@ const json=async r=>JSON.parse(await r.text());
 test('POST counts a visit for total and the Bangkok day; GET only reads',async()=>{
   const {redis}=fakeRedis(); const now=new Date('2026-10-10T18:00:00Z'); // 01:00 on the 11th in Bangkok
   assert.equal(bangkokDay(now),'2026-10-11');
-  await handleVisits(new Request('https://t/api/visits',{method:'POST'}),{redis,now});
-  const r=await handleVisits(new Request('https://t/api/visits',{method:'POST'}),{redis,now});
+  await handleVisits(new Request('https://t/api/visits',{method:'POST',headers:{'x-vercel-forwarded-for':'203.0.113.1'}}),{redis,now,salt:Buffer.alloc(32,9).toString('base64url')});
+  const r=await handleVisits(new Request('https://t/api/visits',{method:'POST',headers:{'x-vercel-forwarded-for':'203.0.113.2'}}),{redis,now,salt:Buffer.alloc(32,9).toString('base64url')});
   assert.deepEqual(await json(r),{total:2,today:2});
   const g=await handleVisits(new Request('https://t/api/visits'),{redis,now:new Date('2026-10-12T05:00:00Z')});
   assert.deepEqual(await json(g),{total:2,today:0});

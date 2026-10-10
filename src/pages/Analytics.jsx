@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
-import { ArrowRight, RotateCw, CalendarDays } from 'lucide-react';
+import DataError from '../components/DataError.js';
+import { useApiData } from '../lib/useApiData.js';
+import { useState } from 'react';
+import { ArrowRight, CalendarDays } from 'lucide-react';
 import Layout, { PageTitle } from '../components/Layout.jsx';
 import { SectionHeading } from '../components/brand.jsx';
 import PlatformIcon from '../components/PlatformIcon.jsx';
@@ -282,10 +284,7 @@ function IndieVsAgency({ d }) {
 }
 
 export default function Analytics() {
-  const [d, setD] = useState(null);
-  const [error, setError] = useState(false);
-  const load = () => { setError(false); fetchOverview().then(setD, () => setError(true)); };
-  useEffect(load, []);
+  const { data: d, error, retry: load } = useApiData(fetchOverview);
   const updated = formatDate(d?.meta?.generated_at);
   return (
     <Layout>
@@ -295,11 +294,7 @@ export default function Analytics() {
       />
       {error && (
         <div className="mx-auto mt-8 max-w-[1920px] px-4 sm:px-6 lg:px-8">
-          <div className="card p-6">
-            <p className="font-medium">โหลดข้อมูลไม่สำเร็จ</p>
-            <p className="mt-1 text-sm text-muted">เช็กอินเทอร์เน็ตแล้วลองอีกครั้ง</p>
-            <button type="button" onClick={load} className="btn btn-secondary mt-4"><RotateCw size={15} aria-hidden="true" /> โหลดอีกครั้ง</button>
-          </div>
+          <DataError onRetry={load} />
         </div>
       )}
       {!d && !error && <div className="mx-auto mt-8 max-w-[1920px] px-4 sm:px-6 lg:px-8"><div className="h-96 animate-pulse rounded-[1.25rem] bg-card" aria-label="กำลังโหลดข้อมูล" /></div>}

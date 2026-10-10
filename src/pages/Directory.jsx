@@ -1,5 +1,7 @@
+import DataError from '../components/DataError.js';
+import { useApiData } from '../lib/useApiData.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Search, RotateCw, X, ChevronDown, Network, BadgeCheck, IdCard, ExternalLink } from 'lucide-react';
+import { Search, X, ChevronDown, Network, BadgeCheck, IdCard, ExternalLink } from 'lucide-react';
 import Layout, { PageTitle } from '../components/Layout.jsx';
 import { AgencyTag, PlatformLink, StatusChip } from '../components/ui.jsx';
 import { creatorSummary, fetchCreatorsPage, fetchOverview, fmt, platformLabel, STATUS_LABELS } from '../lib/api.js';
@@ -70,11 +72,9 @@ function FilterSelect({ id, label, icon: Icon, tone, value, onChange, options })
 export default function Directory() {
   const [filters, setFilters] = useState(readParams);
   const [draft, setDraft] = useState(filters.q);
-  const [stats, setStats] = useState(null);
+  const { data: stats, error: statsError, retry: retryStats } = useApiData(fetchOverview);
   const [page, setPage] = useState({ items: [], cursor: null, status: 'loading' });
   const request = useRef(0);
-
-  useEffect(() => { fetchOverview().then(setStats, () => setStats(null)); }, []);
 
   const load = useCallback(async (append = false, cursor = '') => {
     const id = ++request.current;
@@ -111,6 +111,8 @@ export default function Directory() {
           </span>
         ) : null}
       </PageTitle>
+
+      {statsError && <div className="mx-auto mt-6 max-w-[1920px] px-4 sm:px-6 lg:px-8"><DataError onRetry={retryStats} /></div>}
 
       <form role="search" onSubmit={(e) => e.preventDefault()} className="mx-auto mt-10 max-w-[1920px] px-4 sm:px-6 lg:px-8">
         <div className="card relative overflow-hidden p-5 sm:p-6">
@@ -158,11 +160,7 @@ export default function Directory() {
 
       <section className="mx-auto mt-6 max-w-[1920px] px-4 sm:px-6 lg:px-8" aria-busy={page.status === 'loading'}>
         {page.status === 'error' && page.items.length === 0 ? (
-          <div className="card p-6">
-            <p className="font-semibold">โหลดรายชื่อไม่สำเร็จ</p>
-            <p className="mt-1 text-sm text-muted">เช็กอินเทอร์เน็ตแล้วลองอีกครั้ง</p>
-            <button type="button" onClick={() => load()} className="btn btn-secondary mt-4"><RotateCw size={16} aria-hidden="true" /> โหลดอีกครั้ง</button>
-          </div>
+          <DataError onRetry={() => load()} />
         ) : page.status !== 'loading' && page.items.length === 0 ? (
           <div className="card p-6">
             <p className="font-semibold">{filters.q ? `ไม่เจอ “${filters.q}”` : 'ไม่เจอใครตรงกับตัวกรองนี้'}</p>
@@ -194,7 +192,7 @@ export default function Directory() {
             </button>
           </div>
         )}
-        {page.status === 'error' && page.items.length > 0 && <p className="mt-4 text-center text-sm text-brand">โหลดหน้าถัดไปไม่สำเร็จ กดปุ่มเพื่อลองอีกครั้ง</p>}
+        {page.status === 'error' && page.items.length > 0 && <DataError className="mt-4" onRetry={() => load(true, page.cursor)} />}
       </section>
     </Layout>
   );

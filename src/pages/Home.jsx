@@ -1,4 +1,6 @@
-import { Component, lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import DataError from '../components/DataError.js';
+import { useApiData } from '../lib/useApiData.js';
+import { Component, lazy, Suspense, useCallback, useState } from 'react';
 import { Search, Shuffle, X, BarChart3, ArrowRight, Sparkles, ListFilter, PenLine, ChevronDown, Scale, Dices, EyeOff, RefreshCw } from 'lucide-react';
 import Layout from '../components/Layout.jsx';
 import { SectionHeading } from '../components/brand.jsx';
@@ -21,25 +23,26 @@ class WebGLBoundary extends Component {
 function usePicker() {
   const [picked, setPicked] = useState(null);
   const [picking, setPicking] = useState(false);
+  const [error, setError] = useState(false);
   const pick = useCallback(async () => {
     setPicking(true);
-    try { const [c] = await fetchSpotlight({ n: 1 }); if (c) setPicked(c); } catch { /* keep the current card */ }
+    setError(false);
+    try { const [c] = await fetchSpotlight({ n: 1 }); if (c) setPicked(c); } catch { setError(true); }
     setPicking(false);
   }, []);
-  return { picked, picking, pick, clear: () => setPicked(null) };
+  return { picked, picking, error, pick, clear: () => setPicked(null) };
 }
 
 const TOGGLE = 'flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-white/55 transition hover:text-white aria-pressed:bg-white/10 aria-pressed:text-white';
 
 /** Full-screen hero: the universe fills the screen and stays playable; copy sits on the left of the stage. */
 function Hero() {
-  const [stats, setStats] = useState(null);
+  const { data: stats, error: statsError, retry: retryStats } = useApiData(fetchOverview);
   const [showIndies, setShowIndies] = useState(true);
   const [showAgencies, setShowAgencies] = useState(true);
   const [hover, setHover] = useState(null);
   const [sunClicks, setSunClicks] = useState(0);
-  const { picked, picking, pick, clear } = usePicker();
-  useEffect(() => { fetchOverview().then(setStats, () => setStats(null)); }, []);
+  const { picked, picking, error: pickerError, pick, clear } = usePicker();
 
   return (
     <section className="relative isolate h-[calc(100svh-4rem)] min-h-[640px] overflow-hidden border-b border-line/40 bg-[#0c0922] bg-clip-padding">
@@ -83,6 +86,10 @@ function Hero() {
           </div>
         </div>
       </div>
+
+      {(statsError || pickerError) && (
+        <DataError className="absolute bottom-28 right-4 z-10 sm:right-6 lg:right-8" onRetry={() => { if (statsError) retryStats(); if (pickerError) pick(); }} />
+      )}
 
       {/* Universe controls and feedback */}
       <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full border border-[#3b3088] bg-[#1b1540]/85 p-1 shadow-lg backdrop-blur-md sm:right-6 lg:right-8" role="group" aria-label="เลือกสิ่งที่แสดงในจักรวาล">
@@ -155,14 +162,9 @@ function Explore() {
 
 function Spotlight() {
   const [platform, setPlatform] = useState('');
-  const [items, setItems] = useState(null);
-  const [error, setError] = useState(false);
+  const fetchItems = useCallback(() => fetchSpotlight({ n: 3, platform }), [platform]);
+  const { data: items, error, retry: load } = useApiData(fetchItems);
   const [spin, setSpin] = useState(0);
-  const load = useCallback(() => {
-    setError(false);
-    fetchSpotlight({ n: 3, platform }).then(setItems, () => setError(true));
-  }, [platform]);
-  useEffect(load, [load]);
   const reroll = () => { setSpin((n) => n + 1); load(); };
   return (
     <section id="spotlight" aria-labelledby="spotlight-title" className="mx-auto max-w-[1920px] scroll-mt-20 px-4 sm:px-6 lg:px-8">
@@ -182,7 +184,7 @@ function Spotlight() {
         </div>
       </div>
       <div className="mt-8 grid gap-6 md:grid-cols-3" aria-live="polite">
-        {error && <p className="text-sm text-muted md:col-span-3">สุ่มไม่สำเร็จ ลองกด “สุ่มชุดใหม่” อีกครั้ง</p>}
+        {error && <DataError onRetry={load} className="md:col-span-3" />}
         {!error && !items && [0, 1, 2].map((i) => <div key={i} data-no-reveal className="card card-well h-48 animate-pulse" />)}
         {!error && items?.map((c, i) => <CreatorCard key={`${c.name}-${i}`} creator={c} variant={i} />)}
       </div>
