@@ -20,7 +20,7 @@ export async function handlePublish(request,{storage=defaultStorage,publishSecre
   }
   let snapshot;
   try{snapshot=validateSnapshot(JSON.parse(rawBody.toString('utf8')));}catch{return jsonResponse(400,{error:'invalid_snapshot'},noIndexHeaders());}
-  const current=await storage.readCurrentSnapshot();
+  const current=await storage.readCurrentSnapshot({fresh:true});
   if(current){
     const incoming=Date.parse(snapshot.meta.generated_at),existing=Date.parse(current.meta?.generated_at||'');
     if(!Number.isFinite(incoming)||!Number.isFinite(existing)||incoming<=existing) return jsonResponse(409,{error:'stale_snapshot'},noIndexHeaders());

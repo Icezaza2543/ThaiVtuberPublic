@@ -1,7 +1,7 @@
 import { logApiError } from '../lib/api-error.js';
 import { randomInt } from 'node:crypto';
 import * as defaultStorage from '../lib/storage.js';
-import { jsonResponse, noIndexHeaders } from '../lib/http.js';
+import { cdnCachedHeaders, jsonResponse, noIndexHeaders } from '../lib/http.js';
 
 const MAX = 6;
 
@@ -25,7 +25,7 @@ export async function handleSpotlight(request,{storage=defaultStorage,random=ran
     if(taken.has(i))continue;
     taken.add(i);picked.push(pool[i]);
   }
-  return jsonResponse(200,{items:picked},noIndexHeaders());
+  return jsonResponse(200,{items:picked},cdnCachedHeaders(30));
 }
 
 export function GET(request){return handleSpotlight(request);}

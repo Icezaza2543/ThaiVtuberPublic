@@ -2,7 +2,7 @@ import { requireCursorSecret } from '../lib/config.js';
 import { logApiError } from '../lib/api-error.js';
 import * as defaultStorage from '../lib/storage.js';
 import { decodeCursor, encodeCursor } from '../lib/cursor.js';
-import { jsonResponse, noIndexHeaders } from '../lib/http.js';
+import { cdnCachedHeaders, jsonResponse, noIndexHeaders } from '../lib/http.js';
 import { bangkokDay, isDiscoverable, matchesPlatform, matchesShelf, parseDiscoverQuery, shelfAvailable, shuffleBySeed, toPublicCreator } from '../lib/discover.js';
 
 export async function handleDiscover(request, { storage = defaultStorage, cursorSecret = process.env.VTHAIDEX_CURSOR_SECRET, now = Date.now() } = {}) {
@@ -28,7 +28,7 @@ export async function handleDiscover(request, { storage = defaultStorage, cursor
   const items = ordered.slice(pos, pos + query.limit).map(toPublicCreator);
   const nextPos = pos + items.length;
   const next_cursor = nextPos < ordered.length ? encodeCursor({ ...expected, v: 1, pos: nextPos, exp: Math.floor(now / 1000) + 900 }, { secret: cursorSecret, now }) : null;
-  return jsonResponse(200, { shelf: query.shelf, available, items, next_cursor }, noIndexHeaders());
+  return jsonResponse(200, { shelf: query.shelf, available, items, next_cursor }, cdnCachedHeaders(120, { stale: 300 }));
 }
 
 export function GET(request) { return handleDiscover(request); }

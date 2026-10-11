@@ -2,7 +2,7 @@ import { logApiError } from '../lib/api-error.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { handleHealth } from '../api/health.js';
-import { requireBlobConfig, requireCounterConfig } from '../lib/config.js';
+import { requireCounterConfig, requireSnapshotStoreConfig } from '../lib/config.js';
 import { handleStats } from '../api/stats.js';
 import { handleCreators } from '../api/creators.js';
 import { handleSpotlight } from '../api/spotlight.js';
@@ -10,25 +10,22 @@ import { handleDiscover } from '../api/discover.js';
 import { handleVisits, upstashFromEnv } from '../api/visits.js';
 
 const cursorSecret = Buffer.alloc(32, 7).toString('base64url');
-const env = { BLOB_STORE_ID: 'store-test', VERCEL_OIDC_TOKEN: 'oidc-test', KV_REST_API_URL: 'https://redis.test', KV_REST_API_TOKEN: 'redis-token' };
+const env = { KV_REST_API_URL: 'https://redis.test', KV_REST_API_TOKEN: 'redis-token' };
 const request = path => new Request(`https://test/api/${path}`);
 const storage = { readCurrentSnapshot: async () => ({ snapshot_id: 'current', meta: { generated_at: '2026-10-10T00:00:00Z' } }) };
 
-test('config guard names missing vars and accepts either Blob authentication mode', () => {
-  assert.throws(() => requireBlobConfig({ VERCEL_OIDC_TOKEN: 'test' }), /missing BLOB_STORE_ID/);
-  // the runtime OIDC token arrives per request, so a store ID alone is accepted
-  assert.doesNotThrow(() => requireBlobConfig({ BLOB_STORE_ID: 'test' }));
-  assert.doesNotThrow(() => requireBlobConfig(env));
-  assert.doesNotThrow(() => requireBlobConfig({ BLOB_READ_WRITE_TOKEN: 'test' }));
+test('config guard names missing vars; the snapshot shares the counter Redis', () => {
   assert.throws(() => requireCounterConfig({}), /missing KV_REST_API_URL/);
   assert.throws(() => requireCounterConfig({ KV_REST_API_URL: 'test' }), /missing KV_REST_API_TOKEN/);
+  assert.throws(() => requireSnapshotStoreConfig({ BLOB_STORE_ID: 'old' }), /missing KV_REST_API_URL/);
+  assert.doesNotThrow(() => requireSnapshotStoreConfig(env));
 });
 
 test('health reports snapshot and counter without env values, noindex and no-store', async () => {
   const calls=[];
   const res=await handleHealth(request('health'), { storage, env, redis: async c => { calls.push(c); return ['PONG']; } });
   assert.equal(res.status,200);
-  assert.deepEqual(await res.json(), { blob:'ok', snapshot_id:'current', generated_at:'2026-10-10T00:00:00Z', counter:'ok' });
+  assert.deepEqual(await res.json(), { data:'ok', snapshot_id:'current', generated_at:'2026-10-10T00:00:00Z', counter:'ok' });
   assert.deepEqual(calls,[[['PING']]]);
   assert.equal(res.headers.get('Cache-Control'),'no-store');
   assert.equal(res.headers.get('X-Robots-Tag'),'noindex, nofollow');
@@ -37,7 +34,7 @@ test('health reports snapshot and counter without env values, noindex and no-sto
 test('health identifies missing config without invoking providers; GET only', async () => {
   const res=await handleHealth(request('health'), { env:{}, storage:{ readCurrentSnapshot: () => { throw Error('must not run'); } } });
   assert.equal(res.status,503);
-  assert.deepEqual(await res.json(), { blob:'missing_config', snapshot_id:null, generated_at:null, counter:'missing_config' });
+  assert.deepEqual(await res.json(), { data:'missing_config', snapshot_id:null, generated_at:null, counter:'missing_config' });
   assert.equal((await handleHealth(new Request('https://test/api/health',{method:'POST'}),{env:{}})).status,405);
 });
 
@@ -45,7 +42,7 @@ test('health distinguishes provider failures and an absent snapshot from missing
   for(const readCurrentSnapshot of [async()=>null,async()=>{throw Error('storage down');}]){
     const res=await handleHealth(request('health'),{env, storage:{readCurrentSnapshot},redis:async()=>{throw Error('redis down');}});
     assert.equal(res.status,503);
-    assert.deepEqual(await res.json(),{blob:'error',snapshot_id:null,generated_at:null,counter:'error'});
+    assert.deepEqual(await res.json(),{data:'error',snapshot_id:null,generated_at:null,counter:'error'});
   }
   const res=await handleHealth(request('health'),{env,storage,redis:async()=>{throw Error('redis down');}});
   assert.equal(res.status,200); assert.equal((await res.json()).counter,'error');
@@ -89,7 +86,7 @@ test('Upstash reports command errors even in an HTTP 200 pipeline response',asyn
 });
 
 test('real storage missing config is logged before public APIs return 503, without a network call',async t=>{
-  const keys=['BLOB_STORE_ID','BLOB_READ_WRITE_TOKEN','VERCEL_OIDC_TOKEN'];
+  const keys=['KV_REST_API_URL','KV_REST_API_TOKEN'];
   const old=Object.fromEntries(keys.map(k=>[k,process.env[k]]));
   t.after(()=>{for(const k of keys){if(old[k]===undefined)delete process.env[k];else process.env[k]=old[k];}});
   for(const k of keys)delete process.env[k];
@@ -97,6 +94,6 @@ test('real storage missing config is logged before public APIs return 503, witho
   for(const [endpoint,handler] of [['stats',handleStats],['creators',handleCreators],['spotlight',handleSpotlight],['discover',handleDiscover]]){
     const req=endpoint==='discover'?new Request('https://test/api/discover?shelf=debut'):request(endpoint);
     assert.equal((await handler(req,{cursorSecret})).status,503);
-    assert.match(logs.at(-1),new RegExp(`/api/${endpoint}: missing BLOB_STORE_ID`));
+    assert.match(logs.at(-1),new RegExp(`/api/${endpoint}: missing KV_REST_API_URL`));
   }
 });
