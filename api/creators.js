@@ -2,7 +2,7 @@ import { requireCursorSecret } from '../lib/config.js';
 import { logApiError } from '../lib/api-error.js';
 import * as defaultStorage from '../lib/storage.js';
 import { decodeCursor, encodeCursor } from '../lib/cursor.js';
-import { jsonResponse, noIndexHeaders } from '../lib/http.js';
+import { cdnCachedHeaders, jsonResponse, noIndexHeaders } from '../lib/http.js';
 import { parseCreatorQuery } from '../lib/public-schema.js';
 import { toPublicCreator } from '../lib/discover.js';
 
@@ -31,7 +31,7 @@ export async function handleCreators(request,{storage=defaultStorage,cursorSecre
   const items=filtered.slice(pos,pos+query.limit).map(toPublicCreator);
   const nextPos=pos+items.length;
   const next_cursor=nextPos<filtered.length?encodeCursor({...expected,v:1,pos:nextPos,exp:Math.floor(now/1000)+900},{secret:cursorSecret,now}):null;
-  return jsonResponse(200,{items,next_cursor},noIndexHeaders());
+  return jsonResponse(200,{items,next_cursor},cdnCachedHeaders(120,{stale:300}));
 }
 
 export function GET(request){return handleCreators(request);}
