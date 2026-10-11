@@ -1,5 +1,5 @@
 // "What the data says" cards for /analytics: each card's headline is the finding, computed from
-// summary.insights (count-only aggregates published by ThaiVtuberMaster). Definitions follow Master's insights.
+// summary.insights (count-only aggregates included in the published snapshot).
 import { ArrowRight } from 'lucide-react';
 import { BRAND, NEUTRAL, RAMP } from '../components/ui.jsx';
 import PlatformIcon from '../components/PlatformIcon.jsx';
